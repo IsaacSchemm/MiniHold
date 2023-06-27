@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\isaac\.nuget\packages\fsharp.control.taskseq\0.3.0\contentFiles\any\netstandard2.1\release-notes.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Library.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Control.TaskSeq" Version="0.3.0" />
+    <PackageReference Include="I8Beef.Ecobee" Version="3.0.0.84" />
+  </ItemGroup>
+
+</Project>
