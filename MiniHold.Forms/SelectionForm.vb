@@ -1,6 +1,4 @@
-﻿Imports System.Configuration
-Imports System.IO
-Imports System.Threading
+﻿Imports System.Threading
 Imports I8Beef.Ecobee
 Imports I8Beef.Ecobee.Exceptions
 Imports MiniHold.Abstractions
@@ -23,6 +21,8 @@ Public Class SelectionForm
     End Function
 
     Private Async Sub SelectionForm_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
+        My.Settings.Upgrade()
+
         If String.IsNullOrEmpty(My.Settings.EcobeeApiKey) Then
             Dim promptResult = InputBox($"Enter the API key of an ecobee app you've created in the Developer section of the ecobee portal. This key will be stored in plaintext in your AppData folder.", Text)
             If String.IsNullOrEmpty(promptResult) Then

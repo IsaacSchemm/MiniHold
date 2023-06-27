@@ -64,7 +64,9 @@ Public Class ThermostatForm
     End Function
 
     Private Async Sub ThermostatForm_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
+        TabControl1.Enabled = False
         Await RefreshRuntimeAsync()
+        TabControl1.Enabled = True
     End Sub
 
     Private Async Function HoldAsync(range As TempRange, duration As TimeSpan) As Task
