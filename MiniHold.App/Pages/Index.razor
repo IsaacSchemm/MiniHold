@@ -1,7 +1,177 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<style type="text/css">
+    fieldset {
+        margin: 1em 0;
+    }
+    .temp {
+        font-size: 150%;
+    }
+    .tempBlock {
+        display: inline-block;
+        margin-right: 0.5em;
+    }
+    .buttonGrid {
+        display: grid;
+        row-gap: 1em;
+        column-gap: 1em;
+    }
+    .away {
+        grid-auto-flow: column;
+        grid-template-rows: 1fr 1fr 1fr;
+    }
+    .heat {
+        background-color: mistyrose;
+        color: black;
+    }
+    .cool {
+        background-color: lightcyan;
+        color: black;
+    }
+</style>
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+<div class="container-sm">
+    <div class="row">
+        <div class="col-md-4">
+            <fieldset>
+                <legend>Outdoor</legend>
+                <div>
+                    Hazy
+                </div>
+                <div title="Temperature" class="temp">
+                    78°F
+                </div>
+                <div>
+                    Humidity: xx%
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Indoor</legend>
+                <div title="Temperature" class="temp">
+                    78°F
+                </div>
+                <div>
+                    Humidity: xx%
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Runtime</legend>
+                <div class="tempBlock">
+                    Heat
+                    <div title="Temperature" class="temp">
+                        78°F
+                    </div>
+                </div>
+                <div class="tempBlock">
+                    Cool
+                    <div title="Temperature" class="temp">
+                        78°F
+                    </div>
+                </div>
+                <div>
+                    Fan: auto
+                </div>
+            </fieldset>
+        </div>
+        <div class="col-md-4">
+            <fieldset>
+                <legend>10m Hold</legend>
+                <div class="buttonGrid">
+                    <button class="btn btn-secondary heat">
+                        +2°
+                    </button>
+                    <button class="btn btn-secondary cool">
+                        -2°
+                    </button>
+                    <button class="btn btn-secondary">
+                        Fan
+                    </button>
+                    <button class="btn btn-secondary">
+                        Away
+                    </button>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>30m Hold</legend>
+                <div class="buttonGrid">
+                    <button class="btn btn-secondary heat">
+                        +2°
+                    </button>
+                    <button class="btn btn-secondary cool">
+                        -2°
+                    </button>
+                    <button class="btn btn-secondary">
+                        Fan
+                    </button>
+                    <button class="btn btn-secondary">
+                        Away
+                    </button>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Away</legend>
+                <div class="buttonGrid">
+                    <button class="btn btn-secondary">
+                        for 2 hours
+                    </button>
+                    <button class="btn btn-secondary">
+                        for 4 hours
+                    </button>
+                    <button class="btn btn-secondary">
+                        for 6 hours
+                    </button>
+                    <button class="btn btn-secondary">
+                        until 7 am
+                    </button>
+                    <button class="btn btn-secondary">
+                        until 4 pm
+                    </button>
+                    <button class="btn btn-secondary">
+                        until 9 pm
+                    </button>
+                </div>
+            </fieldset>
+        </div>
+        <div class="col-md-4">
+            <fieldset>
+                <legend>Program</legend>
+                <div class="tempBlock">
+                    Heat
+                    <div title="Temperature" class="temp">
+                        78°F
+                    </div>
+                </div>
+                <div class="tempBlock">
+                    Cool
+                    <div title="Temperature" class="temp">
+                        78°F
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Hold</legend>
+                <div class="tempBlock">
+                    Heat
+                    <div title="Temperature" class="temp">
+                        78°F
+                    </div>
+                </div>
+                <div class="tempBlock">
+                    Cool
+                    <div title="Temperature" class="temp">
+                        78°F
+                    </div>
+                </div>
+                <div>
+                    Fan: auto
+                </div>
+                <div>
+                    Start:
+                </div>
+                <div>
+                    End:
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
