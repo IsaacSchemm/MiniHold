@@ -43,12 +43,12 @@
     }
 </style>
 
-@if (busy > 0)
+@if (ThermostatClientStatic.busy > 0)
 {
     <div style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; background-color: rgb(128, 128, 128, 0.5); z-index: 2" title="Loading"></div>
 }
 
-@foreach (var ti in thermostatClients)
+@foreach (var ti in ThermostatClientStatic.thermostatClients)
 {
     var thermostatClient = ti.t;
     var info = ti.i;
@@ -228,90 +228,9 @@
 <div class="mb-4"></div>
 
 @code {
-    static int busy = 0;
-
-    List<TI> thermostatClients = new();
-
-    class TI
-    {
-        public ThermostatClient t;
-        public ThermostatInformation i;
-        public DateTimeOffset lastUpdated;
-
-        private async Task Act(Func<Task> func)
-        {
-            busy++;
-            await func();
-            i = await t.GetInformationAsync();
-            lastUpdated = DateTimeOffset.Now;
-            busy--;
-        }
-
-        public Task Refresh() =>
-            Act(() => Task.CompletedTask);
-
-        public Task Hold10Heat() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(t, i.Desired, 2, TimeSpan.FromMinutes(10)));
-
-        public Task Hold10Cool() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(t, i.Desired, -2, TimeSpan.FromMinutes(10)));
-
-        public Task Hold10Fan() =>
-            Act(async () => await QuickActions.SetFanAsync(t, i.Desired, true, TimeSpan.FromMinutes(10)));
-
-        public Task Hold10Away() =>
-            Act(async () => await QuickActions.SetAwayAsync(t, TimeSpan.FromMinutes(10)));
-
-        public Task Hold30Heat() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(t, i.Desired, 2, TimeSpan.FromMinutes(30)));
-
-        public Task Hold30Cool() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(t, i.Desired, -2, TimeSpan.FromMinutes(30)));
-
-        public Task Hold30Fan() =>
-            Act(async () => await QuickActions.SetFanAsync(t, i.Desired, true, TimeSpan.FromMinutes(30)));
-
-        public Task Hold30Away() =>
-            Act(async () => await QuickActions.SetAwayAsync(t, TimeSpan.FromMinutes(30)));
-
-        public Task Hold2HAway() =>
-            Act(async () => await QuickActions.SetAwayAsync(t, TimeSpan.FromHours(2)));
-
-        public Task Hold4HAway() =>
-            Act(async () => await QuickActions.SetAwayAsync(t, TimeSpan.FromHours(4)));
-
-        public Task Hold6HAway() =>
-            Act(async () => await QuickActions.SetAwayAsync(t, TimeSpan.FromHours(6)));
-
-        public Task Hold7AAway() =>
-            Act(async () => await QuickActions.SetAwayUntilTimeAsync(t, DateTime.Parse("7:00 AM")));
-
-        public Task Hold4PAway() =>
-            Act(async () => await QuickActions.SetAwayUntilTimeAsync(t, DateTime.Parse("4:00 PM")));
-
-        public Task Hold9PAway() =>
-            Act(async () => await QuickActions.SetAwayUntilTimeAsync(t, DateTime.Parse("9:00 PM")));
-
-        public Task ClearHold() =>
-            Act(async () => await t.CancelHoldAsync());
-    }
-
     protected override async Task OnInitializedAsync()
     {
-        thermostatClients.Clear();
-
-        busy++;
-        await StaticThermostatClient.UpdateAsync();
-        if (StaticThermostatClient.ActiveClient != null)
-        {
-            await foreach (var tClient in ThermostatClient.GetAllAsync(StaticThermostatClient.ActiveClient))
-            {
-                var x = new TI { t = tClient };
-                await x.Refresh();
-                thermostatClients.Add(x);
-            }
-        }
+        await ThermostatClientStatic.UpdateAsync();
         await base.OnInitializedAsync();
-        busy--;
     }
 }

@@ -4,7 +4,7 @@ using I8Beef.Ecobee.Messages;
 
 namespace MiniHold.App
 {
-    public static class StaticThermostatClient
+    public static class ClientStatic
     {
         private static string _apiKey = null;
         private static Pin _pin = null;
@@ -17,6 +17,9 @@ namespace MiniHold.App
 
         public static async Task UpdateAsync()
         {
+            if (_activeClient != null)
+                return;
+
             _apiKey = await SecureStorage.Default.GetAsync("ecobeeApiKey") ?? "";
             _pendingClient = null;
             _pin = null;
@@ -51,12 +54,14 @@ namespace MiniHold.App
 
         public static async Task SetApiKey(string apiKey)
         {
+            _activeClient = null;
             await SecureStorage.Default.SetAsync("ecobeeApiKey", apiKey);
             await UpdateAsync();
         }
 
         public static async Task RemoveApiKey()
         {
+            _activeClient = null;
             SecureStorage.Default.Remove("ecobeeApiKey");
             await UpdateAsync();
         }
@@ -72,6 +77,7 @@ namespace MiniHold.App
 
         public static async Task RemoveToken()
         {
+            _activeClient = null;
             SecureStorage.Default.Remove("ecobeeToken");
             await UpdateAsync();
         }
