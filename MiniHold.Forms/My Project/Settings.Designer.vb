@@ -57,18 +57,6 @@ Namespace My
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("")>  _
-        Public Property EcobeeApiKey() As String
-            Get
-                Return CType(Me("EcobeeApiKey"),String)
-            End Get
-            Set
-                Me("EcobeeApiKey") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
         Public Property EcobeeToken() As String
             Get
                 Return CType(Me("EcobeeToken"),String)

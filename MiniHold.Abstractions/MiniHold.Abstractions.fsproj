@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Keys.fs" />
     <Compile Include="Library.fs" />
     <Compile Include="QuickActions.fs" />
   </ItemGroup>

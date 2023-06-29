@@ -23,18 +23,7 @@ Public Class SelectionForm
     Private Async Sub SelectionForm_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         My.Settings.Upgrade()
 
-        If String.IsNullOrEmpty(My.Settings.EcobeeApiKey) Then
-            Dim promptResult = InputBox($"Enter the API key of an ecobee app you've created in the Developer section of the ecobee portal. This key will be stored in plaintext in your AppData folder.", Text)
-            If String.IsNullOrEmpty(promptResult) Then
-                Close()
-                Exit Sub
-            Else
-                My.Settings.EcobeeApiKey = promptResult
-                My.Settings.Save()
-            End If
-        End If
-
-        Dim client As New Client(My.Settings.EcobeeApiKey, AddressOf GetTokenAsync, AddressOf SetTokenAsync, TimeSpan.FromSeconds(45))
+        Dim client As New Client(Keys.ApiKey, AddressOf GetTokenAsync, AddressOf SetTokenAsync, TimeSpan.FromSeconds(45))
         If Await GetTokenAsync(CancellationToken.None) Is Nothing Then
             Dim pin = Await client.GetPinAsync()
             Clipboard.SetData(DataFormats.Text, pin.EcobeePin)
