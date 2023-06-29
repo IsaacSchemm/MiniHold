@@ -6,11 +6,11 @@
     .column {
         display: block;
         margin: auto;
-        width: 170px;
+        width: 180px;
         vertical-align: top;
     }
 
-    @@media (min-width: 1070px) {
+    @@media (min-width: 1090px) {
         .column {
             display: inline-block;
             margin: auto 1em;
@@ -210,6 +210,18 @@
                 @info.Program.CoolTemp.FarenheitString
             </div>
         </div>
+        <hr />
+        <p>
+            Last updated:
+            <br />
+            @ti.lastUpdated.ToString("h:mm tt M/d/yy")
+            <br />
+            <center>
+                <button class="btn btn-primary mt-2" @onclick="ti.Refresh">
+                    Refresh
+                </button>
+            </center>
+        </p>
     </div>
 }
 
@@ -224,14 +236,19 @@
     {
         public ThermostatClient t;
         public ThermostatInformation i;
+        public DateTimeOffset lastUpdated;
 
         private async Task Act(Func<Task> func)
         {
             busy++;
             await func();
             i = await t.GetInformationAsync();
+            lastUpdated = DateTimeOffset.Now;
             busy--;
         }
+
+        public Task Refresh() =>
+            Act(() => Task.CompletedTask);
 
         public Task Hold10Heat() =>
             Act(async () => await QuickActions.SetTemperatureOffsetAsync(t, i.Desired, 2, TimeSpan.FromMinutes(10)));
@@ -286,8 +303,14 @@
         busy++;
         await StaticThermostatClient.UpdateAsync();
         if (StaticThermostatClient.ActiveClient != null)
+        {
             await foreach (var tClient in ThermostatClient.GetAllAsync(StaticThermostatClient.ActiveClient))
-                thermostatClients.Add(new TI { t = tClient, i = await tClient.GetInformationAsync() });
+            {
+                var x = new TI { t = tClient };
+                await x.Refresh();
+                thermostatClients.Add(x);
+            }
+        }
         await base.OnInitializedAsync();
         busy--;
     }
