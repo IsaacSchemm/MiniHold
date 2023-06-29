@@ -43,15 +43,15 @@
     }
 </style>
 
-@if (ThermostatClientStatic.busy > 0)
+@if (ThermostatObject.Busy > 0)
 {
     <div style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; background-color: rgb(128, 128, 128, 0.5); z-index: 2" title="Loading"></div>
 }
 
-@foreach (var ti in ThermostatClientStatic.thermostatClients)
+@foreach (var ti in ThermostatObject.Clients)
 {
-    var thermostatClient = ti.t;
-    var info = ti.i;
+    var thermostatClient = ti.ThermostatClient;
+    var info = ti.Information;
 
     <h1>@thermostatClient.Name</h1>
     <p>
@@ -214,7 +214,7 @@
         <p>
             Last updated:
             <br />
-            @ti.lastUpdated.ToString("h:mm tt M/d/yy")
+            @ti.LastUpdated.ToString("h:mm tt M/d/yy")
             <br />
             <center>
                 <button class="btn btn-primary mt-2" @onclick="ti.Refresh">
@@ -230,7 +230,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await ThermostatClientStatic.UpdateAsync();
+        await ThermostatObject.UpdateAsync();
         await base.OnInitializedAsync();
     }
 }
