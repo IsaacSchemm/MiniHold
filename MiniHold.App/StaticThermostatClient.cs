@@ -27,7 +27,7 @@ namespace MiniHold.App
                 var c = new Client(_apiKey, GetStoredAuthTokenAsync, SetStoredAuthTokenAsync);
                 if (await GetStoredAuthTokenAsync() == null)
                 {
-                    _pin = await _pendingClient.GetPinAsync();
+                    _pin = await c.GetPinAsync();
                     _pendingClient = c;
                 }
                 else
