@@ -101,6 +101,10 @@ Partial Class ThermostatForm
         Button11 = New Button()
         Button10 = New Button()
         TabControl1 = New TabControl()
+        Label8 = New Label()
+        HeatFan = New Label()
+        Label13 = New Label()
+        CoolFan = New Label()
         GroupBox1.SuspendLayout()
         GroupBox10.SuspendLayout()
         TabPage2.SuspendLayout()
@@ -482,7 +486,7 @@ Partial Class ThermostatForm
         GroupBox7.Controls.Add(HoldHeat)
         GroupBox7.Controls.Add(Label18)
         GroupBox7.Controls.Add(HoldCool)
-        GroupBox7.Location = New Point(341, 112)
+        GroupBox7.Location = New Point(341, 142)
         GroupBox7.Name = "GroupBox7"
         GroupBox7.Size = New Size(143, 164)
         GroupBox7.TabIndex = 8
@@ -665,6 +669,10 @@ Partial Class ThermostatForm
         ' GroupBox6
         ' 
         GroupBox6.AutoSize = True
+        GroupBox6.Controls.Add(Label13)
+        GroupBox6.Controls.Add(CoolFan)
+        GroupBox6.Controls.Add(Label8)
+        GroupBox6.Controls.Add(HeatFan)
         GroupBox6.Controls.Add(ProgramName)
         GroupBox6.Controls.Add(Label4)
         GroupBox6.Controls.Add(ProgramHeat)
@@ -672,7 +680,7 @@ Partial Class ThermostatForm
         GroupBox6.Controls.Add(ProgramCool)
         GroupBox6.Location = New Point(341, 6)
         GroupBox6.Name = "GroupBox6"
-        GroupBox6.Size = New Size(143, 100)
+        GroupBox6.Size = New Size(143, 130)
         GroupBox6.TabIndex = 7
         GroupBox6.TabStop = False
         GroupBox6.Text = "Program"
@@ -916,6 +924,42 @@ Partial Class ThermostatForm
         TabControl1.Size = New Size(498, 337)
         TabControl1.TabIndex = 0
         ' 
+        ' Label8
+        ' 
+        Label8.AutoSize = True
+        Label8.Location = New Point(6, 81)
+        Label8.Name = "Label8"
+        Label8.Size = New Size(60, 15)
+        Label8.TabIndex = 14
+        Label8.Text = "Fan (heat)"
+        ' 
+        ' HeatFan
+        ' 
+        HeatFan.AutoSize = True
+        HeatFan.Location = New Point(72, 81)
+        HeatFan.Name = "HeatFan"
+        HeatFan.Size = New Size(22, 15)
+        HeatFan.TabIndex = 15
+        HeatFan.Text = "---"
+        ' 
+        ' Label13
+        ' 
+        Label13.AutoSize = True
+        Label13.Location = New Point(6, 96)
+        Label13.Name = "Label13"
+        Label13.Size = New Size(60, 15)
+        Label13.TabIndex = 16
+        Label13.Text = "Fan (cool)"
+        ' 
+        ' CoolFan
+        ' 
+        CoolFan.AutoSize = True
+        CoolFan.Location = New Point(72, 96)
+        CoolFan.Name = "CoolFan"
+        CoolFan.Size = New Size(22, 15)
+        CoolFan.TabIndex = 17
+        CoolFan.Text = "---"
+        ' 
         ' ThermostatForm
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -1035,4 +1079,8 @@ Partial Class ThermostatForm
     Friend WithEvents Button10 As Button
     Friend WithEvents Button16 As Button
     Friend WithEvents Button9 As Button
+    Friend WithEvents Label13 As Label
+    Friend WithEvents CoolFan As Label
+    Friend WithEvents Label8 As Label
+    Friend WithEvents HeatFan As Label
 End Class

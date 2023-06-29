@@ -161,6 +161,9 @@
             <div class="col-md-6 col-lg-4">
                 <hr />
                 <h5>Program</h5>
+                <p>
+                    @info.Program.Name
+                </p>
                 <div class="tempBlock">
                     Heat
                     <div title="Temperature" class="temp">
@@ -172,7 +175,14 @@
                     <div title="Temperature" class="temp">
                         @info.Program.CoolTemp.FarenheitString
                     </div>
-                </div>@if (info.Events.FirstOrDefault() is Event e && e.EventType == "hold")
+                </div>
+                <div>
+                    <strong>Fan (heat):</strong> @info.Program.HeatFan
+                </div>
+                <div>
+                    <strong>Fan (cool):</strong> @info.Program.CoolFan
+                </div>
+                @if (info.Events.FirstOrDefault() is Event e && e.EventType == "hold")
                 {
                     var temp = e.AbsoluteTemperatureRanges.SingleOrDefault();
                     <hr />

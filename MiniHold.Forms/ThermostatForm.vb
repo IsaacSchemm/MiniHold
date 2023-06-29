@@ -25,6 +25,8 @@ Public Class ThermostatForm
         ProgramName.Text = information.Program.Name
         ProgramHeat.Text = information.Program.HeatTemp.FarenheitString
         ProgramCool.Text = information.Program.CoolTemp.FarenheitString
+        HeatFan.Text = information.Program.HeatFan
+        CoolFan.Text = information.Program.CoolFan
 
         DataGridView1.Rows.Clear()
         For Each e In information.Events

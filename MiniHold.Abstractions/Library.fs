@@ -61,6 +61,8 @@ type Program = {
     Name: string
     CoolTemp: Temperature
     HeatTemp: Temperature
+    CoolFan: string
+    HeatFan: string
 }
 
 type Alert = {
@@ -190,6 +192,8 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                             Name = c.Name
                             CoolTemp = Temperature c.CoolTemp.Value
                             HeatTemp = Temperature c.HeatTemp.Value
+                            CoolFan = c.CoolFan
+                            HeatFan = c.HeatFan
                         }
             })
             Alerts = [
