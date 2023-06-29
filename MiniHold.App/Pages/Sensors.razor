@@ -1,0 +1,46 @@
+﻿@page "/sensors"
+@using I8Beef.Ecobee;
+@using MiniHold.Abstractions;
+
+@if (ClientStatic.Busy > 0)
+{
+    <div style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; background-color: rgb(128, 128, 128, 0.5); z-index: 2" title="Loading"></div>
+}
+
+@foreach (var ti in ClientStatic.ThermostatObjects)
+{
+    <h1>@ti.ThermostatClient.Name</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Temp</th>
+                <th scope="col">Occ.</th>
+                <th scope="col">Diff.</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in ti.Information.Sensors)
+            {
+                var average = ti.Information.Actual.Temperature.Select(x => x.Farenheit).SingleOrDefault();
+                var specific = s.Readings.Temperature.Select(x => x.Farenheit).SingleOrDefault();
+                var offset = specific - average;
+                <tr>
+                    <td>@s.Name</td>
+                    <td>@specific.ToString("0.0")°F</td>
+                    <td>@s.Occupied</td>
+                    <td>@offset.ToString("0.0")°F</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ClientStatic.UpdateAsync();
+        await base.OnInitializedAsync();
+    }
+}
