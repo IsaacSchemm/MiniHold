@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.WebView.Maui;
-using MiniHold.App.Data;
-
-namespace MiniHold.App
+﻿namespace MiniHold.App
 {
     public static class MauiProgram
     {
@@ -19,8 +16,6 @@ namespace MiniHold.App
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
-
-            builder.Services.AddSingleton<WeatherForecastService>();
 
             return builder.Build();
         }
