@@ -10,7 +10,7 @@
         vertical-align: top;
     }
 
-    @@media (min-width: 1050px) {
+    @@media (min-width: 1070px) {
         .column {
             display: inline-block;
             margin: auto 1em;
@@ -68,45 +68,6 @@
             </div>
         }
     </div>
-
-    <div class="column">
-        <hr />
-        <h5>Outdoor</h5>
-        <div>
-            @info.Weather.Condition
-        </div>
-        <div title="Temperature" class="temp">
-            @info.Weather.Temperature.FarenheitString
-        </div>
-        <div>
-            <strong>Humidity:</strong> @info.Weather.Humidity.PercentageString
-        </div>
-        <hr />
-        <h5>Indoor</h5>
-        <div title="Temperature" class="temp">
-            @info.Actual.Temperature.FirstOrDefault()?.FarenheitString
-        </div>
-        <div>
-            <strong>Humidity:</strong> @info.Actual.Humidity.FirstOrDefault()?.PercentageString
-        </div>
-        <hr />
-        <h5>Runtime</h5>
-        <div class="tempBlock">
-            Heat
-            <div title="Temperature" class="temp">
-                @info.Desired.HeatTemp.FarenheitString
-            </div>
-        </div>
-        <div class="tempBlock">
-            Cool
-            <div title="Temperature" class="temp">
-                @info.Desired.CoolTemp.FarenheitString
-            </div>
-        </div>
-        <div>
-            <strong>Fan:</strong> @info.Desired.Fan
-        </div>
-    </div>
     <div class="column" style="width: 300px">
         <hr />
         <div style="display: grid; row-gap: 1em; column-gap: 1em">
@@ -163,21 +124,46 @@
             </button>
         </div>
     </div>
+
     <div class="column">
         <hr />
-        <h5>Program</h5>
+        <h5>Outdoor</h5>
+        <div>
+            @info.Weather.Condition
+        </div>
+        <div title="Temperature" class="temp">
+            @info.Weather.Temperature.FarenheitString
+        </div>
+        <div>
+            <strong>Humidity:</strong> @info.Weather.Humidity.PercentageString
+        </div>
+        <hr />
+        <h5>Indoor</h5>
+        <div title="Temperature" class="temp">
+            @info.Actual.Temperature.FirstOrDefault()?.FarenheitString
+        </div>
+        <div>
+            <strong>Humidity:</strong> @info.Actual.Humidity.FirstOrDefault()?.PercentageString
+        </div>
+        <hr />
+        <h5>Runtime</h5>
         <div class="tempBlock">
             Heat
             <div title="Temperature" class="temp">
-                @info.Program.HeatTemp.FarenheitString
+                @info.Desired.HeatTemp.FarenheitString
             </div>
         </div>
         <div class="tempBlock">
             Cool
             <div title="Temperature" class="temp">
-                @info.Program.CoolTemp.FarenheitString
+                @info.Desired.CoolTemp.FarenheitString
             </div>
         </div>
+        <div>
+            <strong>Fan:</strong> @info.Desired.Fan
+        </div>
+    </div>
+    <div class="column">
         @if (info.Events.FirstOrDefault() is Event e && e.EventType == "hold")
         {
             var temp = e.AbsoluteTemperatureRanges.SingleOrDefault();
@@ -210,6 +196,20 @@
                 </button>
             </center>
         }
+        <hr />
+        <h5>Program</h5>
+        <div class="tempBlock">
+            Heat
+            <div title="Temperature" class="temp">
+                @info.Program.HeatTemp.FarenheitString
+            </div>
+        </div>
+        <div class="tempBlock">
+            Cool
+            <div title="Temperature" class="temp">
+                @info.Program.CoolTemp.FarenheitString
+            </div>
+        </div>
     </div>
 }
 
