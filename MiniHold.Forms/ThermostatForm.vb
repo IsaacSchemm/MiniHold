@@ -1,4 +1,5 @@
-﻿Imports MiniHold.Abstractions
+﻿Imports I8Beef.Ecobee.Protocol.Objects
+Imports MiniHold.Abstractions
 
 Public Class ThermostatForm
     Public ThermostatClient As ThermostatClient = Nothing
@@ -63,10 +64,17 @@ Public Class ThermostatForm
         LastDesired = information.Desired
     End Function
 
-    Private Async Sub ThermostatForm_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
+    Private Async Sub Act(action As Func(Of Task))
         TabControl1.Enabled = False
+        Await action()
         Await RefreshRuntimeAsync()
         TabControl1.Enabled = True
+    End Sub
+
+    Private Sub ThermostatForm_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
+        Act(Async Function()
+                Await Task.Yield()
+            End Function)
     End Sub
 
     Private Async Function HoldAsync(range As TempRange, duration As TimeSpan) As Task
@@ -77,94 +85,100 @@ Public Class ThermostatForm
         TabControl1.Enabled = True
     End Function
 
-    Private Async Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Await HoldAsync(LastDesired.WithHeatTemp(LastDesired.HeatTemp.AddFarenheit(2)), TimeSpan.FromMinutes(10))
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Act(Async Function()
+                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, LastDesired, 2, TimeSpan.FromMinutes(10))
+            End Function)
     End Sub
 
-    Private Async Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        Await HoldAsync(LastDesired.WithCoolTemp(LastDesired.CoolTemp.AddFarenheit(-2)), TimeSpan.FromMinutes(10))
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Act(Async Function()
+                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, LastDesired, -2, TimeSpan.FromMinutes(10))
+            End Function)
     End Sub
 
-    Private Async Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
-        Await HoldAsync(LastDesired.WithFan("on"), TimeSpan.FromMinutes(10))
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        Act(Async Function()
+                Await QuickActions.SetFanAsync(ThermostatClient, LastDesired, True, TimeSpan.FromMinutes(10))
+            End Function)
     End Sub
 
-    Private Async Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
-        Await HoldAsync(LastDesired.WithHeatTemp(LastDesired.HeatTemp.AddFarenheit(2)), TimeSpan.FromMinutes(30))
+    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
+        Act(Async Function()
+                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, LastDesired, 2, TimeSpan.FromMinutes(30))
+            End Function)
     End Sub
 
-    Private Async Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        Await HoldAsync(LastDesired.WithCoolTemp(LastDesired.CoolTemp.AddFarenheit(-2)), TimeSpan.FromMinutes(30))
+    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
+        Act(Async Function()
+                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, LastDesired, -2, TimeSpan.FromMinutes(30))
+            End Function)
     End Sub
 
-    Private Async Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
-        Await HoldAsync(LastDesired.WithFan("on"), TimeSpan.FromMinutes(30))
+    Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
+        Act(Async Function()
+                Await QuickActions.SetFanAsync(ThermostatClient, LastDesired, True, TimeSpan.FromMinutes(30))
+            End Function)
     End Sub
 
-    Private Async Function HoldComfortSettingAsync(holdClimateRef As String, duration As TimeSpan) As Task
-        TabControl1.Enabled = False
-        Dim dt = ThermostatClient.ToThermostatTime(Date.Now)
-        Await ThermostatClient.HoldComfortSettingAsync(holdClimateRef, dt, dt + duration)
-        Await RefreshRuntimeAsync()
-        TabControl1.Enabled = True
-    End Function
-
-    Private Async Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
-        Await HoldComfortSettingAsync("away", TimeSpan.FromMinutes(10))
+    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+        Act(Async Function()
+                Await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromMinutes(10))
+            End Function)
     End Sub
 
-    Private Async Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
-        Await HoldComfortSettingAsync("away", TimeSpan.FromMinutes(30))
+    Private Sub Button12_Click(sender As Object, e As EventArgs) Handles Button12.Click
+        Act(Async Function()
+                Await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromMinutes(30))
+            End Function)
     End Sub
 
-    Private Async Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
-        Await HoldComfortSettingAsync("away", TimeSpan.FromHours(2))
+    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
+        Act(Async Function()
+                Await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(2))
+            End Function)
     End Sub
 
-    Private Async Sub Button16_Click(sender As Object, e As EventArgs) Handles Button16.Click
-        Await HoldComfortSettingAsync("away", TimeSpan.FromHours(4))
+    Private Sub Button16_Click(sender As Object, e As EventArgs) Handles Button16.Click
+        Act(Async Function()
+                Await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(4))
+            End Function)
     End Sub
 
-    Private Async Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
-        Await HoldComfortSettingAsync("away", TimeSpan.FromHours(6))
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
+        Act(Async Function()
+                Await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(6))
+            End Function)
     End Sub
 
-    Private Async Function AwayUntilTimeAsync(time As Date) As Task
-        TabControl1.Enabled = False
-        Dim startPoint = ThermostatClient.ToThermostatTime(Date.Now)
-        Dim endPoint = startPoint.Date + time.TimeOfDay
-        If endPoint < startPoint Then
-            endPoint += TimeSpan.FromDays(1)
-        End If
-        Await ThermostatClient.HoldComfortSettingAsync("away", startPoint, endPoint)
-        Await RefreshRuntimeAsync()
-        TabControl1.Enabled = True
-    End Function
-
-    Private Async Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
-        Await AwayUntilTimeAsync(#7:00 AM#)
+    Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
+        Act(Async Function()
+                Await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, #7:00 AM#)
+            End Function)
     End Sub
 
-    Private Async Sub Button14_Click(sender As Object, e As EventArgs) Handles Button14.Click
-        Await AwayUntilTimeAsync(#4:00 PM#)
+    Private Sub Button14_Click(sender As Object, e As EventArgs) Handles Button14.Click
+        Act(Async Function()
+                Await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, #4:00 PM#)
+            End Function)
     End Sub
 
-    Private Async Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click
-        Await AwayUntilTimeAsync(#9:00 PM#)
+    Private Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click
+        Act(Async Function()
+                Await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, #9:00 PM#)
+            End Function)
     End Sub
 
-    Private Async Sub CancelHoldButton_Click(sender As Object, e As EventArgs) Handles CancelHoldButton.Click
-        TabControl1.Enabled = False
-        Await ThermostatClient.CancelHoldAsync()
-        Await RefreshRuntimeAsync()
-        TabControl1.Enabled = True
+    Private Sub CancelHoldButton_Click(sender As Object, e As EventArgs) Handles CancelHoldButton.Click
+        Act(Async Function()
+                Await ThermostatClient.CancelHoldAsync()
+            End Function)
     End Sub
 
-    Private Async Sub SendAlertButton_Click(sender As Object, e As EventArgs) Handles SendAlertButton.Click
-        TabControl1.Enabled = False
-        Await ThermostatClient.SendMessageAsync(TextBox2.Text)
-        TextBox2.Text = ""
-        Await RefreshRuntimeAsync()
-        TabControl1.Enabled = True
+    Private Sub SendAlertButton_Click(sender As Object, e As EventArgs) Handles SendAlertButton.Click
+        Act(Async Function()
+                Await ThermostatClient.SendMessageAsync(TextBox2.Text)
+                TextBox2.Text = ""
+            End Function)
     End Sub
 End Class
