@@ -284,15 +284,4 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
             failwithf "%d: %s" response.Status.Code.Value response.Status.Message
     }
 
-    member _.SendMessageAsync(text: string) = task {
-        let request = new ThermostatUpdateRequest()
-        request.Selection <- new Selection(SelectionType = "thermostats", SelectionMatch = thermostat.Identifier)
-        request.Functions <- [|
-            yield new SendMessageFunction(Params = new SendMessageParams(Text = text))
-        |]
-        let! response = client.PostAsync<ThermostatUpdateRequest, Response>(request)
-        if response.Status.Code.HasValue && response.Status.Code.Value <> 0 then
-            failwithf "%d: %s" response.Status.Code.Value response.Status.Message
-    }
-
     override _.ToString() = thermostat.Name

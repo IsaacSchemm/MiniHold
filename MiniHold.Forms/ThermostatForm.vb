@@ -176,11 +176,4 @@ Public Class ThermostatForm
                 Await ThermostatClient.CancelHoldAsync()
             End Function)
     End Sub
-
-    Private Sub SendAlertButton_Click(sender As Object, e As EventArgs) Handles SendAlertButton.Click
-        Act(Async Function()
-                Await ThermostatClient.SendMessageAsync(TextBox2.Text)
-                TextBox2.Text = ""
-            End Function)
-    End Sub
 End Class

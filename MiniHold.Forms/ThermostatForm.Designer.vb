@@ -30,10 +30,6 @@ Partial Class ThermostatForm
         FlowLayoutPanel1 = New FlowLayoutPanel()
         TabPage2 = New TabPage()
         TextBox1 = New TextBox()
-        Panel1 = New Panel()
-        Label2 = New Label()
-        TextBox2 = New TextBox()
-        SendAlertButton = New Button()
         TabPage3 = New TabPage()
         DataGridView1 = New DataGridView()
         TypeColumn = New DataGridViewTextBoxColumn()
@@ -78,6 +74,10 @@ Partial Class ThermostatForm
         Label14 = New Label()
         CoolAt = New Label()
         GroupBox6 = New GroupBox()
+        Label13 = New Label()
+        CoolFan = New Label()
+        Label8 = New Label()
+        HeatFan = New Label()
         ProgramName = New Label()
         Label4 = New Label()
         ProgramHeat = New Label()
@@ -101,14 +101,9 @@ Partial Class ThermostatForm
         Button11 = New Button()
         Button10 = New Button()
         TabControl1 = New TabControl()
-        Label8 = New Label()
-        HeatFan = New Label()
-        Label13 = New Label()
-        CoolFan = New Label()
         GroupBox1.SuspendLayout()
         GroupBox10.SuspendLayout()
         TabPage2.SuspendLayout()
-        Panel1.SuspendLayout()
         TabPage3.SuspendLayout()
         CType(DataGridView1, ComponentModel.ISupportInitialize).BeginInit()
         TabPage5.SuspendLayout()
@@ -188,7 +183,6 @@ Partial Class ThermostatForm
         ' TabPage2
         ' 
         TabPage2.Controls.Add(TextBox1)
-        TabPage2.Controls.Add(Panel1)
         TabPage2.Location = New Point(4, 24)
         TabPage2.Name = "TabPage2"
         TabPage2.Padding = New Padding(3)
@@ -206,47 +200,9 @@ Partial Class ThermostatForm
         TextBox1.Name = "TextBox1"
         TextBox1.ReadOnly = True
         TextBox1.ScrollBars = ScrollBars.Both
-        TextBox1.Size = New Size(484, 274)
+        TextBox1.Size = New Size(484, 303)
         TextBox1.TabIndex = 10
         TextBox1.WordWrap = False
-        ' 
-        ' Panel1
-        ' 
-        Panel1.Controls.Add(Label2)
-        Panel1.Controls.Add(TextBox2)
-        Panel1.Controls.Add(SendAlertButton)
-        Panel1.Dock = DockStyle.Bottom
-        Panel1.Location = New Point(3, 277)
-        Panel1.Name = "Panel1"
-        Panel1.Size = New Size(484, 29)
-        Panel1.TabIndex = 11
-        ' 
-        ' Label2
-        ' 
-        Label2.AutoSize = True
-        Label2.Location = New Point(3, 7)
-        Label2.Name = "Label2"
-        Label2.Size = New Size(87, 15)
-        Label2.TabIndex = 1
-        Label2.Text = "Send new alert:"
-        ' 
-        ' TextBox2
-        ' 
-        TextBox2.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
-        TextBox2.Location = New Point(96, 3)
-        TextBox2.Name = "TextBox2"
-        TextBox2.Size = New Size(304, 23)
-        TextBox2.TabIndex = 1
-        ' 
-        ' SendAlertButton
-        ' 
-        SendAlertButton.Anchor = AnchorStyles.Top Or AnchorStyles.Right
-        SendAlertButton.Location = New Point(406, 3)
-        SendAlertButton.Name = "SendAlertButton"
-        SendAlertButton.Size = New Size(75, 23)
-        SendAlertButton.TabIndex = 2
-        SendAlertButton.Text = "Send"
-        SendAlertButton.UseVisualStyleBackColor = True
         ' 
         ' TabPage3
         ' 
@@ -685,6 +641,42 @@ Partial Class ThermostatForm
         GroupBox6.TabStop = False
         GroupBox6.Text = "Program"
         ' 
+        ' Label13
+        ' 
+        Label13.AutoSize = True
+        Label13.Location = New Point(6, 96)
+        Label13.Name = "Label13"
+        Label13.Size = New Size(60, 15)
+        Label13.TabIndex = 16
+        Label13.Text = "Fan (cool)"
+        ' 
+        ' CoolFan
+        ' 
+        CoolFan.AutoSize = True
+        CoolFan.Location = New Point(72, 96)
+        CoolFan.Name = "CoolFan"
+        CoolFan.Size = New Size(22, 15)
+        CoolFan.TabIndex = 17
+        CoolFan.Text = "---"
+        ' 
+        ' Label8
+        ' 
+        Label8.AutoSize = True
+        Label8.Location = New Point(6, 81)
+        Label8.Name = "Label8"
+        Label8.Size = New Size(60, 15)
+        Label8.TabIndex = 14
+        Label8.Text = "Fan (heat)"
+        ' 
+        ' HeatFan
+        ' 
+        HeatFan.AutoSize = True
+        HeatFan.Location = New Point(72, 81)
+        HeatFan.Name = "HeatFan"
+        HeatFan.Size = New Size(22, 15)
+        HeatFan.TabIndex = 15
+        HeatFan.Text = "---"
+        ' 
         ' ProgramName
         ' 
         ProgramName.AutoSize = True
@@ -924,42 +916,6 @@ Partial Class ThermostatForm
         TabControl1.Size = New Size(498, 337)
         TabControl1.TabIndex = 0
         ' 
-        ' Label8
-        ' 
-        Label8.AutoSize = True
-        Label8.Location = New Point(6, 81)
-        Label8.Name = "Label8"
-        Label8.Size = New Size(60, 15)
-        Label8.TabIndex = 14
-        Label8.Text = "Fan (heat)"
-        ' 
-        ' HeatFan
-        ' 
-        HeatFan.AutoSize = True
-        HeatFan.Location = New Point(72, 81)
-        HeatFan.Name = "HeatFan"
-        HeatFan.Size = New Size(22, 15)
-        HeatFan.TabIndex = 15
-        HeatFan.Text = "---"
-        ' 
-        ' Label13
-        ' 
-        Label13.AutoSize = True
-        Label13.Location = New Point(6, 96)
-        Label13.Name = "Label13"
-        Label13.Size = New Size(60, 15)
-        Label13.TabIndex = 16
-        Label13.Text = "Fan (cool)"
-        ' 
-        ' CoolFan
-        ' 
-        CoolFan.AutoSize = True
-        CoolFan.Location = New Point(72, 96)
-        CoolFan.Name = "CoolFan"
-        CoolFan.Size = New Size(22, 15)
-        CoolFan.TabIndex = 17
-        CoolFan.Text = "---"
-        ' 
         ' ThermostatForm
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -975,8 +931,6 @@ Partial Class ThermostatForm
         GroupBox10.ResumeLayout(False)
         TabPage2.ResumeLayout(False)
         TabPage2.PerformLayout()
-        Panel1.ResumeLayout(False)
-        Panel1.PerformLayout()
         TabPage3.ResumeLayout(False)
         CType(DataGridView1, ComponentModel.ISupportInitialize).EndInit()
         TabPage5.ResumeLayout(False)
@@ -1008,10 +962,6 @@ Partial Class ThermostatForm
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents TabPage2 As TabPage
     Friend WithEvents TextBox1 As TextBox
-    Friend WithEvents Panel1 As Panel
-    Friend WithEvents Label2 As Label
-    Friend WithEvents TextBox2 As TextBox
-    Friend WithEvents SendAlertButton As Button
     Friend WithEvents TabPage3 As TabPage
     Friend WithEvents DataGridView1 As DataGridView
     Friend WithEvents TabPage5 As TabPage
