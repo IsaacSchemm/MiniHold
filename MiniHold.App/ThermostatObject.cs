@@ -5,32 +5,6 @@ namespace MiniHold.App
 {
     public class ThermostatObject
     {
-        public static readonly List<ThermostatObject> _clients = new();
-
-        public static IReadOnlyList<ThermostatObject> Clients => _clients;
-
-        public static int Busy { get; private set; } = 0;
-
-        private static IClient lastActive = null;
-
-        public static async Task UpdateAsync()
-        {
-            Busy++;
-            await ClientStatic.UpdateAsync();
-            if (ClientStatic.ActiveClient != lastActive)
-            {
-                lastActive = ClientStatic.ActiveClient;
-                _clients.Clear();
-                await foreach (var tClient in ThermostatClient.GetAllAsync(ClientStatic.ActiveClient))
-                {
-                    var x = new ThermostatObject(tClient);
-                    await x.Refresh();
-                    _clients.Add(x);
-                }
-            }
-            Busy--;
-        }
-
         public ThermostatObject(ThermostatClient t)
         {
             this.t = t;
@@ -46,11 +20,11 @@ namespace MiniHold.App
 
         private async Task Act(Func<Task> func)
         {
-            Busy++;
+            ClientStatic.Busy++;
             await func();
             i = await ThermostatClient.GetInformationAsync();
             LastUpdated = DateTimeOffset.Now;
-            Busy--;
+            ClientStatic.Busy--;
         }
 
         public Task Refresh() =>
