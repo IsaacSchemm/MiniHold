@@ -1,0 +1,30 @@
+﻿@page "/abstraction"
+@using I8Beef.Ecobee;
+@using MiniHold.Abstractions;
+
+@if (ClientStatic.Busy > 0)
+{
+    <div style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; background-color: rgb(128, 128, 128, 0.5); z-index: 2" title="Loading"></div>
+}
+
+@foreach (var ti in ClientStatic.ThermostatObjects)
+{
+    <h1>@ti.ThermostatClient.Name</h1>
+
+    <p>
+        This app's F# backend has retrieved the thermostat's current state
+        from the ecobee API and abstracted it into the structure below. The
+        app's display and functions are based on this abstraction. More
+        detailed information is available in your ecobee app.
+    </p>
+
+    <pre>@ti.Information</pre>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ClientStatic.UpdateAsync();
+        await base.OnInitializedAsync();
+    }
+}
