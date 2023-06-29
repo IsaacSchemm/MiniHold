@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using I8Beef.Ecobee;
+@using MiniHold.Abstractions;
 
 <style type="text/css">
     .column {
@@ -41,40 +43,56 @@
     }
 </style>
 
-<div class="">
+@foreach (var ti in thermostatClients)
+{
+    var thermostatClient = ti.t;
+    var info = ti.i;
+
+    <h1>@thermostatClient.Name</h1>
+    <p>@thermostatClient.Brand &ndash; @thermostatClient.Version</p>
+
+    <div title="Equipment Status">
+        @foreach (string str in info.EquipmentStatus)
+        {
+            <div class="badge bg-primary">
+                @str
+            </div>
+        }
+    </div>
+
     <div class="column">
         <h5>Outdoor</h5>
         <div>
-            Hazy
+            @info.Weather.Condition
         </div>
         <div title="Temperature" class="temp">
-            78°F
+            @info.Weather.Temperature.FarenheitString
         </div>
         <div>
-            <strong>Humidity:</strong> xx%
+            <strong>Humidity:</strong> @info.Weather.Humidity.PercentageString
         </div>
         <h5>Indoor</h5>
         <div title="Temperature" class="temp">
-            78°F
+            @info.Actual.Temperature.FirstOrDefault()?.FarenheitString
         </div>
         <div>
-            <strong>Humidity:</strong> xx%
+            <strong>Humidity:</strong> @info.Actual.Humidity.FirstOrDefault()?.PercentageString
         </div>
         <h5>Runtime</h5>
         <div class="tempBlock">
             Heat
             <div title="Temperature" class="temp">
-                178°F
+                @info.Desired.HeatTemp.FarenheitString
             </div>
         </div>
         <div class="tempBlock">
             Cool
             <div title="Temperature" class="temp">
-                178°F
+                @info.Desired.CoolTemp.FarenheitString
             </div>
         </div>
         <div>
-            <strong>Fan:</strong> auto
+            <strong>Fan:</strong> @info.Desired.Fan
         </div>
     </div>
     <div class="column" style="width: 300px">
@@ -88,7 +106,7 @@
             <button class="btn btn-secondary cool" style="grid-column: 1">
                 -2°
             </button>
-            <button class="btn btn-secondary" style="grid-column: 1">
+            <button class="btn btn-secondary" style="grid-column: 1" @onclick="ti.Hold10Fan">
                 Fan
             </button>
             <button class="btn btn-secondary" style="grid-column: 1">
@@ -137,41 +155,78 @@
         <div class="tempBlock">
             Heat
             <div title="Temperature" class="temp">
-                178°F
+                @info.Program.HeatTemp.FarenheitString
             </div>
         </div>
         <div class="tempBlock">
             Cool
             <div title="Temperature" class="temp">
-                178°F
+                @info.Program.CoolTemp.FarenheitString
             </div>
         </div>
-        <h5>Hold</h5>
-        <div class="tempBlock">
-            Heat
-            <div title="Temperature" class="temp">
-                178°F
+        @if (info.Events.FirstOrDefault() is Event e && e.EventType == "hold")
+        {
+            var temp = e.AbsoluteTemperatureRanges.SingleOrDefault();
+            <h5>Hold</h5>
+            <div class="tempBlock">
+                Heat
+                <div title="Temperature" class="temp">
+                    @temp?.HeatTemp.FarenheitString
+                </div>
             </div>
-        </div>
-        <div class="tempBlock">
-            Cool
-            <div title="Temperature" class="temp">
-                178°F
+            <div class="tempBlock">
+                Cool
+                <div title="Temperature" class="temp">
+                    @temp?.CoolTemp.FarenheitString
+                </div>
             </div>
-        </div>
-        <div>
-            <strong>Fan:</strong> auto
-        </div>
-        <div>
-            <strong>Start:</strong>
-        </div>
-        <div>
-            <strong>End:</strong>
-        </div>
-        <center>
-            <button class="btn btn-secondary mt-2">
-                Cancel Hold
-            </button>
-        </center>
+            <div>
+                <strong>Fan:</strong> @temp?.Fan
+            </div>
+            <div>
+                <strong>Start:</strong> @e.StartDate?.ToString("h:mm tt M/d/yy")
+            </div>
+            <div>
+                <strong>End:</strong> @e.EndDate?.ToString("h:mm tt M/d/yy")
+            </div>
+            <center>
+                <button class="btn btn-secondary mt-2" @onclick="ti.ClearHold">
+                    Cancel Hold
+                </button>
+            </center>
+        }
     </div>
-</div>
+}
+
+@code {
+    List<TI> thermostatClients = new();
+
+    class TI
+    {
+        public ThermostatClient t;
+        public ThermostatInformation i;
+
+        public async Task Hold10Fan()
+        {
+            await QuickActions.SetFanAsync(t, i.Desired, true, TimeSpan.FromMinutes(10));
+            i = await t.GetInformationAsync();
+        }
+
+        public async Task ClearHold()
+        {
+            await t.CancelHoldAsync();
+            i = await t.GetInformationAsync();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        thermostatClients.Clear();
+
+        await StaticThermostatClient.UpdateAsync();
+        if (StaticThermostatClient.ActiveClient != null)
+            await foreach (var tClient in ThermostatClient.GetAllAsync(StaticThermostatClient.ActiveClient))
+                thermostatClients.Add(new TI { t = tClient, i = await tClient.GetInformationAsync() });
+        await base.OnInitializedAsync();
+    }
+}

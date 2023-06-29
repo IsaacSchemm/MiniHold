@@ -41,7 +41,7 @@ Public Class SelectionForm
             Do
                 Dim wait = Task.Delay(TimeSpan.FromSeconds(pin.Interval))
 
-                Dim promptResult = MsgBox($"Your PIN code ({pin.EcobeePin}) has been copied to the clipboard. Enter this code in the My Apps > Add Application section of the customer portal, and press OK to continue. This token will be stored in plaintext in your AppData folder.", MsgBoxStyle.OkCancel, Text)
+                Dim promptResult = MsgBox($"Your PIN code ({pin.EcobeePin}) has been copied to the clipboard. Enter this code in the My Apps > Add Application section of the customer portal, and press OK when ready. This token will be stored in plaintext in your AppData folder.", MsgBoxStyle.OkCancel, Text)
                 If promptResult = MsgBoxResult.Cancel Then
                     Close()
                     Exit Sub
