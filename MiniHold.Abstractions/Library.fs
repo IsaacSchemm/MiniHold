@@ -8,23 +8,17 @@ open I8Beef.Ecobee.Protocol.Thermostat
 open I8Beef.Ecobee.Protocol.Functions
 open I8Beef.Ecobee.Protocol
 
-type TemperatureOffset = OffsetFarenheit of decimal | OffsetCelsius of double
-
-[<StructuredFormatDisplay("{TemperatureString}")>]
+[<StructuredFormatDisplay("{PreciseFarenheitString}")>]
 type Temperature = Temperature of int
 with
     member this.Tenths = let (Temperature x) = this in x
     member this.Farenheit = (decimal this.Tenths / 10m)
-    member this.FarenheitString = sprintf "%d°F" (this.Farenheit |> round |> int)
-    member this.Celsius = (float this.Farenheit - 32.0) / 1.8
-    member this.CelsiusString = sprintf "%d°C" (this.Celsius |> round |> int)
-    member this.TemperatureString = String.concat " / " [this.FarenheitString; this.CelsiusString]
+    member this.FarenheitString = sprintf "%.0f°F" this.Farenheit
+    member this.PreciseFarenheitString = sprintf "%.1f°F" this.Farenheit
 
     static member FromFarenheit degrees = degrees * 10m |> Math.Round |> int |> Temperature
-    static member FromCelsius degrees = degrees * 1.8 + 32.0 |> decimal |> Temperature.FromFarenheit
 
     member this.AddFarenheit degrees = Temperature.FromFarenheit (this.Farenheit + degrees)
-    member this.AddCelsius degrees = Temperature.FromCelsius (this.Celsius + degrees)
 
 [<StructuredFormatDisplay("{PercentageString}")>]
 type Humidity = Humidity of int
