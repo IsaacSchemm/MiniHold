@@ -39,7 +39,7 @@ namespace MiniHold.App
             }
             else
             {
-                foreach (var tClient in await ThermostatClient.GetAllAsListAsync(c))
+                await foreach (var tClient in ThermostatEnumerator.FindAsync(c))
                 {
                     var x = new ThermostatObject(tClient);
                     await x.Refresh();

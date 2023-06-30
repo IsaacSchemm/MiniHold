@@ -100,26 +100,6 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
 
     member _.ToThermostatTime(time: DateTime) = TimeZoneInfo.ConvertTime(time, timeZone)
 
-    static member GetAllAsListAsync(client: IClient) = task {
-        let arr = new ResizeArray<ThermostatClient>()
-        let mutable page = 1
-        let mutable finished = false
-        while not finished do
-            let request = new ThermostatRequest()
-            request.Page <- new Page(CurrentPage = page)
-            request.Selection <- new Selection(SelectionType = "registered", SelectionMatch = "")
-            request.Selection.IncludeLocation <- true
-            request.Selection.IncludeVersion <- true
-            let! response = client.GetAsync<ThermostatRequest, ThermostatResponse>(request)
-            for t in response.ThermostatList do
-                arr.Add(new ThermostatClient(client, t))
-            if request.Page.TotalPages.HasValue && request.Page.TotalPages.Value <= page then
-                page <- request.Page.TotalPages.Value
-            else
-                finished <- true
-        return List.ofSeq arr
-    }
-
     member _.GetInformationAsync() = task {
         let request = new ThermostatRequest()
         request.Selection <- new Selection(SelectionType = "thermostats", SelectionMatch = thermostat.Identifier)

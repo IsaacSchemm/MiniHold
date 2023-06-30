@@ -46,7 +46,7 @@ Public Class SelectionForm
                 End Try
             Loop
         End If
-        Dim thermostats = Await ThermostatClient.GetAllAsListAsync(client)
+        Dim thermostats = Await ThermostatEnumerator.FindAllAsync(client)
         For Each t In thermostats
             ComboBox1.Items.Add(t)
         Next

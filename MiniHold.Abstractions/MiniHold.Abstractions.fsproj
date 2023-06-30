@@ -11,11 +11,13 @@
 
   <ItemGroup>
     <Compile Include="Keys.fs" />
-    <Compile Include="Library.fs" />
+    <Compile Include="ThermostatClient.fs" />
+    <Compile Include="ThermostatEnumerator.fs" />
     <Compile Include="QuickActions.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FSharp.Control.AsyncSeq" Version="3.2.1" />
     <PackageReference Include="I8Beef.Ecobee" Version="3.0.0.84" />
   </ItemGroup>
 
