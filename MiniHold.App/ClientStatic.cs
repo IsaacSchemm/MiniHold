@@ -12,20 +12,20 @@ namespace MiniHold.App
 
         public static string EcobeePin => _pin?.EcobeePin;
 
-        public static bool HasToken { get; private set; } = false;
+        public static bool HasToken => _objs.Count > 0;
 
-        public static readonly List<ThermostatObject> _objs = new();
+		public static readonly List<ThermostatObject> _objs = new();
 
         public static IReadOnlyList<ThermostatObject> ThermostatObjects => _objs;
 
         public static int Busy { get; set; } = 0;
 
-        public static async Task UpdateAsync()
+		public static async Task UpdateAsync()
         {
-            if (HasToken)
-                return;
+			if (HasToken)
+				return;
 
-            Busy++;
+			Busy++;
 
             _pendingClient = null;
             _pin = null;
@@ -39,8 +39,7 @@ namespace MiniHold.App
             }
             else
             {
-                HasToken = true;
-                await foreach (var tClient in ThermostatClient.GetAllAsync(c))
+                foreach (var tClient in await ThermostatClient.GetAllAsListAsync(c))
                 {
                     var x = new ThermostatObject(tClient);
                     await x.Refresh();
@@ -48,8 +47,8 @@ namespace MiniHold.App
                 }
             }
 
-            Busy--;
-        }
+			Busy--;
+		}
 
         private static async Task<StoredAuthToken> GetStoredAuthTokenAsync(CancellationToken _ = default)
         {
@@ -75,7 +74,7 @@ namespace MiniHold.App
         public static async Task RemoveToken()
         {
             _objs.Clear();
-            SecureStorage.Default.Remove("ecobeeToken");
+			SecureStorage.Default.Remove("ecobeeToken");
             await UpdateAsync();
         }
     }

@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Control.TaskSeq" Version="0.3.0" />
     <PackageReference Include="I8Beef.Ecobee" Version="3.0.0.84" />
   </ItemGroup>
 
