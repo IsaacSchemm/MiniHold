@@ -62,6 +62,17 @@
         }
     </div>
 
+    <hr />
+    <p align="center">
+        Last updated:
+        <br />
+        @ti.LastUpdated.ToString("h:mm tt M/d/yy")
+        <br />
+        <button class="btn btn-primary mt-2" @onclick="ti.Refresh">
+            Refresh
+        </button>
+    </p>
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6 col-lg-4">
@@ -214,16 +225,6 @@
                         </button>
                     </center>
                 }
-                <hr />
-                <p align="center">
-                    Last updated:
-                    <br />
-                    @ti.LastUpdated.ToString("h:mm tt M/d/yy")
-                    <br />
-                    <button class="btn btn-primary mt-2" @onclick="ti.Refresh">
-                        Refresh
-                    </button>
-                </p>
             </div>
         </div>
     </div>
