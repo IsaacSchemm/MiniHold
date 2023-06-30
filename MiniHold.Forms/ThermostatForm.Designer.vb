@@ -765,7 +765,7 @@ Partial Class ThermostatForm
         Button2.Name = "Button2"
         Button2.Size = New Size(75, 23)
         Button2.TabIndex = 7
-        Button2.Text = "-3°"
+        Button2.Text = "-2°"
         Button2.UseVisualStyleBackColor = False
         ' 
         ' Button1
@@ -776,7 +776,7 @@ Partial Class ThermostatForm
         Button1.Name = "Button1"
         Button1.Size = New Size(75, 23)
         Button1.TabIndex = 6
-        Button1.Text = "+3°"
+        Button1.Text = "+2°"
         Button1.UseVisualStyleBackColor = False
         ' 
         ' GroupBox4
@@ -819,7 +819,7 @@ Partial Class ThermostatForm
         Button7.Name = "Button7"
         Button7.Size = New Size(75, 23)
         Button7.TabIndex = 7
-        Button7.Text = "-3°"
+        Button7.Text = "-2°"
         Button7.UseVisualStyleBackColor = False
         ' 
         ' Button8
@@ -830,7 +830,7 @@ Partial Class ThermostatForm
         Button8.Name = "Button8"
         Button8.Size = New Size(75, 23)
         Button8.TabIndex = 6
-        Button8.Text = "+3°"
+        Button8.Text = "+2°"
         Button8.UseVisualStyleBackColor = False
         ' 
         ' GroupBox9
