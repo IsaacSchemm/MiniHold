@@ -11,6 +11,12 @@
 {
     <h1>@ti.ThermostatClient.Name</h1>
 
+    <p align="center">
+        Last updated:
+        <br />
+        @ti.LastUpdated.ToString("h:mm tt M/d/yy")
+    </p>
+
     <p>
         This app's F# backend has retrieved the thermostat's current state
         from the ecobee API and abstracted it into the structure below. The
