@@ -14,6 +14,7 @@
     <Compile Include="ThermostatClient.fs" />
     <Compile Include="ThermostatEnumerator.fs" />
     <Compile Include="QuickActions.fs" />
+    <Compile Include="Equipment.fs" />
   </ItemGroup>
 
   <ItemGroup>

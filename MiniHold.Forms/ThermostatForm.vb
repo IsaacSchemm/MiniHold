@@ -1,5 +1,4 @@
-﻿Imports I8Beef.Ecobee.Protocol.Objects
-Imports MiniHold.Abstractions
+﻿Imports MiniHold.Abstractions
 
 Public Class ThermostatForm
     Public ThermostatClient As ThermostatClient = Nothing
@@ -57,8 +56,25 @@ Public Class ThermostatForm
         End If
 
         FlowLayoutPanel1.Controls.Clear()
-        For Each e In information.EquipmentStatus
-            FlowLayoutPanel1.Controls.Add(New ActiveEquipmentIndicator With {.Text = e})
+        For Each e In EquipmentModule.FromThermostatInformation(information)
+            Dim indicator As New Label With {.Text = e.Name, .AutoSize = True, .Padding = New Padding(3)}
+            If e.Heat Then
+                indicator.BackColor = Color.Red
+                indicator.ForeColor = Color.White
+            ElseIf e.Cool Then
+                indicator.BackColor = Color.Blue
+                indicator.ForeColor = Color.White
+            Else
+                indicator.BackColor = Color.Gray
+                indicator.ForeColor = Color.White
+            End If
+            If e.Comp Then
+                indicator.Text = "⇄ " & indicator.Text
+            End If
+            If e.AuxHeat Then
+                indicator.Text = "🔥 " & indicator.Text
+            End If
+            FlowLayoutPanel1.Controls.Add(indicator)
         Next
 
         TextBox1.Text = $"{information}".Replace(vbLf, vbCrLf)

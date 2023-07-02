@@ -43,19 +43,31 @@
     var thermostatClient = ti.ThermostatClient;
     var info = ti.Information;
 
+    var equipment = EquipmentModule.FromThermostatInformation(info);
+
     <h1>@thermostatClient.Name</h1>
 
     <hr />
     <RefreshBox Thermostat="@ti" />
 
-    if (ti.Information.EquipmentStatus.Any())
+    if (equipment.Any())
     {
         <hr />
         <div title="Running Equipment">
-            @foreach (string str in ti.Information.EquipmentStatus)
+            @foreach (var eq in equipment)
             {
-                <div class="badge bg-primary">
-                    @str
+                <div class="badge @(eq.Heat ? "bg-danger" : eq.Cool ? "bg-info text-dark" : "bg-secondary")">
+                    @if (eq.Comp)
+                    {
+                        <span class="oi oi-transfer" aria-hidden="true"></span>
+                        @:&nbsp;
+                    }
+                    @if (eq.AuxHeat)
+                    {
+                        <span class="oi oi-fire" aria-hidden="true"></span>
+                        @:&nbsp;
+                    }
+                    @eq.Name
                 </div>
                 @:&nbsp;
             }
