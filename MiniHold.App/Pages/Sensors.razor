@@ -1,21 +1,16 @@
-﻿@page "/sensors"
+﻿@inherits MiniHoldPage
+@page "/sensors"
 @using I8Beef.Ecobee;
 @using MiniHold.Abstractions;
 
-@if (ClientStatic.Busy > 0)
-{
-    <div style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; background-color: rgb(128, 128, 128, 0.5); z-index: 2" title="Loading"></div>
-}
+<LoadingSpinner Busy=@(Busy > 0) />
 
 @foreach (var ti in ClientStatic.ThermostatObjects)
 {
     <h1>@ti.ThermostatClient.Name</h1>
 
-    <p align="center">
-        Last updated:
-        <br />
-        @ti.LastUpdated.ToString("h:mm tt M/d/yy")
-    </p>
+    <hr />
+    <RefreshBox Thermostat="@ti" />
 
     <table class="table">
         <thead>
@@ -41,12 +36,4 @@
             }
         </tbody>
     </table>
-}
-
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        await ClientStatic.UpdateAsync();
-        await base.OnInitializedAsync();
-    }
 }

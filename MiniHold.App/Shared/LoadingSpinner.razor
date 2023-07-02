@@ -1,0 +1,9 @@
+﻿@if (Busy)
+{
+    <div style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; background-color: rgb(128, 128, 128, 0.5); z-index: 2" title="Loading"></div>
+}
+
+@code {
+    [Parameter]
+    public bool Busy { get; set; }
+}

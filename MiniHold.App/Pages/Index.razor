@@ -1,4 +1,5 @@
-﻿@page "/"
+﻿@inherits MiniHoldPage
+@page "/"
 @using I8Beef.Ecobee;
 @using MiniHold.Abstractions;
 
@@ -35,10 +36,7 @@
     }
 </style>
 
-@if (ClientStatic.Busy > 0)
-{
-    <div style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; background-color: rgb(128, 128, 128, 0.5); z-index: 2" title="Loading"></div>
-}
+<LoadingSpinner Busy=@(Busy > 0) />
 
 @foreach (var ti in ClientStatic.ThermostatObjects)
 {
@@ -46,32 +44,9 @@
     var info = ti.Information;
 
     <h1>@thermostatClient.Name</h1>
-    <p>
-        @thermostatClient.Brand
-        <br />
-        Firmware version: @thermostatClient.Version
-    </p>
-
-    <div title="Equipment Status">
-        @foreach (string str in info.EquipmentStatus)
-        {
-            <div class="badge bg-primary">
-                @str
-            </div>
-            @:&nbsp;
-        }
-    </div>
 
     <hr />
-    <p align="center">
-        Last updated:
-        <br />
-        @ti.LastUpdated.ToString("h:mm tt M/d/yy")
-        <br />
-        <button class="btn btn-primary mt-2" @onclick="ti.Refresh">
-            Refresh
-        </button>
-    </p>
+    <RefreshBox Thermostat="@ti" />
 
     <div class="container-fluid">
         <div class="row">
@@ -233,11 +208,3 @@
 }
 
 <div class="mb-4"></div>
-
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        await ClientStatic.UpdateAsync();
-        await base.OnInitializedAsync();
-    }
-}

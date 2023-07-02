@@ -18,14 +18,10 @@ namespace MiniHold.App
 
         public static IReadOnlyList<ThermostatObject> ThermostatObjects => _objs;
 
-        public static int Busy { get; set; } = 0;
-
-		public static async Task UpdateAsync()
+		public static async Task EstablishThermostatListAsync()
         {
 			if (HasToken)
 				return;
-
-			Busy++;
 
             _pendingClient = null;
             _pin = null;
@@ -46,9 +42,17 @@ namespace MiniHold.App
                     _objs.Add(x);
                 }
             }
+        }
 
-			Busy--;
-		}
+        public static async Task EstablishThermostatInformationAsync()
+        {
+            var invalidBefore = DateTimeOffset.UtcNow - TimeSpan.FromMinutes(10);
+            var invalidAfter = DateTimeOffset.UtcNow + TimeSpan.FromMinutes(10);
+
+            foreach (var x in ThermostatObjects)
+                if (x.LastUpdated < invalidBefore || x.LastUpdated > invalidAfter)
+                    await x.Refresh();
+        }
 
         private static async Task<StoredAuthToken> GetStoredAuthTokenAsync(CancellationToken _ = default)
         {
@@ -67,7 +71,7 @@ namespace MiniHold.App
             try
             {
                 await _pendingClient.GetAccessTokenAsync(_pin.Code);
-                await UpdateAsync();
+                await EstablishThermostatListAsync();
             } catch (ApiAuthException) { }
         }
 
@@ -75,7 +79,7 @@ namespace MiniHold.App
         {
             _objs.Clear();
 			SecureStorage.Default.Remove("ecobeeToken");
-            await UpdateAsync();
+            await EstablishThermostatListAsync();
         }
     }
 }
