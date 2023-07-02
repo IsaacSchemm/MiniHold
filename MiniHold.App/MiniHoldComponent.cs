@@ -4,37 +4,20 @@ namespace MiniHold.App
 {
     public class MiniHoldPage : ComponentBase
     {
-        public int Busy { get; set; }
-
         protected override async Task OnInitializedAsync()
         {
-            Busy++;
-            await ClientStatic.EstablishThermostatListAsync();
-            await ClientStatic.EstablishThermostatInformationAsync();
-            Busy--;
+            await App.Act(async () =>
+            {
+                await ClientStatic.EstablishThermostatListAsync();
+                await ClientStatic.EstablishThermostatInformationAsync();
+            });
             await base.OnInitializedAsync();
             App.CurrentPage = this;
         }
 
-        public async void HandleResume()
+        public void SignalChange()
         {
-            Busy++;
             StateHasChanged();
-
-            try
-            {
-                await ClientStatic.EstablishThermostatListAsync();
-                await ClientStatic.EstablishThermostatInformationAsync();
-            }
-            catch (Exception ex)
-            {
-
-            }
-            finally
-            {
-                Busy--;
-                StateHasChanged();
-            }
         }
     }
 }

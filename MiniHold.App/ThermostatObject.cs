@@ -18,14 +18,12 @@ namespace MiniHold.App
 
         private async Task Act(Func<Task> func)
         {
-            var p = App.CurrentPage;
-            if (p != null)
-                p.Busy++;
-            await func();
-            Information = await ThermostatClient.GetInformationAsync();
-            LastUpdated = DateTimeOffset.UtcNow;
-            if (p != null)
-                p.Busy--;
+            await App.Act(async () =>
+            {
+                await func();
+                Information = await ThermostatClient.GetInformationAsync();
+                LastUpdated = DateTimeOffset.UtcNow;
+            });
         }
 
         public Task Refresh() =>

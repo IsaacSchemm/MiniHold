@@ -36,7 +36,7 @@
     }
 </style>
 
-<LoadingSpinner Busy=@(Busy > 0) />
+<LoadingSpinner Busy="@App.Busy" />
 
 @foreach (var ti in ClientStatic.ThermostatObjects)
 {
@@ -47,6 +47,20 @@
 
     <hr />
     <RefreshBox Thermostat="@ti" />
+
+    if (ti.Information.EquipmentStatus.Any())
+    {
+        <hr />
+        <div title="Running Equipment">
+            @foreach (string str in ti.Information.EquipmentStatus)
+            {
+                <div class="badge bg-primary">
+                    @str
+                </div>
+                @:&nbsp;
+            }
+        </div>
+    }
 
     <div class="container-fluid">
         <div class="row">

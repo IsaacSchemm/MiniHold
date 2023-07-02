@@ -3,7 +3,7 @@
 @using I8Beef.Ecobee;
 @using MiniHold.Abstractions;
 
-<LoadingSpinner Busy=@(Busy > 0) />
+<LoadingSpinner Busy="@App.Busy" />
 
 @foreach (var ti in ClientStatic.ThermostatObjects)
 {
