@@ -89,37 +89,37 @@ Public Class ThermostatForm
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         Act(Async Function()
-                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, LastDesired, 2, TimeSpan.FromMinutes(10))
+                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(10))
             End Function)
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         Act(Async Function()
-                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, LastDesired, -2, TimeSpan.FromMinutes(10))
+                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, -2, TimeSpan.FromMinutes(10))
             End Function)
     End Sub
 
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
         Act(Async Function()
-                Await QuickActions.SetFanAsync(ThermostatClient, LastDesired, True, TimeSpan.FromMinutes(10))
+                Await QuickActions.SetFanAsync(ThermostatClient, True, TimeSpan.FromMinutes(10))
             End Function)
     End Sub
 
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
         Act(Async Function()
-                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, LastDesired, 2, TimeSpan.FromMinutes(30))
+                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(30))
             End Function)
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
         Act(Async Function()
-                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, LastDesired, -2, TimeSpan.FromMinutes(30))
+                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, -2, TimeSpan.FromMinutes(30))
             End Function)
     End Sub
 
     Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
         Act(Async Function()
-                Await QuickActions.SetFanAsync(ThermostatClient, LastDesired, True, TimeSpan.FromMinutes(30))
+                Await QuickActions.SetFanAsync(ThermostatClient, True, TimeSpan.FromMinutes(30))
             End Function)
     End Sub
 

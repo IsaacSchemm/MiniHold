@@ -32,25 +32,25 @@ namespace MiniHold.App
             Act(() => Task.CompletedTask);
 
         public Task Hold10Heat() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, Information.Desired, 2, TimeSpan.FromMinutes(10)));
+            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(10)));
 
         public Task Hold10Cool() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, Information.Desired, -2, TimeSpan.FromMinutes(10)));
+            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, -2, TimeSpan.FromMinutes(10)));
 
         public Task Hold10Fan() =>
-            Act(async () => await QuickActions.SetFanAsync(ThermostatClient, Information.Desired, true, TimeSpan.FromMinutes(10)));
+            Act(async () => await QuickActions.SetFanAsync(ThermostatClient, true, TimeSpan.FromMinutes(10)));
 
         public Task Hold10Away() =>
             Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromMinutes(10)));
 
         public Task Hold30Heat() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, Information.Desired, 2, TimeSpan.FromMinutes(30)));
+            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(30)));
 
         public Task Hold30Cool() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, Information.Desired, -2, TimeSpan.FromMinutes(30)));
+            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, -2, TimeSpan.FromMinutes(30)));
 
         public Task Hold30Fan() =>
-            Act(async () => await QuickActions.SetFanAsync(ThermostatClient, Information.Desired, true, TimeSpan.FromMinutes(30)));
+            Act(async () => await QuickActions.SetFanAsync(ThermostatClient, true, TimeSpan.FromMinutes(30)));
 
         public Task Hold30Away() =>
             Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromMinutes(30)));

@@ -3,21 +3,23 @@
 open System
 
 module QuickActions =
-    let SetTemperatureOffsetAsync(client: ThermostatClient, current, offsetFarenheit, duration) = task {
+    let SetTemperatureOffsetAsync(client: ThermostatClient, offsetFarenheit, duration) = task {
         let startTime = client.ToThermostatTime(DateTime.Now)
         let endTime = startTime + duration
+        let! info = client.GetInformationAsync()
         do! client.HoldAsync({
-            current with
-                HeatTemp = current.HeatTemp.AddFarenheit offsetFarenheit
-                CoolTemp = current.CoolTemp.AddFarenheit offsetFarenheit
+            info.Desired with
+                HeatTemp = info.Desired.HeatTemp.AddFarenheit offsetFarenheit
+                CoolTemp = info.Desired.CoolTemp.AddFarenheit offsetFarenheit
         }, startTime, endTime)
     }
 
-    let SetFanAsync(client: ThermostatClient, current, fan, duration) = task {
+    let SetFanAsync(client: ThermostatClient, fan, duration) = task {
         let startTime = client.ToThermostatTime(DateTime.Now)
         let endTime = startTime + duration
+        let! info = client.GetInformationAsync()
         do! client.HoldAsync({
-            current with
+            info.Desired with
                 Fan = if fan then "on" else "auto"
         }, startTime, endTime)
     }
