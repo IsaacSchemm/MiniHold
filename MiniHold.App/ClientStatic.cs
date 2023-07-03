@@ -8,7 +8,6 @@ namespace MiniHold.App
     public static class ClientStatic
     {
         private static Pin _pin = null;
-        private static IClient _pendingClient = null;
 
         public static string EcobeePin => _pin?.EcobeePin;
 
@@ -23,18 +22,14 @@ namespace MiniHold.App
 			if (HasToken)
 				return;
 
-            _pendingClient = null;
-            _pin = null;
-            _objs.Clear();
-
             var c = new Client(Keys.ApiKey, GetStoredAuthTokenAsync, SetStoredAuthTokenAsync);
             if (await GetStoredAuthTokenAsync() == null)
             {
-                _pin = await c.GetPinAsync();
-                _pendingClient = c;
+                _pin ??= await c.GetPinAsync();
             }
             else
             {
+                _pin = null;
                 await foreach (var tClient in ThermostatEnumerator.FindAsync(c))
                 {
                     var x = new ThermostatObject(tClient);
@@ -70,7 +65,7 @@ namespace MiniHold.App
         {
             try
             {
-                await _pendingClient.GetAccessTokenAsync(_pin.Code);
+                await new Client(Keys.ApiKey, GetStoredAuthTokenAsync, SetStoredAuthTokenAsync).GetAccessTokenAsync(_pin.Code);
                 await EstablishThermostatListAsync();
             } catch (ApiAuthException) { }
         }
