@@ -25,6 +25,10 @@ type Humidity = Humidity of int
 with
     member this.PercentageString = let (Humidity x) = this in sprintf "%d%%" x
 
+type IUserInterfaceReading =
+    abstract member Temperatures: (string * Temperature) list
+    abstract member OtherReadings: (string * string) list
+
 type TempRange = {
     HeatTemp: Temperature
     CoolTemp: Temperature
@@ -33,11 +37,18 @@ type TempRange = {
     member this.WithHeatTemp x = { this with HeatTemp = x }
     member this.WithCoolTemp x = { this with CoolTemp = x }
     member this.WithFan x = { this with Fan = x }
+    interface IUserInterfaceReading with
+        member this.Temperatures = ["Heat", this.HeatTemp; "Cool", this.CoolTemp]
+        member this.OtherReadings = ["Fan", this.Fan]
 
 type Readings = {
     Temperature: Temperature list
     Humidity: Humidity list
 }
+with
+    interface IUserInterfaceReading with
+        member this.Temperatures = [for x in this.Temperature do "", x]
+        member this.OtherReadings = [for x in this.Humidity do "Humidity", x.PercentageString]
 
 type Sensor = {
     Name: string
@@ -50,6 +61,10 @@ type Weather = {
     Temperature: Temperature
     Humidity: Humidity
 }
+with
+    interface IUserInterfaceReading with
+        member this.Temperatures = ["", this.Temperature]
+        member this.OtherReadings = ["Condition", this.Condition; "Humidity", this.Humidity.PercentageString]
 
 type Program = {
     Name: string
@@ -58,6 +73,10 @@ type Program = {
     CoolFan: string
     HeatFan: string
 }
+with
+    interface IUserInterfaceReading with
+        member this.Temperatures = ["Heat", this.HeatTemp; "Cool", this.CoolTemp]
+        member this.OtherReadings = ["Comfort Setting", this.Name; "Fan (heat)", this.HeatFan; "Fan (cool)", this.CoolFan]
 
 type Alert = {
     DateTime: DateTime

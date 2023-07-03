@@ -82,3 +82,34 @@ a, .btn-link {
 		padding-left: env(safe-area-inset-left);
 	}
 }
+
+.indexPage button {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+.indexPage h5 {
+    margin-top: 1em;
+    margin-bottom: 0.25em;
+    font-weight: bold;
+}
+
+.indexPage .temp {
+    font-size: 150%;
+}
+
+.indexPage .tempBlock {
+    display: inline-block;
+    margin-right: 0.5em;
+}
+
+.indexPage .heat {
+    background-color: mistyrose;
+    color: black;
+}
+
+.indexPage .cool {
+    background-color: lightcyan;
+    color: black;
+}

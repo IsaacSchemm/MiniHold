@@ -1,0 +1,25 @@
+﻿@using MiniHold.Abstractions;
+
+@if (UserInterfaceReading != null)
+{
+    foreach (var t in UserInterfaceReading.Temperatures)
+    {
+        <div class="tempBlock">
+            @t.Item1
+            <div title="Temperature" class="temp">
+                @t.Item2.FarenheitString
+            </div>
+        </div>
+    }
+    foreach (var r in UserInterfaceReading.OtherReadings)
+    {
+        <div>
+            <strong>@r.Item1:</strong> @r.Item2
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public IUserInterfaceReading UserInterfaceReading { get; set; }
+}

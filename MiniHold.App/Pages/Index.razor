@@ -3,40 +3,14 @@
 @using I8Beef.Ecobee;
 @using MiniHold.Abstractions;
 
-<style type="text/css">
-    button {
-        white-space: nowrap;
-        overflow-x: hidden;
-        text-overflow: ellipsis;
-    }
-
-    h5 {
-        margin-top: 1em;
-        margin-bottom: 0.25em;
-        font-weight: bold;
-    }
-
-    .temp {
-        font-size: 150%;
-    }
-
-    .tempBlock {
-        display: inline-block;
-        margin-right: 0.5em;
-    }
-
-    .heat {
-        background-color: mistyrose;
-        color: black;
-    }
-
-    .cool {
-        background-color: lightcyan;
-        color: black;
-    }
-</style>
-
 <LoadingSpinner Busy="@App.Busy" />
+
+@if (ClientStatic.ThermostatObjects.Count == 0)
+{
+    <p>
+        Use the API Connection page to set up the app.
+    </p>
+}
 
 @foreach (var ti in ClientStatic.ThermostatObjects)
 {
@@ -56,7 +30,7 @@
         <div title="Running Equipment">
             @foreach (var eq in equipment)
             {
-                <div class="badge @(eq.Heat ? "bg-danger" : eq.Cool ? "bg-info text-dark" : "bg-secondary")">
+                <div class="badge @(eq.Heat ? "bg-danger" : eq.Cool ? "bg-primary" : "bg-secondary")">
                     @if (eq.Comp)
                     {
                         <span class="oi oi-transfer" aria-hidden="true"></span>
@@ -74,45 +48,18 @@
         </div>
     }
 
-    <div class="container-fluid">
+    <div class="container-fluid indexPage">
         <div class="row">
             <div class="col-md-6 col-lg-4">
                 <hr />
                 <h5>Outdoor</h5>
-                <div>
-                    @info.Weather.Condition
-                </div>
-                <div title="Temperature" class="temp">
-                    @info.Weather.Temperature.FarenheitString
-                </div>
-                <div>
-                    <strong>Humidity:</strong> @info.Weather.Humidity.PercentageString
-                </div>
+                <TemperatureDisplayBox UserInterfaceReading="@info.Weather" />
                 <hr />
                 <h5>Indoor</h5>
-                <div title="Temperature" class="temp">
-                    @info.Actual.Temperature.FirstOrDefault()?.FarenheitString
-                </div>
-                <div>
-                    <strong>Humidity:</strong> @info.Actual.Humidity.FirstOrDefault()?.PercentageString
-                </div>
+                <TemperatureDisplayBox UserInterfaceReading="@info.Actual" />
                 <hr />
                 <h5>Runtime</h5>
-                <div class="tempBlock">
-                    Heat
-                    <div title="Temperature" class="temp">
-                        @info.Desired.HeatTemp.FarenheitString
-                    </div>
-                </div>
-                <div class="tempBlock">
-                    Cool
-                    <div title="Temperature" class="temp">
-                        @info.Desired.CoolTemp.FarenheitString
-                    </div>
-                </div>
-                <div>
-                    <strong>Fan:</strong> @info.Desired.Fan
-                </div>
+                <TemperatureDisplayBox UserInterfaceReading="@info.Desired" />
             </div>
             <div class="col-md-6 col-lg-4">
                 <hr />
@@ -147,47 +94,13 @@
             <div class="col-md-6 col-lg-4">
                 <hr />
                 <h5>Program</h5>
-                <p>
-                    @info.Program.Name
-                </p>
-                <div class="tempBlock">
-                    Heat
-                    <div title="Temperature" class="temp">
-                        @info.Program.HeatTemp.FarenheitString
-                    </div>
-                </div>
-                <div class="tempBlock">
-                    Cool
-                    <div title="Temperature" class="temp">
-                        @info.Program.CoolTemp.FarenheitString
-                    </div>
-                </div>
-                <div>
-                    <strong>Fan (heat):</strong> @info.Program.HeatFan
-                </div>
-                <div>
-                    <strong>Fan (cool):</strong> @info.Program.CoolFan
-                </div>
+                <TemperatureDisplayBox UserInterfaceReading="@info.Program" />
                 @if (info.Events.FirstOrDefault() is Event e && e.EventType == "hold")
                 {
                     var temp = e.AbsoluteTemperatureRanges.SingleOrDefault();
                     <hr />
                     <h5>Hold</h5>
-                    <div class="tempBlock">
-                        Heat
-                        <div title="Temperature" class="temp">
-                            @temp?.HeatTemp.FarenheitString
-                        </div>
-                    </div>
-                    <div class="tempBlock">
-                        Cool
-                        <div title="Temperature" class="temp">
-                            @temp?.CoolTemp.FarenheitString
-                        </div>
-                    </div>
-                    <div>
-                        <strong>Fan:</strong> @temp?.Fan
-                    </div>
+                    <TemperatureDisplayBox UserInterfaceReading="@temp" />
                     <div>
                         <strong>Start:</strong> @e.StartDate?.ToString("h:mm tt M/d/yy")
                     </div>
