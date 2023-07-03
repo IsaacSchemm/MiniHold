@@ -51,24 +51,22 @@ namespace MiniHold.App
 
         private static async Task<StoredAuthToken> GetStoredAuthTokenAsync(CancellationToken _ = default)
         {
-#if NET8_0_OR_GREATER
-            return await SecureStorage.Default.GetAsync("ecobeeToken") is string json
-                ? System.Text.Json.JsonSerializer.Deserialize<StoredAuthToken>(json)
-                : null;
-#else
-            return Preferences.Default.Get<string>("ecobeeToken", null) is string xyz
-                ? System.Text.Json.JsonSerializer.Deserialize<StoredAuthToken>(xyz)
-                : null;
-#endif
+            try
+            {
+                return await SecureStorage.Default.GetAsync("ecobeeToken") is string json
+                    ? System.Text.Json.JsonSerializer.Deserialize<StoredAuthToken>(json)
+                    : null;
+            }
+            catch (Exception)
+            {
+                SecureStorage.Default.RemoveAll();
+                return null;
+            }
         }
 
         private static async Task SetStoredAuthTokenAsync(StoredAuthToken token, CancellationToken _ = default)
         {
-#if NET8_0_OR_GREATER
             await SecureStorage.Default.SetAsync("ecobeeToken", System.Text.Json.JsonSerializer.Serialize(token));
-#else
-            Preferences.Default.Set("ecobeeToken", System.Text.Json.JsonSerializer.Serialize(token));
-#endif
         }
 
         public static async Task GetToken()
@@ -83,11 +81,7 @@ namespace MiniHold.App
         public static async Task RemoveToken()
         {
             _objs.Clear();
-#if NET8_0_OR_GREATER
             SecureStorage.Default.Remove("ecobeeToken");
-#else
-            Preferences.Default.Remove("ecobeeToken");
-#endif
             await EstablishThermostatListAsync();
         }
     }
