@@ -30,14 +30,6 @@ Partial Class ThermostatForm
         FlowLayoutPanel1 = New FlowLayoutPanel()
         TabPage2 = New TabPage()
         TextBox1 = New TextBox()
-        TabPage3 = New TabPage()
-        DataGridView1 = New DataGridView()
-        TypeColumn = New DataGridViewTextBoxColumn()
-        HeatColumn = New DataGridViewTextBoxColumn()
-        CoolColumn = New DataGridViewTextBoxColumn()
-        FanColumn = New DataGridViewTextBoxColumn()
-        StartTimeColumn = New DataGridViewTextBoxColumn()
-        EndTimeColumn = New DataGridViewTextBoxColumn()
         TabPage5 = New TabPage()
         DataGridView2 = New DataGridView()
         SensorColumn1 = New DataGridViewTextBoxColumn()
@@ -104,8 +96,6 @@ Partial Class ThermostatForm
         GroupBox1.SuspendLayout()
         GroupBox10.SuspendLayout()
         TabPage2.SuspendLayout()
-        TabPage3.SuspendLayout()
-        CType(DataGridView1, ComponentModel.ISupportInitialize).BeginInit()
         TabPage5.SuspendLayout()
         CType(DataGridView2, ComponentModel.ISupportInitialize).BeginInit()
         TabPage1.SuspendLayout()
@@ -203,69 +193,6 @@ Partial Class ThermostatForm
         TextBox1.Size = New Size(484, 303)
         TextBox1.TabIndex = 10
         TextBox1.WordWrap = False
-        ' 
-        ' TabPage3
-        ' 
-        TabPage3.Controls.Add(DataGridView1)
-        TabPage3.Location = New Point(4, 24)
-        TabPage3.Name = "TabPage3"
-        TabPage3.Padding = New Padding(3)
-        TabPage3.Size = New Size(490, 309)
-        TabPage3.TabIndex = 2
-        TabPage3.Text = "Hold Stack"
-        TabPage3.UseVisualStyleBackColor = True
-        ' 
-        ' DataGridView1
-        ' 
-        DataGridView1.AllowUserToAddRows = False
-        DataGridView1.AllowUserToDeleteRows = False
-        DataGridView1.AllowUserToOrderColumns = True
-        DataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-        DataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridView1.Columns.AddRange(New DataGridViewColumn() {TypeColumn, HeatColumn, CoolColumn, FanColumn, StartTimeColumn, EndTimeColumn})
-        DataGridView1.Dock = DockStyle.Fill
-        DataGridView1.Location = New Point(3, 3)
-        DataGridView1.Name = "DataGridView1"
-        DataGridView1.ReadOnly = True
-        DataGridView1.RowTemplate.Height = 25
-        DataGridView1.Size = New Size(484, 303)
-        DataGridView1.TabIndex = 0
-        ' 
-        ' TypeColumn
-        ' 
-        TypeColumn.HeaderText = "Type"
-        TypeColumn.Name = "TypeColumn"
-        TypeColumn.ReadOnly = True
-        ' 
-        ' HeatColumn
-        ' 
-        HeatColumn.HeaderText = "Heat"
-        HeatColumn.Name = "HeatColumn"
-        HeatColumn.ReadOnly = True
-        ' 
-        ' CoolColumn
-        ' 
-        CoolColumn.HeaderText = "Cool"
-        CoolColumn.Name = "CoolColumn"
-        CoolColumn.ReadOnly = True
-        ' 
-        ' FanColumn
-        ' 
-        FanColumn.HeaderText = "Fan"
-        FanColumn.Name = "FanColumn"
-        FanColumn.ReadOnly = True
-        ' 
-        ' StartTimeColumn
-        ' 
-        StartTimeColumn.HeaderText = "Start"
-        StartTimeColumn.Name = "StartTimeColumn"
-        StartTimeColumn.ReadOnly = True
-        ' 
-        ' EndTimeColumn
-        ' 
-        EndTimeColumn.HeaderText = "End"
-        EndTimeColumn.Name = "EndTimeColumn"
-        EndTimeColumn.ReadOnly = True
         ' 
         ' TabPage5
         ' 
@@ -908,7 +835,6 @@ Partial Class ThermostatForm
         TabControl1.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         TabControl1.Controls.Add(TabPage1)
         TabControl1.Controls.Add(TabPage5)
-        TabControl1.Controls.Add(TabPage3)
         TabControl1.Controls.Add(TabPage2)
         TabControl1.Location = New Point(12, 101)
         TabControl1.Name = "TabControl1"
@@ -931,8 +857,6 @@ Partial Class ThermostatForm
         GroupBox10.ResumeLayout(False)
         TabPage2.ResumeLayout(False)
         TabPage2.PerformLayout()
-        TabPage3.ResumeLayout(False)
-        CType(DataGridView1, ComponentModel.ISupportInitialize).EndInit()
         TabPage5.ResumeLayout(False)
         CType(DataGridView2, ComponentModel.ISupportInitialize).EndInit()
         TabPage1.ResumeLayout(False)
@@ -962,8 +886,6 @@ Partial Class ThermostatForm
     Friend WithEvents FlowLayoutPanel1 As FlowLayoutPanel
     Friend WithEvents TabPage2 As TabPage
     Friend WithEvents TextBox1 As TextBox
-    Friend WithEvents TabPage3 As TabPage
-    Friend WithEvents DataGridView1 As DataGridView
     Friend WithEvents TabPage5 As TabPage
     Friend WithEvents DataGridView2 As DataGridView
     Friend WithEvents SensorColumn1 As DataGridViewTextBoxColumn
@@ -1017,12 +939,6 @@ Partial Class ThermostatForm
     Friend WithEvents Button8 As Button
     Friend WithEvents GroupBox9 As GroupBox
     Friend WithEvents TabControl1 As TabControl
-    Friend WithEvents TypeColumn As DataGridViewTextBoxColumn
-    Friend WithEvents HeatColumn As DataGridViewTextBoxColumn
-    Friend WithEvents CoolColumn As DataGridViewTextBoxColumn
-    Friend WithEvents FanColumn As DataGridViewTextBoxColumn
-    Friend WithEvents StartTimeColumn As DataGridViewTextBoxColumn
-    Friend WithEvents EndTimeColumn As DataGridViewTextBoxColumn
     Friend WithEvents Button15 As Button
     Friend WithEvents Button14 As Button
     Friend WithEvents Button11 As Button

@@ -95,7 +95,7 @@
                 <hr />
                 <h5>Program</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.Program" />
-                @if (info.Events.FirstOrDefault() is Event e && e.EventType == "hold")
+                @if (info.Events.Where(x => x.Running).FirstOrDefault() is Event e && e.EventType == "hold")
                 {
                     var temp = e.AbsoluteTemperatureRanges.SingleOrDefault();
                     <hr />

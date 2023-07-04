@@ -27,12 +27,6 @@ Public Class ThermostatForm
         HeatFan.Text = information.Program.HeatFan
         CoolFan.Text = information.Program.CoolFan
 
-        DataGridView1.Rows.Clear()
-        For Each e In information.Events
-            Dim temp = e.AbsoluteTemperatureRanges.SingleOrDefault()
-            DataGridView1.Rows.Add({e.EventType, temp?.HeatTemp, temp?.CoolTemp, temp?.Fan, e.StartDate, e.EndDate})
-        Next
-
         DataGridView2.Rows.Clear()
         For Each s In information.Sensors
             Dim average = information.Actual.Temperature.Select(Function(x) x.Farenheit).SingleOrDefault()
@@ -41,18 +35,18 @@ Public Class ThermostatForm
             DataGridView2.Rows.Add({s.Name, $"{specific:0.0}°F", s.Occupied, $"{offset:0.0}°F"})
         Next
 
-        Dim firstEvent = information.Events.DefaultIfEmpty(Nothing).First()
-        If firstEvent Is Nothing OrElse firstEvent.EventType <> "hold" Then
+        Dim runningEvent = information.Events.Where(Function(e) e.Running).FirstOrDefault()
+        If runningEvent Is Nothing OrElse runningEvent.EventType <> "hold" Then
             GroupBox7.Visible = False
         Else
             GroupBox7.Visible = True
-            Dim temp = firstEvent.AbsoluteTemperatureRanges.SingleOrDefault()
+            Dim temp = runningEvent.AbsoluteTemperatureRanges.SingleOrDefault()
             HoldHeat.Text = temp?.HeatTemp?.FarenheitString
             HoldCool.Text = temp?.CoolTemp?.FarenheitString
             HoldFan.Text = temp?.Fan
 
-            HoldStartLabel.Text = $"{firstEvent.StartDate:h:mm tt M/d/yy}"
-            HoldEndLabel.Text = $"{firstEvent.EndDate:h:mm tt M/d/yy}"
+            HoldStartLabel.Text = $"{runningEvent.StartDate:h:mm tt M/d/yy}"
+            HoldEndLabel.Text = $"{runningEvent.EndDate:h:mm tt M/d/yy}"
         End If
 
         FlowLayoutPanel1.Controls.Clear()
