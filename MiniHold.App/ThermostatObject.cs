@@ -29,17 +29,17 @@ namespace MiniHold.App
         public Task Refresh() =>
             Act(() => Task.CompletedTask);
 
-        public Task Hold10Heat() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(10)));
+        public Task Hold15Heat() =>
+            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(15)));
 
-        public Task Hold10Cool() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, -2, TimeSpan.FromMinutes(10)));
+        public Task Hold15Cool() =>
+            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, -2, TimeSpan.FromMinutes(15)));
 
-        public Task Hold10Fan() =>
-            Act(async () => await QuickActions.SetFanAsync(ThermostatClient, true, TimeSpan.FromMinutes(10)));
+        public Task Hold15Fan() =>
+            Act(async () => await QuickActions.SetFanAsync(ThermostatClient, true, TimeSpan.FromMinutes(15)));
 
-        public Task Hold10Away() =>
-            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromMinutes(10)));
+        public Task Hold15Away() =>
+            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromMinutes(15)));
 
         public Task Hold30Heat() =>
             Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(30)));
@@ -59,8 +59,11 @@ namespace MiniHold.App
         public Task Hold4HAway() =>
             Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(4)));
 
-        public Task Hold6HAway() =>
-            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(6)));
+        public Task Hold12HAway() =>
+            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(12)));
+
+        public Task Hold7DAway() =>
+            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromDays(7)));
 
         public Task Hold7AAway() =>
             Act(async () => await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, DateTime.Parse("7:00 AM")));
@@ -70,6 +73,9 @@ namespace MiniHold.App
 
         public Task Hold9PAway() =>
             Act(async () => await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, DateTime.Parse("9:00 PM")));
+
+        public Task Hold10PAway() =>
+            Act(async () => await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, DateTime.Parse("10:00 PM")));
 
         public Task ClearHold() =>
             Act(async () => await ThermostatClient.CancelHoldAsync());

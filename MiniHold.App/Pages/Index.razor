@@ -62,19 +62,19 @@
                 <hr />
                 <div style="display: grid; row-gap: 1em; column-gap: 1em">
                     <h5 style="grid-row: 1; grid-column: 1">
-                        10m Hold
+                        15m Hold
                     </h5>
-                    <GridButton Position="(2, 1)" OnClick="ti.Hold10Heat" Text="+2°" />
-                    <GridButton Position="(3, 1)" OnClick="ti.Hold10Cool" Text="-2°" />
-                    <GridButton Position="(4, 1)" OnClick="ti.Hold10Fan" Text="Fan" />
-                    <GridButton Position="(5, 1)" OnClick="ti.Hold10Away" Text="Away" />
+                    <GridButton Position="(2, 1)" OnClick="ti.Hold15Heat" Text="+2°" />
+                    <GridButton Position="(3, 1)" OnClick="ti.Hold15Cool" Text="-2°" />
+                    <GridButton Position="(4, 1)" OnClick="ti.Hold15Fan" Text="Same + fan" />
+                    <GridButton Position="(5, 1)" OnClick="ti.Hold15Away" Text="Away" />
 
                     <h5 style="grid-row: 1; grid-column: 2">
                         30m Hold
                     </h5>
                     <GridButton Position="(2, 2)" OnClick="ti.Hold30Heat" Text="+2°" />
                     <GridButton Position="(3, 2)" OnClick="ti.Hold30Cool" Text="-2°" />
-                    <GridButton Position="(4, 2)" OnClick="ti.Hold30Fan" Text="Fan" />
+                    <GridButton Position="(4, 2)" OnClick="ti.Hold30Fan" Text="Same + fan" />
                     <GridButton Position="(5, 2)" OnClick="ti.Hold30Away" Text="Away" />
 
                     <h5 style="grid-row: 6; grid-column: 1 / 3">
@@ -82,10 +82,16 @@
                     </h5>
                     <GridButton Position="(7, 1)" OnClick="ti.Hold2HAway" Text="for 2 hours" />
                     <GridButton Position="(8, 1)" OnClick="ti.Hold4HAway" Text="for 4 hours" />
-                    <GridButton Position="(9, 1)" OnClick="ti.Hold6HAway" Text="for 6 hours" />
+                    <GridButton Position="(9, 1)" OnClick="ti.Hold12HAway" Text="for 12 hours" />
+                    <GridButton Position="(10, 1)" OnClick="ti.Hold7DAway" Text="for one week" />
                     <GridButton Position="(7, 2)" OnClick="ti.Hold7AAway" Text="until 7 am" />
                     <GridButton Position="(8, 2)" OnClick="ti.Hold4PAway" Text="until 4 pm" />
                     <GridButton Position="(9, 2)" OnClick="ti.Hold9PAway" Text="until 9 pm" />
+                    <GridButton Position="(10, 2)" OnClick="ti.Hold10PAway" Text="until 10 pm" />
+
+                    <div style="grid-row: 11; grid-column: 1 / 3" class="text-muted">
+                        (or until cancelled)
+                    </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">

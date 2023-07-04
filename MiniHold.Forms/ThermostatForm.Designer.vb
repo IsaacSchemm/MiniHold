@@ -664,7 +664,7 @@ Partial Class ThermostatForm
         GroupBox5.Size = New Size(87, 154)
         GroupBox5.TabIndex = 3
         GroupBox5.TabStop = False
-        GroupBox5.Text = "10m Hold"
+        GroupBox5.Text = "15m Hold"
         ' 
         ' Button6
         ' 
