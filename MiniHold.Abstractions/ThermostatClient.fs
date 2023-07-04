@@ -99,6 +99,7 @@ type Event = {
 }
 
 type ThermostatInformation = {
+    Mode: string
     EquipmentStatus: string list
     Desired: TempRange
     Actual: Readings
@@ -127,6 +128,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
         request.Selection.IncludeEvents <- true
         request.Selection.IncludeProgram <- true
         request.Selection.IncludeRuntime <- true
+        request.Selection.IncludeSettings <- true
         request.Selection.IncludeSensors <- true
         request.Selection.IncludeWeather <- true
         let! response = client.GetAsync<ThermostatRequest, ThermostatResponse>(request)
@@ -135,6 +137,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
         let t = Seq.exactlyOne response.ThermostatList
         let currentWeather = Seq.head t.Weather.Forecasts
         return {
+            Mode = t.Settings.HvacMode
             EquipmentStatus = t.EquipmentStatus.Split(',') |> Seq.except [""] |> Seq.toList
             Desired = {
                 HeatTemp = Temperature t.Runtime.DesiredHeat.Value

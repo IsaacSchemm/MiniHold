@@ -7,9 +7,6 @@
 
 @foreach (var ti in ClientStatic.ThermostatObjects)
 {
-    <h1>@ti.ThermostatClient.Name</h1>
-
-    <hr />
     <RefreshBox Thermostat="@ti" />
 
     <table class="table">

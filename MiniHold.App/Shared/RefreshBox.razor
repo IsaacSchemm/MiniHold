@@ -1,5 +1,22 @@
 ﻿@if (Thermostat != null)
 {
+    <h1>@Thermostat.ThermostatClient.Name</h1>
+
+    string cssClass = Thermostat.Information.Mode switch
+    {
+        "auto" => "bg-success",
+        "heat" => "bg-danger",
+        "auxHeatOnly" => "bg-danger",
+        "cool" => "bg-primary",
+        _ => "bg-secondary"
+    };
+
+    <div class="badge @cssClass">
+        @Thermostat.Information.Mode
+    </div>
+
+    <hr />
+
     <p align="center">
         Last updated:
         <br />
