@@ -8,7 +8,7 @@
 @if (ClientStatic.ThermostatObjects.Count == 0)
 {
     <p>
-        Use the API Connection page to set up the app.
+        Use the Setup page to set up the app.
     </p>
 }
 
@@ -80,9 +80,9 @@
                     <h5 style="grid-row: 6; grid-column: 1 / 3">
                         Away
                     </h5>
-                    <GridButton Position="(7, 1)" OnClick="ti.Hold2HAway" Text="for 2 hours" />
-                    <GridButton Position="(8, 1)" OnClick="ti.Hold4HAway" Text="for 4 hours" />
-                    <GridButton Position="(9, 1)" OnClick="ti.Hold12HAway" Text="for 12 hours" />
+                    <GridButton Position="(7, 1)" OnClick="ti.Hold1HAway" Text="for 1 hour" />
+                    <GridButton Position="(8, 1)" OnClick="ti.Hold2HAway" Text="for 2 hours" />
+                    <GridButton Position="(9, 1)" OnClick="ti.Hold4HAway" Text="for 4 hours" />
                     <GridButton Position="(10, 1)" OnClick="ti.Hold7DAway" Text="for one week" />
                     <GridButton Position="(7, 2)" OnClick="ti.Hold7AAway" Text="until 7 am" />
                     <GridButton Position="(8, 2)" OnClick="ti.Hold4PAway" Text="until 4 pm" />
