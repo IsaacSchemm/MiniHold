@@ -53,14 +53,14 @@ namespace MiniHold.App
         public Task Hold30Away() =>
             Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromMinutes(30)));
 
+        public Task Hold1HAway() =>
+            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(2)));
+
         public Task Hold2HAway() =>
             Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(2)));
 
         public Task Hold4HAway() =>
             Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(4)));
-
-        public Task Hold12HAway() =>
-            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(12)));
 
         public Task Hold7DAway() =>
             Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromDays(7)));
@@ -79,5 +79,16 @@ namespace MiniHold.App
 
         public Task ClearHold() =>
             Act(async () => await ThermostatClient.CancelHoldAsync());
+
+        public Task CreateVacation(string name, TempRange tempRange, DateTime startDate, DateTime endDate) =>
+            Act(async () => await ThermostatClient.CreateVacationAsync(
+                name,
+                tempRange,
+                ThermostatClient.ToThermostatTime(startDate),
+                ThermostatClient.ToThermostatTime(endDate),
+                0));
+
+        public Task DeleteVacation(string name) =>
+            Act(async () => await ThermostatClient.DeleteVacationAsync(name));
     }
 }

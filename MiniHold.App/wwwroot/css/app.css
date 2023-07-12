@@ -95,11 +95,11 @@ a, .btn-link {
     font-weight: bold;
 }
 
-.indexPage .temp {
+.temp {
     font-size: 150%;
 }
 
-.indexPage .tempBlock {
+.tempBlock {
     display: inline-block;
     margin-right: 0.5em;
 }

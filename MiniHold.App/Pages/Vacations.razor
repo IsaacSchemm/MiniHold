@@ -1,0 +1,163 @@
+﻿@inherits MiniHoldPage
+@page "/vacations"
+@inject IJSRuntime JsRuntime
+@using I8Beef.Ecobee;
+@using MiniHold.Abstractions;
+
+<LoadingSpinner Busy="@App.Busy" />
+
+@foreach (var ti in ClientStatic.ThermostatObjects)
+{
+    <RefreshBox Thermostat="@ti" />
+
+    foreach (var v in ti.Information.Events.Where(e => e.EventType == "vacation"))
+    {
+        <hr />
+
+        <h5>@v.Name</h5>
+
+        <p>
+            Start: <b>@v.StartDate?.ToString("dddd, MMMM d, yyyy")</b> (@v.StartDate?.ToString("h:mm tt"))
+            <br />
+            End: <b>@v.EndDate?.ToString("dddd, MMMM d, yyyy")</b> (@v.EndDate?.ToString("h:mm tt"))
+            <br />
+            @if (v.Running)
+            {
+                <div class="badge bg-primary">Running</div>
+            }
+            else
+            {
+                <div class="badge bg-secondary">Scheduled</div>
+            }
+        </p>
+        <p>
+            @foreach (var tr in v.AbsoluteTemperatureRanges)
+            {
+                <TemperatureDisplayBox UserInterfaceReading="@tr" />
+            }
+        </p>
+        <p>
+            @{
+                async Task del()
+                {
+                    if (await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to remove the vacation \"{v.Name}\" from the thermostat \"{ti.ThermostatClient.Name}\"?"))
+                    {
+                        await ti.DeleteVacation(v.Name);
+                    }
+                }
+            }
+            <button class="btn btn-danger" @onclick="del">Cancel</button>
+        </p>
+    }
+
+    <hr />
+
+    <p>
+        Add new vacation:
+    </p>
+}
+
+@if (ClientStatic.ThermostatObjects.Any())
+{
+    <form style="max-width: 400px; margin: auto">
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <label id="nameLabel" for="inputState" class="form-label">Name</label>
+                <input type="text" class="form-control" aria-labelledby="nameLabel" @bind-value="name">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <label id="startDate" for="inputState" class="form-label">Start date</label>
+            </div>
+            <div class="col-md-6 mb-3">
+                <input type="date" class="form-control" aria-labelledby="startDate" @bind-value="startDate">
+            </div>
+            <div class="col-md-6 mb-3">
+                <input type="time" class="form-control" aria-label="Start time" @bind-value="startTime">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <label id="endDate" for="inputState" class="form-label">End date</label>
+            </div>
+            <div class="col-md-6 mb-3">
+                <input type="date" class="form-control" aria-labelledby="startDate" @bind-value="endDate">
+            </div>
+            <div class="col-md-6 mb-3">
+                <input type="time" class="form-control" aria-label="End time" @bind-value="endTime">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label id="heatLabel" for="inputState" class="form-label">Heat at (°F)</label>
+                <input type="number"
+                       class="form-control"
+                       aria-labelledby="heatLabel"
+                       min="@ClientStatic.ThermostatObjects.Select(x => x.Information.HeatRangeLow.Farenheit).Max()"
+                       max="@ClientStatic.ThermostatObjects.Select(x => x.Information.HeatRangeHigh.Farenheit).Min()"
+                       step="0.1"
+                @bind-value="heatAt" />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label id="coolLabel" for="inputState" class="form-label">Cool at (°F)</label>
+                <input type="number"
+                       class="form-control"
+                       aria-labelledby="coolLabel"
+                       min="@ClientStatic.ThermostatObjects.Select(x => x.Information.CoolRangeLow.Farenheit).Max()"
+                       max="@ClientStatic.ThermostatObjects.Select(x => x.Information.CoolRangeHigh.Farenheit).Min()"
+                       step="0.1"
+                @bind-value="coolAt" />
+            </div>
+            <div class="col-md-4 mb-3" style="vertical-align: bottom">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="fanLabel" @bind-value="fan">
+                    <label class="form-check-label" for="fanLabel">
+                        Keep fan on
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mb-3">
+                <button type="submit" class="btn btn-primary" @onclick="submit">Add new vacation</button>
+            </div>
+        </div>
+    </form>
+}
+
+@code {
+    static TempRange getTemplate() => ClientStatic.ThermostatObjects
+        .SelectMany(x => x.Information.Events)
+        .Where(x => x.EventType == "template")
+        .SelectMany(x => x.AbsoluteTemperatureRanges)
+        .DefaultIfEmpty(new TempRange(
+            Temperature.FromFarenheit(58),
+            Temperature.FromFarenheit(82),
+            "auto"))
+        .First();
+
+    private string name = "Vacation";
+    private DateTime startDate = DateTime.Today.AddDays(1);
+    private DateTime startTime = new DateTime(2000, 1, 1, 12, 0, 0);
+    private DateTime endDate = DateTime.Today.AddDays(3);
+    private DateTime endTime = new DateTime(2000, 1, 1, 12, 0, 0);
+    private decimal heatAt = getTemplate().HeatTemp.Farenheit;
+    private decimal coolAt = getTemplate().CoolTemp.Farenheit;
+    private bool fan = getTemplate().Fan == "on";
+
+    async Task submit()
+    {
+        foreach (var t in ClientStatic.ThermostatObjects)
+        {
+            await t.CreateVacation(
+                name,
+                new TempRange(
+                    heatTemp: Temperature.FromFarenheit(heatAt),
+                    coolTemp: Temperature.FromFarenheit(coolAt),
+                    fan: fan ? "on" : "auto"),
+                startDate.Date + startTime.TimeOfDay,
+                endDate.Date + endTime.TimeOfDay);
+        }
+    }
+}

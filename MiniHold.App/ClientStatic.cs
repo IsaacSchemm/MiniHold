@@ -7,6 +7,8 @@ namespace MiniHold.App
 {
     public static class ClientStatic
     {
+        private static readonly SemaphoreSlim _establishListSem = new(1, 1);
+
         private static Pin _pin = null;
 
         public static string EcobeePin => _pin?.EcobeePin;
@@ -19,23 +21,32 @@ namespace MiniHold.App
 
 		public static async Task EstablishThermostatListAsync()
         {
-			if (HasToken)
-				return;
+            await _establishListSem.WaitAsync();
 
-            var c = new Client(Keys.ApiKey, GetStoredAuthTokenAsync, SetStoredAuthTokenAsync);
-            if (await GetStoredAuthTokenAsync() == null)
+            try
             {
-                _pin ??= await c.GetPinAsync();
-            }
-            else
-            {
-                _pin = null;
-                await foreach (var tClient in ThermostatEnumerator.FindAsync(c))
+                if (HasToken)
+                    return;
+
+                var c = new Client(Keys.ApiKey, GetStoredAuthTokenAsync, SetStoredAuthTokenAsync);
+                if (await GetStoredAuthTokenAsync() == null)
                 {
-                    var x = new ThermostatObject(tClient);
-                    await x.Refresh();
-                    _objs.Add(x);
+                    _pin ??= await c.GetPinAsync();
                 }
+                else
+                {
+                    _pin = null;
+                    await foreach (var tClient in ThermostatEnumerator.FindAsync(c))
+                    {
+                        var x = new ThermostatObject(tClient);
+                        await x.Refresh();
+                        _objs.Add(x);
+                    }
+                }
+            }
+            finally
+            {
+                _establishListSem.Release();
             }
         }
 

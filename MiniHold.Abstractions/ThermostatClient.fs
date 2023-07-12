@@ -91,6 +91,7 @@ type Override = {
 }
 
 type Event = {
+    Name: string
     EventType: string
     AbsoluteTemperatureRanges: TempRange list
     StartDate: Nullable<DateTime>
@@ -100,6 +101,10 @@ type Event = {
 
 type ThermostatInformation = {
     Mode: string
+    CoolRangeHigh: Temperature
+    CoolRangeLow: Temperature
+    HeatRangeHigh: Temperature
+    HeatRangeLow: Temperature
     EquipmentStatus: string list
     Desired: TempRange
     Actual: Readings
@@ -138,6 +143,10 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
         let currentWeather = Seq.head t.Weather.Forecasts
         return {
             Mode = t.Settings.HvacMode
+            CoolRangeHigh = Temperature t.Settings.CoolRangeHigh.Value
+            CoolRangeLow = Temperature t.Settings.CoolRangeLow.Value
+            HeatRangeHigh = Temperature t.Settings.HeatRangeHigh.Value
+            HeatRangeLow = Temperature t.Settings.HeatRangeLow.Value
             EquipmentStatus = t.EquipmentStatus.Split(',') |> Seq.except [""] |> Seq.toList
             Desired = {
                 HeatTemp = Temperature t.Runtime.DesiredHeat.Value
@@ -200,6 +209,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
             Events = [
                 for e in t.Events do
                     {
+                        Name = e.Name
                         EventType = e.Type
                         AbsoluteTemperatureRanges = [
                             if e.IsTemperatureAbsolute = Nullable(true) then {
@@ -273,6 +283,40 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
         request.Selection <- new Selection(SelectionType = "thermostats", SelectionMatch = thermostat.Identifier)
         request.Functions <- [|
             yield new ResumeProgramFunction(Params = new ResumeProgramParams(ResumeAll = false))
+        |]
+        let! response = client.PostAsync<ThermostatUpdateRequest, Response>(request)
+        if response.Status.Code.HasValue && response.Status.Code.Value <> 0 then
+            failwithf "%d: %s" response.Status.Code.Value response.Status.Message
+    }
+
+    member _.CreateVacationAsync(name: string, tempRange: TempRange, startTime: DateTime, endTime: DateTime, fanMinOnTime: int) = task {
+        let request = new ThermostatUpdateRequest()
+        request.Selection <- new Selection(SelectionType = "thermostats", SelectionMatch = thermostat.Identifier)
+        request.Functions <- [|
+            let ps = new CreateVacationParams()
+
+            ps.Name <- name
+            ps.CoolHoldTemp <- tempRange.CoolTemp.Tenths
+            ps.HeatHoldTemp <- tempRange.HeatTemp.Tenths
+            ps.StartDate <- startTime.ToString("yyyy-MM-dd")
+            ps.StartTime <- startTime.ToString("HH:mm:ss")
+            ps.EndDate <- endTime.ToString("yyyy-MM-dd")
+            ps.EndTime <- endTime.ToString("HH:mm:ss")
+            ps.Fan <- tempRange.Fan
+            ps.FanMinOnTime <- sprintf "%d" fanMinOnTime
+
+            yield new CreateVacationFunction(Params = ps)
+        |]
+        let! response = client.PostAsync<ThermostatUpdateRequest, Response>(request)
+        if response.Status.Code.HasValue && response.Status.Code.Value <> 0 then
+            failwithf "%d: %s" response.Status.Code.Value response.Status.Message
+    }
+
+    member _.DeleteVacationAsync(name: string) = task {
+        let request = new ThermostatUpdateRequest()
+        request.Selection <- new Selection(SelectionType = "thermostats", SelectionMatch = thermostat.Identifier)
+        request.Functions <- [|
+            yield new DeleteVacationFunction(Params = new DeleteVacationParams(Name = name))
         |]
         let! response = client.PostAsync<ThermostatUpdateRequest, Response>(request)
         if response.Status.Code.HasValue && response.Status.Code.Value <> 0 then
