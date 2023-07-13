@@ -83,11 +83,13 @@
                     <GridButton Position="(7, 1)" OnClick="ti.Hold1HAway" Text="for 1 hour" />
                     <GridButton Position="(8, 1)" OnClick="ti.Hold2HAway" Text="for 2 hours" />
                     <GridButton Position="(9, 1)" OnClick="ti.Hold4HAway" Text="for 4 hours" />
-                    <GridButton Position="(10, 1)" OnClick="ti.Hold7DAway" Text="for one week" />
                     <GridButton Position="(7, 2)" OnClick="ti.Hold7AAway" Text="until 7 am" />
                     <GridButton Position="(8, 2)" OnClick="ti.Hold4PAway" Text="until 4 pm" />
                     <GridButton Position="(9, 2)" OnClick="ti.Hold9PAway" Text="until 9 pm" />
-                    <GridButton Position="(10, 2)" OnClick="ti.Hold10PAway" Text="until 10 pm" />
+
+                    <button class="btn btn-secondary" style="grid-row: 10; grid-column: 1 / 3" @onclick="ti.Hold7DAway">
+                        for one week
+                    </button>
 
                     <div style="grid-row: 11; grid-column: 1 / 3" class="text-muted">
                         (or until cancelled)

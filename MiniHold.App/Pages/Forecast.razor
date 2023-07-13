@@ -1,0 +1,18 @@
+﻿@inherits MiniHoldPage
+@page "/forecast"
+@using I8Beef.Ecobee;
+@using MiniHold.Abstractions;
+
+<LoadingSpinner Busy="@App.Busy" />
+
+@foreach (var ti in ClientStatic.ThermostatObjects)
+{
+    <RefreshBox Thermostat="@ti" />
+
+    foreach (var f in ti.Information.DailyForecasts)
+    {
+        <h3>@f.Date.ToString("dddd, MMM d")</h3>
+        <TemperatureDisplayBox UserInterfaceReading="@f" />
+        <hr />
+    }
+}

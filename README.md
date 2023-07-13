@@ -7,6 +7,7 @@ thermostats.
   current indoor temperature, and the thermostat's current setting
 * View the thermostat's current base program and the current or next hold
   event (if any)
+* View the daily weather forecast from the ecobee web service
 * Set a 10-minute or 30-minute hold to raise or lower the temperature range by
   2°F, or to force the fan to run
 * Set a hold on the Away comfort setting in short-term intervals, for the next

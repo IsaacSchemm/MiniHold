@@ -66,6 +66,25 @@ with
         member this.Temperatures = ["", this.Temperature]
         member this.OtherReadings = ["Condition", this.Condition; "Humidity", this.Humidity.PercentageString]
 
+type DailyForecast = {
+    Date: DateTime
+    High: Temperature
+    Low: Temperature
+    Condition: string
+    Pop: Nullable<int>
+}
+with
+    interface IUserInterfaceReading with
+        member this.Temperatures = [
+            "High", this.High
+            "Low", this.Low
+        ]
+        member this.OtherReadings = [
+            "Condition", this.Condition
+            if this.Pop.HasValue && this.Pop.Value > 0 then
+                "Chance of Precipitation", $"{this.Pop}%%"
+        ]
+
 type Program = {
     Name: string
     CoolTemp: Temperature
@@ -110,6 +129,7 @@ type ThermostatInformation = {
     Actual: Readings
     Sensors: Sensor list
     Weather: Weather
+    DailyForecasts: DailyForecast list
     Program: Program
     Alerts: Alert list
     Events: Event list
@@ -189,6 +209,17 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                 Temperature = Temperature currentWeather.Temperature.Value
                 Humidity = Humidity currentWeather.RelativeHumidity.Value
             }
+            DailyForecasts = [
+                for w in t.Weather.Forecasts do
+                    if w.TempHigh <> Nullable -5002 && w.TempLow <> Nullable -5002 then
+                        {
+                            Date = DateTime.Parse w.DateTime
+                            High = Temperature w.TempHigh.Value
+                            Low = Temperature w.TempLow.Value
+                            Condition = w.Condition
+                            Pop = w.Pop
+                        }
+            ]
             Program = Seq.head (seq {
                 for c in t.Program.Climates do
                     if c.ClimateRef = t.Program.CurrentClimateRef then
