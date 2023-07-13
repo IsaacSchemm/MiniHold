@@ -21,9 +21,10 @@ with
     member this.AddFarenheit degrees = Temperature.FromFarenheit (this.Farenheit + degrees)
 
 [<StructuredFormatDisplay("{PercentageString}")>]
-type Humidity = Humidity of int
+type Percentage = Percentage of int
 with
-    member this.PercentageString = let (Humidity x) = this in sprintf "%d%%" x
+    member this.Value = let (Percentage x) = this in x
+    member this.PercentageString = sprintf "%d%%" this.Value
 
 type IUserInterfaceReading =
     abstract member Temperatures: (string * Temperature) list
@@ -43,7 +44,7 @@ type TempRange = {
 
 type Readings = {
     Temperature: Temperature list
-    Humidity: Humidity list
+    Humidity: Percentage list
 }
 with
     interface IUserInterfaceReading with
@@ -59,7 +60,7 @@ type Sensor = {
 type Weather = {
     Condition: string
     Temperature: Temperature
-    Humidity: Humidity
+    Humidity: Percentage
 }
 with
     interface IUserInterfaceReading with
@@ -71,7 +72,7 @@ type DailyForecast = {
     High: Temperature
     Low: Temperature
     Condition: string
-    Pop: Nullable<int>
+    Pop: Percentage
 }
 with
     interface IUserInterfaceReading with
@@ -81,8 +82,8 @@ with
         ]
         member this.OtherReadings = [
             "Condition", this.Condition
-            if this.Pop.HasValue && this.Pop.Value > 0 then
-                "Chance of Precipitation", $"{this.Pop}%%"
+            if this.Pop.Value > 0 then
+                "Chance of Precipitation", this.Pop.PercentageString
         ]
 
 type Program = {
@@ -180,7 +181,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                 ]
                 Humidity = [
                     if t.Runtime.ActualHumidity.HasValue then
-                        Humidity t.Runtime.ActualHumidity.Value
+                        Percentage t.Runtime.ActualHumidity.Value
                 ]
             }
             Sensors = [
@@ -199,7 +200,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                         Humidity = [
                             for c in s.Capability do
                                 if c.Type = "humidity" then
-                                    Humidity (Int32.Parse c.Value)
+                                    Percentage (Int32.Parse c.Value)
                         ]
                     }
                 }
@@ -207,7 +208,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
             Weather = {
                 Condition = currentWeather.Condition
                 Temperature = Temperature currentWeather.Temperature.Value
-                Humidity = Humidity currentWeather.RelativeHumidity.Value
+                Humidity = Percentage currentWeather.RelativeHumidity.Value
             }
             DailyForecasts = [
                 for w in t.Weather.Forecasts do
@@ -217,7 +218,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                             High = Temperature w.TempHigh.Value
                             Low = Temperature w.TempLow.Value
                             Condition = w.Condition
-                            Pop = w.Pop
+                            Pop = Percentage w.Pop.Value
                         }
             ]
             Program = Seq.head (seq {
