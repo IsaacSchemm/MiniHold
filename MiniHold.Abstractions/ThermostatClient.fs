@@ -121,6 +121,8 @@ type Event = {
 
 type ThermostatInformation = {
     Mode: string
+    CompressorMin: Temperature
+    AuxMax: Temperature
     CoolRangeHigh: Temperature
     CoolRangeLow: Temperature
     HeatRangeHigh: Temperature
@@ -164,6 +166,8 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
         let currentWeather = Seq.head t.Weather.Forecasts
         return {
             Mode = t.Settings.HvacMode
+            CompressorMin = Temperature t.Settings.CompressorProtectionMinTemp.Value
+            AuxMax = Temperature t.Settings.AuxMaxOutdoorTemp.Value
             CoolRangeHigh = Temperature t.Settings.CoolRangeHigh.Value
             CoolRangeLow = Temperature t.Settings.CoolRangeLow.Value
             HeatRangeHigh = Temperature t.Settings.HeatRangeHigh.Value
