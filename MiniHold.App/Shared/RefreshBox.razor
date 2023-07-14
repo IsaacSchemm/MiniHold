@@ -1,6 +1,11 @@
 ﻿@if (Thermostat != null)
 {
-    <h1>@Thermostat.ThermostatClient.Name</h1>
+    <h1>
+        <span class="visually-hidden">
+            Current thermostat:
+        </span>
+        @Thermostat.ThermostatClient.Name
+    </h1>
 
     string cssClass = Thermostat.Information.Mode switch
     {
@@ -12,6 +17,9 @@
     };
 
     <div class="badge @cssClass">
+        <span class="visually-hidden">
+            Thermostat mode:
+        </span>
         @Thermostat.Information.Mode
     </div>
 
@@ -20,7 +28,7 @@
     <p align="center">
         Last updated:
         <br />
-        @Thermostat.LastUpdated.ToLocalTime()
+        @Thermostat.LastUpdated.ToLocalTime().ToString("h:mm tt on MMMM d, yyyy")
         <br />
         <button class="btn btn-primary mt-2" @onclick="Thermostat.Refresh">
             Refresh

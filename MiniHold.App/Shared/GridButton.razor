@@ -1,5 +1,11 @@
 ﻿<button class="btn btn-secondary @(Positive ? "heat" : Negative ? "cool" : "")" style="grid-row: @Position.row; grid-column: @Position.col" @onclick="OnClick">
+    <span class="visually-hidden">
+        @Prefix
+    </span>
     @Text
+    <span class="visually-hidden">
+        (@Suffix)
+    </span>
 </button>
 
 @code {
@@ -9,6 +15,10 @@
     public EventCallback<MouseEventArgs> OnClick { get; set; }
     [Parameter]
     public string Text { get; set; }
+    [Parameter]
+    public string Prefix { get; set; }
+    [Parameter]
+    public string Suffix { get; set; }
 
     public bool Positive => Text.StartsWith("+");
     public bool Negative => Text.StartsWith("-");

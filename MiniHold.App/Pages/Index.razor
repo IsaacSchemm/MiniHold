@@ -25,6 +25,9 @@
     {
         <hr />
         <div title="Running Equipment">
+            <span class="visually-hidden">
+                Running equipment:
+            </span>
             @foreach (var eq in equipment)
             {
                 <div class="badge @(eq.Heat ? "bg-danger" : eq.Cool ? "bg-primary" : "bg-secondary")">
@@ -49,6 +52,7 @@
         <div class="row">
             <div class="col-md-6 col-lg-4">
                 <hr />
+                <h4 class="visually-hidden">Temperature Readings</h4>
                 <h5>Outdoor</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.Weather" />
                 <hr />
@@ -60,34 +64,38 @@
             </div>
             <div class="col-md-6 col-lg-4">
                 <hr />
+                <h4 class="visually-hidden">Temperature Controls</h4>
                 <div style="display: grid; row-gap: 1em; column-gap: 1em">
                     <h5 style="grid-row: 1; grid-column: 1">
                         15m Hold
                     </h5>
-                    <GridButton Position="(2, 1)" OnClick="ti.Hold15Heat" Text="+2°" />
-                    <GridButton Position="(3, 1)" OnClick="ti.Hold15Cool" Text="-2°" />
-                    <GridButton Position="(4, 1)" OnClick="ti.Hold15Fan" Text="Same + fan" />
-                    <GridButton Position="(5, 1)" OnClick="ti.Hold15Away" Text="Away" />
+                    <GridButton Position="(2, 1)" OnClick="ti.Hold15Heat" Text="+2°" Suffix="for 15 minutes" />
+                    <GridButton Position="(3, 1)" OnClick="ti.Hold15Cool" Text="-2°" Suffix="for 15 minutes" />
+                    <GridButton Position="(4, 1)" OnClick="ti.Hold15Fan" Text="Same + fan" Suffix="for 15 minutes" />
+                    <GridButton Position="(5, 1)" OnClick="ti.Hold15Away" Text="Away" Suffix="for 15 minutes" />
 
                     <h5 style="grid-row: 1; grid-column: 2">
                         30m Hold
                     </h5>
-                    <GridButton Position="(2, 2)" OnClick="ti.Hold30Heat" Text="+2°" />
-                    <GridButton Position="(3, 2)" OnClick="ti.Hold30Cool" Text="-2°" />
-                    <GridButton Position="(4, 2)" OnClick="ti.Hold30Fan" Text="Same + fan" />
-                    <GridButton Position="(5, 2)" OnClick="ti.Hold30Away" Text="Away" />
+                    <GridButton Position="(2, 2)" OnClick="ti.Hold30Heat" Text="+2°" Suffix="for 30 minutes" />
+                    <GridButton Position="(3, 2)" OnClick="ti.Hold30Cool" Text="-2°" Suffix="for 30 minutes" />
+                    <GridButton Position="(4, 2)" OnClick="ti.Hold30Fan" Text="Same + fan" Suffix="for 30 minutes" />
+                    <GridButton Position="(5, 2)" OnClick="ti.Hold30Away" Text="Away" Suffix="for 30 minutes" />
 
                     <h5 style="grid-row: 6; grid-column: 1 / 3">
                         Away
                     </h5>
-                    <GridButton Position="(7, 1)" OnClick="ti.Hold1HAway" Text="for 1 hour" />
-                    <GridButton Position="(8, 1)" OnClick="ti.Hold2HAway" Text="for 2 hours" />
-                    <GridButton Position="(9, 1)" OnClick="ti.Hold4HAway" Text="for 4 hours" />
-                    <GridButton Position="(7, 2)" OnClick="ti.Hold7AAway" Text="until 7 am" />
-                    <GridButton Position="(8, 2)" OnClick="ti.Hold4PAway" Text="until 4 pm" />
-                    <GridButton Position="(9, 2)" OnClick="ti.Hold9PAway" Text="until 9 pm" />
+                    <GridButton Position="(7, 1)" OnClick="ti.Hold1HAway" Text="for 1 hour" Prefix="Away" />
+                    <GridButton Position="(8, 1)" OnClick="ti.Hold2HAway" Text="for 2 hours" Prefix="Away" />
+                    <GridButton Position="(9, 1)" OnClick="ti.Hold4HAway" Text="for 4 hours" Prefix="Away" />
+                    <GridButton Position="(7, 2)" OnClick="ti.Hold7AAway" Text="until 7 am" Prefix="Away" />
+                    <GridButton Position="(8, 2)" OnClick="ti.Hold4PAway" Text="until 4 pm" Prefix="Away" />
+                    <GridButton Position="(9, 2)" OnClick="ti.Hold9PAway" Text="until 9 pm" Prefix="Away" />
 
                     <button class="btn btn-secondary" style="grid-row: 10; grid-column: 1 / 3" @onclick="ti.Hold7DAway">
+                        <span class="visually-hidden">
+                            Away
+                        </span>
                         for one week
                     </button>
 
@@ -98,6 +106,7 @@
             </div>
             <div class="col-md-6 col-lg-4">
                 <hr />
+                <h4 class="visually-hidden">Current Thermostat Settings</h4>
                 <h5>Program</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.Program" />
                 @if (info.Events.Where(x => x.Running).FirstOrDefault() is Event e && e.EventType == "hold")
