@@ -72,6 +72,7 @@ Public Class ThermostatForm
         Next
 
         TextBox1.Text = $"{information}".Replace(vbLf, vbCrLf)
+        TextBox2.Text = information.GetThresholdReport()
 
         LastDesired = information.Desired
     End Function

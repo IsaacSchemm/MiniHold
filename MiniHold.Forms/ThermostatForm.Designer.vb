@@ -93,6 +93,8 @@ Partial Class ThermostatForm
         Button11 = New Button()
         Button10 = New Button()
         TabControl1 = New TabControl()
+        TabPage3 = New TabPage()
+        TextBox2 = New TextBox()
         GroupBox1.SuspendLayout()
         GroupBox10.SuspendLayout()
         TabPage2.SuspendLayout()
@@ -108,6 +110,7 @@ Partial Class ThermostatForm
         GroupBox4.SuspendLayout()
         GroupBox9.SuspendLayout()
         TabControl1.SuspendLayout()
+        TabPage3.SuspendLayout()
         SuspendLayout()
         ' 
         ' GroupBox1
@@ -835,12 +838,37 @@ Partial Class ThermostatForm
         TabControl1.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         TabControl1.Controls.Add(TabPage1)
         TabControl1.Controls.Add(TabPage5)
+        TabControl1.Controls.Add(TabPage3)
         TabControl1.Controls.Add(TabPage2)
         TabControl1.Location = New Point(12, 101)
         TabControl1.Name = "TabControl1"
         TabControl1.SelectedIndex = 0
         TabControl1.Size = New Size(498, 337)
         TabControl1.TabIndex = 0
+        ' 
+        ' TabPage3
+        ' 
+        TabPage3.Controls.Add(TextBox2)
+        TabPage3.Location = New Point(4, 24)
+        TabPage3.Name = "TabPage3"
+        TabPage3.Padding = New Padding(3)
+        TabPage3.Size = New Size(490, 309)
+        TabPage3.TabIndex = 5
+        TabPage3.Text = "Threshold Comparison"
+        TabPage3.UseVisualStyleBackColor = True
+        ' 
+        ' TextBox2
+        ' 
+        TextBox2.Dock = DockStyle.Fill
+        TextBox2.Font = New Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point)
+        TextBox2.Location = New Point(3, 3)
+        TextBox2.Multiline = True
+        TextBox2.Name = "TextBox2"
+        TextBox2.ReadOnly = True
+        TextBox2.ScrollBars = ScrollBars.Both
+        TextBox2.Size = New Size(484, 303)
+        TextBox2.TabIndex = 11
+        TextBox2.WordWrap = False
         ' 
         ' ThermostatForm
         ' 
@@ -875,6 +903,8 @@ Partial Class ThermostatForm
         GroupBox4.ResumeLayout(False)
         GroupBox9.ResumeLayout(False)
         TabControl1.ResumeLayout(False)
+        TabPage3.ResumeLayout(False)
+        TabPage3.PerformLayout()
         ResumeLayout(False)
     End Sub
 
@@ -949,4 +979,6 @@ Partial Class ThermostatForm
     Friend WithEvents CoolFan As Label
     Friend WithEvents Label8 As Label
     Friend WithEvents HeatFan As Label
+    Friend WithEvents TabPage3 As TabPage
+    Friend WithEvents TextBox2 As TextBox
 End Class

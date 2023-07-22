@@ -16,6 +16,8 @@ with
     member this.FarenheitString = sprintf "%.0f°F" this.Farenheit
     member this.PreciseFarenheitString = sprintf "%.1f°F" this.Farenheit
 
+    member this.Celsius = (decimal this.Farenheit - 32m) / 1.8m
+
     static member FromFarenheit degrees = degrees * 10m |> Math.Round |> int |> Temperature
 
     member this.AddFarenheit degrees = Temperature.FromFarenheit (this.Farenheit + degrees)
@@ -119,10 +121,20 @@ type Event = {
     Running: bool
 }
 
+type ComfortLevelThresholds = {
+    ComfortLevelName: string
+    Min: Temperature
+    Max: Temperature
+    CoolDelta: Temperature
+    HeatDelta: Temperature
+} with
+    member this.HeatAt = Temperature (this.Min.Tenths - this.HeatDelta.Tenths)
+    member this.CoolAt = Temperature (this.Max.Tenths + this.CoolDelta.Tenths)
+
 type ThermostatInformation = {
     Mode: string
-    CompressorMin: Temperature
-    AuxMax: Temperature
+    AuxCrossover: Temperature * Temperature
+    Thresholds: ComfortLevelThresholds list
     CoolRangeHigh: Temperature
     CoolRangeLow: Temperature
     HeatRangeHigh: Temperature
@@ -136,7 +148,34 @@ type ThermostatInformation = {
     Program: Program
     Alerts: Alert list
     Events: Event list
-}
+} with
+    member this.GetThresholdReport() = String.concat "\r\n" [
+        let minimum = List.min [for x in this.Thresholds do x.HeatAt]
+        let maximum = List.max [for x in this.Thresholds do x.CoolAt]
+        for x in minimum.Farenheit - 1m .. 0.2m .. maximum.Farenheit + 1m do
+            String.concat "  " [
+                let t = Temperature .FromFarenheit x
+
+                if Math.Round t.Farenheit = t.Farenheit then
+                    sprintf "%.0f°F" t.Farenheit
+                else
+                    "    "
+
+                for c in this.Thresholds do
+                    c.ComfortLevelName
+
+                    if t < c.HeatAt then "Heat"
+                    else if t < c.Min then "****"
+                    else if t < c.Max then "    "
+                    else if t < c.CoolAt then "~~~~"
+                    else "Cool"
+
+                if Math.Round t.Celsius = t.Celsius then
+                    sprintf "%.0f°C" t.Celsius
+                else
+                    "    "
+            ]
+    ]
 
 type ThermostatClient(client: IClient, thermostat: Thermostat) =
     let timeZone = TimeZoneInfo.FindSystemTimeZoneById(thermostat.Location.TimeZone)
@@ -166,8 +205,17 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
         let currentWeather = Seq.head t.Weather.Forecasts
         return {
             Mode = t.Settings.HvacMode
-            CompressorMin = Temperature t.Settings.CompressorProtectionMinTemp.Value
-            AuxMax = Temperature t.Settings.AuxMaxOutdoorTemp.Value
+            AuxCrossover = (Temperature t.Settings.CompressorProtectionMinTemp.Value, Temperature t.Settings.AuxMaxOutdoorTemp.Value)
+            Thresholds = [
+                for c in t.Program.Climates do
+                    {
+                        ComfortLevelName = c.Name
+                        Min = Temperature c.HeatTemp.Value
+                        Max = Temperature c.CoolTemp.Value
+                        CoolDelta = Temperature t.Settings.Stage1CoolingDifferentialTemp.Value
+                        HeatDelta = Temperature t.Settings.Stage1HeatingDifferentialTemp.Value
+                    }
+            ]
             CoolRangeHigh = Temperature t.Settings.CoolRangeHigh.Value
             CoolRangeLow = Temperature t.Settings.CoolRangeLow.Value
             HeatRangeHigh = Temperature t.Settings.HeatRangeHigh.Value
