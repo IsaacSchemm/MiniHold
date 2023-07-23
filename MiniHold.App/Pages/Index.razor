@@ -128,6 +128,79 @@
                     </center>
                 }
             </div>
+            <div class="col-xl-6">
+                <hr />
+                <h4>Sensors</h4>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Temp</th>
+                            <th scope="col">Occ.</th>
+                            <th scope="col">Diff.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in ti.Information.Sensors)
+                        {
+                            var average = ti.Information.Actual.Temperature.SingleOrDefault();
+                            var specific = s.Readings.Temperature.SingleOrDefault();
+                            var offset = Temperature.FromFarenheit(specific.Farenheit - average.Farenheit);
+                            <tr>
+                                <td>@s.Name</td>
+                                <td>@specific</td>
+                                <td>@s.Occupied</td>
+                                <td>@offset</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-xl-6">
+                <hr />
+                <h4>Comfort Settings</h4>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">
+                                Heat at
+                            </th>
+                            <th scope="col">
+                                Stop at
+                            </th>
+                            <th scope="col">
+                                Cool at
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in ti.Information.ComfortLevels)
+                        {
+                            <tr>
+                                <td>
+                                    @s.Name
+                                    @if (s.Active) {
+                                        <span class="visually-hidden">(active)</span>
+                                        <span aria-hidden="true">✓</span>
+                                    }
+                                </td>
+                                <td>
+                                    @s.HeatAt
+                                </td>
+                                <td>
+                                    @s.Min – @s.Max
+                                </td>
+                                <td>
+                                    @s.CoolAt
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 }

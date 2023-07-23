@@ -71,8 +71,16 @@ Public Class ThermostatForm
             FlowLayoutPanel1.Controls.Add(indicator)
         Next
 
+        DataGridView1.Rows.Clear()
+        For Each c In information.ComfortLevels
+            Dim name = c.Name
+            If c.Active Then
+                name &= " (active)"
+            End If
+            DataGridView1.Rows.Add(name, c.HeatAt, $"{c.Min} – {c.Max}", c.CoolAt)
+        Next
+
         TextBox1.Text = $"{information}".Replace(vbLf, vbCrLf)
-        TextBox2.Text = information.GetThresholdReport()
 
         LastDesired = information.Desired
     End Function

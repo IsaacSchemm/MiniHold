@@ -94,7 +94,11 @@ Partial Class ThermostatForm
         Button10 = New Button()
         TabControl1 = New TabControl()
         TabPage3 = New TabPage()
-        TextBox2 = New TextBox()
+        DataGridView1 = New DataGridView()
+        DataGridViewTextBoxColumn1 = New DataGridViewTextBoxColumn()
+        DataGridViewTextBoxColumn2 = New DataGridViewTextBoxColumn()
+        DataGridViewTextBoxColumn3 = New DataGridViewTextBoxColumn()
+        DataGridViewTextBoxColumn4 = New DataGridViewTextBoxColumn()
         GroupBox1.SuspendLayout()
         GroupBox10.SuspendLayout()
         TabPage2.SuspendLayout()
@@ -111,6 +115,7 @@ Partial Class ThermostatForm
         GroupBox9.SuspendLayout()
         TabControl1.SuspendLayout()
         TabPage3.SuspendLayout()
+        CType(DataGridView1, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' GroupBox1
@@ -848,27 +853,54 @@ Partial Class ThermostatForm
         ' 
         ' TabPage3
         ' 
-        TabPage3.Controls.Add(TextBox2)
+        TabPage3.Controls.Add(DataGridView1)
         TabPage3.Location = New Point(4, 24)
         TabPage3.Name = "TabPage3"
         TabPage3.Padding = New Padding(3)
         TabPage3.Size = New Size(490, 309)
         TabPage3.TabIndex = 5
-        TabPage3.Text = "Threshold Comparison"
+        TabPage3.Text = "Comfort Levels"
         TabPage3.UseVisualStyleBackColor = True
         ' 
-        ' TextBox2
+        ' DataGridView1
         ' 
-        TextBox2.Dock = DockStyle.Fill
-        TextBox2.Font = New Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point)
-        TextBox2.Location = New Point(3, 3)
-        TextBox2.Multiline = True
-        TextBox2.Name = "TextBox2"
-        TextBox2.ReadOnly = True
-        TextBox2.ScrollBars = ScrollBars.Both
-        TextBox2.Size = New Size(484, 303)
-        TextBox2.TabIndex = 11
-        TextBox2.WordWrap = False
+        DataGridView1.AllowUserToAddRows = False
+        DataGridView1.AllowUserToDeleteRows = False
+        DataGridView1.AllowUserToOrderColumns = True
+        DataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+        DataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        DataGridView1.Columns.AddRange(New DataGridViewColumn() {DataGridViewTextBoxColumn1, DataGridViewTextBoxColumn2, DataGridViewTextBoxColumn3, DataGridViewTextBoxColumn4})
+        DataGridView1.Dock = DockStyle.Fill
+        DataGridView1.Location = New Point(3, 3)
+        DataGridView1.Name = "DataGridView1"
+        DataGridView1.ReadOnly = True
+        DataGridView1.RowTemplate.Height = 25
+        DataGridView1.Size = New Size(484, 303)
+        DataGridView1.TabIndex = 1
+        ' 
+        ' DataGridViewTextBoxColumn1
+        ' 
+        DataGridViewTextBoxColumn1.HeaderText = "Name"
+        DataGridViewTextBoxColumn1.Name = "DataGridViewTextBoxColumn1"
+        DataGridViewTextBoxColumn1.ReadOnly = True
+        ' 
+        ' DataGridViewTextBoxColumn2
+        ' 
+        DataGridViewTextBoxColumn2.HeaderText = "Heat At"
+        DataGridViewTextBoxColumn2.Name = "DataGridViewTextBoxColumn2"
+        DataGridViewTextBoxColumn2.ReadOnly = True
+        ' 
+        ' DataGridViewTextBoxColumn3
+        ' 
+        DataGridViewTextBoxColumn3.HeaderText = "Stop At"
+        DataGridViewTextBoxColumn3.Name = "DataGridViewTextBoxColumn3"
+        DataGridViewTextBoxColumn3.ReadOnly = True
+        ' 
+        ' DataGridViewTextBoxColumn4
+        ' 
+        DataGridViewTextBoxColumn4.HeaderText = "Cool At"
+        DataGridViewTextBoxColumn4.Name = "DataGridViewTextBoxColumn4"
+        DataGridViewTextBoxColumn4.ReadOnly = True
         ' 
         ' ThermostatForm
         ' 
@@ -904,7 +936,7 @@ Partial Class ThermostatForm
         GroupBox9.ResumeLayout(False)
         TabControl1.ResumeLayout(False)
         TabPage3.ResumeLayout(False)
-        TabPage3.PerformLayout()
+        CType(DataGridView1, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
     End Sub
 
@@ -980,5 +1012,9 @@ Partial Class ThermostatForm
     Friend WithEvents Label8 As Label
     Friend WithEvents HeatFan As Label
     Friend WithEvents TabPage3 As TabPage
-    Friend WithEvents TextBox2 As TextBox
+    Friend WithEvents DataGridView1 As DataGridView
+    Friend WithEvents DataGridViewTextBoxColumn1 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn2 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn3 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn4 As DataGridViewTextBoxColumn
 End Class
