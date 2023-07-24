@@ -7,6 +7,13 @@
         @Thermostat.ThermostatClient.Name
     </h1>
 
+    foreach (var a in Thermostat.Information.Alerts)
+    {
+        <div class="alert alert-danger" role="alert">
+            @a.Text (@a.DateTime)
+        </div>
+    }
+
     string cssClass = Thermostat.Information.Mode switch
     {
         "auto" => "bg-success",
