@@ -174,19 +174,19 @@ Public Class ThermostatForm
 
     Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
         Act(Async Function()
-                Await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, #7:00 AM#)
+                Await QuickActions.SetAwayUntilClockAsync(ThermostatClient, #7:00 AM#.TimeOfDay)
             End Function)
     End Sub
 
     Private Sub Button14_Click(sender As Object, e As EventArgs) Handles Button14.Click
         Act(Async Function()
-                Await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, #4:00 PM#)
+                Await QuickActions.SetAwayUntilClockAsync(ThermostatClient, #4:00 PM#.TimeOfDay)
             End Function)
     End Sub
 
     Private Sub Button15_Click(sender As Object, e As EventArgs) Handles Button15.Click
         Act(Async Function()
-                Await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, #9:00 PM#)
+                Await QuickActions.SetAwayUntilClockAsync(ThermostatClient, #9:00 PM#.TimeOfDay)
             End Function)
     End Sub
 

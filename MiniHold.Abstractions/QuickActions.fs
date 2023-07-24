@@ -30,9 +30,9 @@ module QuickActions =
         do! client.HoldComfortSettingAsync("away", startTime, endTime)
     }
 
-    let SetAwayUntilTimeAsync(client: ThermostatClient, time: DateTime) = task {
+    let SetAwayUntilClockAsync(client: ThermostatClient, timeOfDay: TimeSpan) = task {
         let startTime = client.ToThermostatTime(DateTime.UtcNow)
-        let mutable endTime = startTime.Date + time.TimeOfDay
+        let mutable endTime = startTime.Date + timeOfDay
         if endTime < startTime then
             endTime <- endTime.AddDays(1)
         do! client.HoldComfortSettingAsync("away", startTime, endTime)

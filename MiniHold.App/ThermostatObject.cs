@@ -1,4 +1,5 @@
 ﻿using MiniHold.Abstractions;
+using System.Globalization;
 
 namespace MiniHold.App
 {
@@ -66,16 +67,13 @@ namespace MiniHold.App
             Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromDays(7)));
 
         public Task Hold7AAway() =>
-            Act(async () => await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, DateTime.Parse("7:00 AM")));
+            Act(async () => await QuickActions.SetAwayUntilClockAsync(ThermostatClient, TimeSpan.FromHours(7)));
 
         public Task Hold4PAway() =>
-            Act(async () => await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, DateTime.Parse("4:00 PM")));
+            Act(async () => await QuickActions.SetAwayUntilClockAsync(ThermostatClient, TimeSpan.FromHours(12 + 4)));
 
         public Task Hold9PAway() =>
-            Act(async () => await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, DateTime.Parse("9:00 PM")));
-
-        public Task Hold10PAway() =>
-            Act(async () => await QuickActions.SetAwayUntilTimeAsync(ThermostatClient, DateTime.Parse("10:00 PM")));
+            Act(async () => await QuickActions.SetAwayUntilClockAsync(ThermostatClient, TimeSpan.FromHours(12 + 9)));
 
         public Task ClearHold() =>
             Act(async () => await ThermostatClient.CancelHoldAsync());
