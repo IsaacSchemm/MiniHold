@@ -790,7 +790,7 @@ Partial Class ThermostatForm
         Button9.Name = "Button9"
         Button9.Size = New Size(75, 23)
         Button9.TabIndex = 17
-        Button9.Text = "for 6 hours"
+        Button9.Text = "for 1 week"
         Button9.UseVisualStyleBackColor = True
         ' 
         ' Button16
@@ -799,7 +799,7 @@ Partial Class ThermostatForm
         Button16.Name = "Button16"
         Button16.Size = New Size(75, 23)
         Button16.TabIndex = 16
-        Button16.Text = "for 4 hours"
+        Button16.Text = "for 1 day"
         Button16.UseVisualStyleBackColor = True
         ' 
         ' Button15
@@ -835,7 +835,7 @@ Partial Class ThermostatForm
         Button10.Name = "Button10"
         Button10.Size = New Size(75, 23)
         Button10.TabIndex = 12
-        Button10.Text = "for 2 hours"
+        Button10.Text = "for 1 hour"
         Button10.UseVisualStyleBackColor = True
         ' 
         ' TabControl1
