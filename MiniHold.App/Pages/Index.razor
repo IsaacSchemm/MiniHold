@@ -17,6 +17,8 @@
     var thermostatClient = ti.ThermostatClient;
     var info = ti.Information;
 
+    var activeHold = info.Events.Where(x => x.Running).Take(1).Where(e => e.EventType == "hold").FirstOrDefault();
+
     var equipment = EquipmentModule.FromThermostatInformation(info);
 
     <RefreshBox Thermostat="@ti" />
@@ -69,35 +71,28 @@
                     <h5 style="grid-row: 1; grid-column: 1">
                         15m Hold
                     </h5>
-                    <GridButton Position="(2, 1)" OnClick="ti.Hold15Heat" Text="+2°" Suffix="for 15 minutes" />
-                    <GridButton Position="(3, 1)" OnClick="ti.Hold15Cool" Text="-2°" Suffix="for 15 minutes" />
-                    <GridButton Position="(4, 1)" OnClick="ti.Hold15Fan" Text="Same + fan" Suffix="for 15 minutes" />
+                    <GridButton Position="(2, 1)" OnClick="ti.Hold15Heat" Text="+2°F" Suffix="for 15 minutes" />
+                    <GridButton Position="(3, 1)" OnClick="ti.Hold15Cool" Text="-2°F" Suffix="for 15 minutes" />
+                    <GridButton Position="(4, 1)" OnClick="ti.Hold15Fan" Text="Fan" Suffix="for 15 minutes" />
 
                     <h5 style="grid-row: 1; grid-column: 2">
                         30m Hold
                     </h5>
-                    <GridButton Position="(2, 2)" OnClick="ti.Hold30Heat" Text="+2°" Suffix="for 30 minutes" />
-                    <GridButton Position="(3, 2)" OnClick="ti.Hold30Cool" Text="-2°" Suffix="for 30 minutes" />
-                    <GridButton Position="(4, 2)" OnClick="ti.Hold30Fan" Text="Same + fan" Suffix="for 30 minutes" />
+                    <GridButton Position="(2, 2)" OnClick="ti.Hold30Heat" Text="+2°F" Suffix="for 30 minutes" />
+                    <GridButton Position="(3, 2)" OnClick="ti.Hold30Cool" Text="-2°F" Suffix="for 30 minutes" />
+                    <GridButton Position="(4, 2)" OnClick="ti.Hold30Fan" Text="Fan" Suffix="for 30 minutes" />
 
                     <h5 style="grid-row: 6; grid-column: 1 / 3">
                         Away
                     </h5>
                     <GridButton Position="(7, 1)" OnClick="ti.Hold1HAway" Text="for 1 hour" Prefix="Away" />
-                    <GridButton Position="(8, 1)" OnClick="ti.Hold2HAway" Text="for 2 hours" Prefix="Away" />
-                    <GridButton Position="(9, 1)" OnClick="ti.Hold4HAway" Text="for 4 hours" Prefix="Away" />
+                    <GridButton Position="(8, 1)" OnClick="ti.Hold1DAway" Text="for 1 day" Prefix="Away" />
+                    <GridButton Position="(9, 1)" OnClick="ti.Hold7DAway" Text="for 1 week" Prefix="Away" />
                     <GridButton Position="(7, 2)" OnClick="ti.Hold7AAway" Text="until 7 am" Prefix="Away" />
                     <GridButton Position="(8, 2)" OnClick="ti.Hold4PAway" Text="until 4 pm" Prefix="Away" />
                     <GridButton Position="(9, 2)" OnClick="ti.Hold9PAway" Text="until 9 pm" Prefix="Away" />
 
-                    <button class="btn btn-secondary" style="grid-row: 10; grid-column: 1 / 3" @onclick="ti.Hold7DAway">
-                        <span class="visually-hidden">
-                            Away
-                        </span>
-                        for one week
-                    </button>
-
-                    <div style="grid-row: 11; grid-column: 1 / 3" class="text-muted">
+                    <div style="grid-row: 10; grid-column: 1 / 3" class="text-muted">
                         (or until cancelled)
                     </div>
                 </div>
@@ -107,17 +102,17 @@
                 <h4 class="visually-hidden">Current Thermostat Settings</h4>
                 <h5>Program</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.Program" />
-                @if (info.Events.Where(x => x.Running).FirstOrDefault() is Event e && e.EventType == "hold")
+                @if (activeHold != null)
                 {
-                    var temp = e.AbsoluteTemperatureRanges.SingleOrDefault();
+                    var temp = activeHold.AbsoluteTemperatureRanges.SingleOrDefault();
                     <hr />
                     <h5>Hold</h5>
                     <TemperatureDisplayBox UserInterfaceReading="@temp" />
                     <div>
-                        <strong>Start:</strong> @e.StartDate?.ToString("h:mm tt M/d/yy")
+                        <strong>Start:</strong> @activeHold.StartDate?.ToString("h:mm tt M/d/yy")
                     </div>
                     <div>
-                        <strong>End:</strong> @e.EndDate?.ToString("h:mm tt M/d/yy")
+                        <strong>End:</strong> @activeHold.EndDate?.ToString("h:mm tt M/d/yy")
                     </div>
                     <center>
                         <button class="btn btn-secondary mt-2" @onclick="ti.ClearHold">
@@ -148,9 +143,31 @@
                             <tr>
                                 <td>@s.Name</td>
                                 <td>@specific</td>
-                                <td>@s.Occupied</td>
+                                <td>
+                                    @if (s.Occupied)
+                                    {
+                                        <span class="visually-hidden">yes</span>
+                                        <span aria-hidden="true">✓</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="visually-hidden">no</span>
+                                    }
+                                </td>
                                 <td>@offset</td>
                             </tr>
+                        }
+                        @if (ti.Information.Sensors.Length > 1)
+                        {
+                            foreach (var t in ti.Information.Actual.Temperature)
+                            {
+                                <tr class="text-muted">
+                                    <td>All</td>
+                                    <td>@t</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
@@ -185,16 +202,29 @@
                                         <span aria-hidden="true">✓</span>
                                     }
                                 </td>
-                                <td>
-                                    @s.HeatAt
-                                </td>
-                                <td>
-                                    @s.Min – @s.Max
-                                </td>
-                                <td>
-                                    @s.CoolAt
-                                </td>
+                                <td>@info.ApplyHeatDelta(s.Min)</td>
+                                <td>@s.Min – @s.Max</td>
+                                <td>@info.ApplyCoolDelta(s.Max)</td>
                             </tr>
+                        }
+                        @if (activeHold != null)
+                        {
+                            foreach (var t in activeHold.AbsoluteTemperatureRanges)
+                            {
+                                <tr class="text-muted">
+                                    <td>
+                                        Hold
+                                        @if (activeHold.Running)
+                                        {
+                                            <span class="visually-hidden">(running)</span>
+                                            <span aria-hidden="true">✓</span>
+                                        }
+                                    </td>
+                                    <td>@info.ApplyHeatDelta(t.HeatTemp)</td>
+                                    <td>@t.HeatTemp – @t.CoolTemp</td>
+                                    <td>@info.ApplyCoolDelta(t.CoolTemp)</td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>

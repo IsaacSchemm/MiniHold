@@ -126,15 +126,13 @@ type ComfortLevel = {
     Active: bool
     Min: Temperature
     Max: Temperature
-    CoolDelta: Temperature
-    HeatDelta: Temperature
-} with
-    member this.HeatAt = Temperature (this.Min.Tenths - this.HeatDelta.Tenths)
-    member this.CoolAt = Temperature (this.Max.Tenths + this.CoolDelta.Tenths)
+}
 
 type ThermostatInformation = {
     Mode: string
     AuxCrossover: Temperature * Temperature
+    CoolDelta: Temperature
+    HeatDelta: Temperature
     ComfortLevels: ComfortLevel list
     CoolRangeHigh: Temperature
     CoolRangeLow: Temperature
@@ -149,7 +147,9 @@ type ThermostatInformation = {
     Program: Program
     Alerts: Alert list
     Events: Event list
-}
+} with
+    member this.ApplyHeatDelta (t: Temperature) = Temperature (t.Tenths - this.HeatDelta.Tenths)
+    member this.ApplyCoolDelta (t: Temperature) = Temperature (t.Tenths + this.CoolDelta.Tenths)
 
 type ThermostatClient(client: IClient, thermostat: Thermostat) =
     let timeZone = TimeZoneInfo.FindSystemTimeZoneById(thermostat.Location.TimeZone)
@@ -180,6 +180,8 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
         return {
             Mode = t.Settings.HvacMode
             AuxCrossover = (Temperature t.Settings.CompressorProtectionMinTemp.Value, Temperature t.Settings.AuxMaxOutdoorTemp.Value)
+            CoolDelta = Temperature t.Settings.Stage1CoolingDifferentialTemp.Value
+            HeatDelta = Temperature t.Settings.Stage1HeatingDifferentialTemp.Value
             ComfortLevels = [
                 for c in t.Program.Climates do
                     {
@@ -187,8 +189,6 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                         Active = t.Program.CurrentClimateRef = c.ClimateRef
                         Min = Temperature c.HeatTemp.Value
                         Max = Temperature c.CoolTemp.Value
-                        CoolDelta = Temperature t.Settings.Stage1CoolingDifferentialTemp.Value
-                        HeatDelta = Temperature t.Settings.Stage1HeatingDifferentialTemp.Value
                     }
             ]
             CoolRangeHigh = Temperature t.Settings.CoolRangeHigh.Value

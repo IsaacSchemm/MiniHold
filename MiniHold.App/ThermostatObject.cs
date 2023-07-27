@@ -39,9 +39,6 @@ namespace MiniHold.App
         public Task Hold15Fan() =>
             Act(async () => await QuickActions.SetFanAsync(ThermostatClient, true, TimeSpan.FromMinutes(15)));
 
-        public Task Hold15Away() =>
-            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromMinutes(15)));
-
         public Task Hold30Heat() =>
             Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(30)));
 
@@ -51,17 +48,11 @@ namespace MiniHold.App
         public Task Hold30Fan() =>
             Act(async () => await QuickActions.SetFanAsync(ThermostatClient, true, TimeSpan.FromMinutes(30)));
 
-        public Task Hold30Away() =>
-            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromMinutes(30)));
-
         public Task Hold1HAway() =>
-            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(2)));
+            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(1)));
 
-        public Task Hold2HAway() =>
-            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(2)));
-
-        public Task Hold4HAway() =>
-            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromHours(4)));
+        public Task Hold1DAway() =>
+            Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromDays(1)));
 
         public Task Hold7DAway() =>
             Act(async () => await QuickActions.SetAwayAsync(ThermostatClient, TimeSpan.FromDays(7)));
