@@ -859,7 +859,7 @@ Partial Class ThermostatForm
         TabPage3.Padding = New Padding(3)
         TabPage3.Size = New Size(490, 309)
         TabPage3.TabIndex = 5
-        TabPage3.Text = "Comfort Levels"
+        TabPage3.Text = "Comfort Settings"
         TabPage3.UseVisualStyleBackColor = True
         ' 
         ' DataGridView1

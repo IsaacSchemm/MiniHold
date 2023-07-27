@@ -77,7 +77,7 @@ Public Class ThermostatForm
             If c.Active Then
                 name &= " (active)"
             End If
-            DataGridView1.Rows.Add(name, c.HeatAt, $"{c.Min} – {c.Max}", c.CoolAt)
+            DataGridView1.Rows.Add(name, information.ApplyHeatDelta(c.Min), $"{c.Min} – {c.Max}", information.ApplyCoolDelta(c.Max))
         Next
 
         TextBox1.Text = $"{information}".Replace(vbLf, vbCrLf)
