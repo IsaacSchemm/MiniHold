@@ -17,15 +17,13 @@ Public Class ThermostatForm
         OutdoorHumidity.Text = information.Weather.Humidity.PercentageString
         IndoorTemp.Text = information.Actual.Temperature.Select(Function(x) x.FarenheitString).SingleOrDefault()
         IndoorHumidity.Text = information.Actual.Humidity.Select(Function(x) x.PercentageString).SingleOrDefault()
-        HeatAt.Text = information.Desired.HeatTemp.FarenheitString
-        CoolAt.Text = information.Desired.CoolTemp.FarenheitString
-        FanState.Text = $"{information.Desired.Fan}"
+        HeatAt.Text = information.Runtime.HeatTemp.FarenheitString
+        CoolAt.Text = information.Runtime.CoolTemp.FarenheitString
+        FanState.Text = $"{information.Runtime.Fan}"
 
         ProgramName.Text = information.Program.Name
         ProgramHeat.Text = information.Program.HeatTemp.FarenheitString
         ProgramCool.Text = information.Program.CoolTemp.FarenheitString
-        HeatFan.Text = information.Program.HeatFan
-        CoolFan.Text = information.Program.CoolFan
 
         DataGridView2.Rows.Clear()
         For Each s In information.Sensors
@@ -77,12 +75,12 @@ Public Class ThermostatForm
             If c.Active Then
                 name &= " (active)"
             End If
-            DataGridView1.Rows.Add(name, information.ApplyHeatDelta(c.Min), $"{c.Min} – {c.Max}", information.ApplyCoolDelta(c.Max))
+            DataGridView1.Rows.Add(name, information.ApplyHeatDelta(c.HeatTemp), $"{c.HeatTemp} – {c.CoolTemp}", information.ApplyCoolDelta(c.CoolTemp))
         Next
 
         TextBox1.Text = $"{information}".Replace(vbLf, vbCrLf)
 
-        LastDesired = information.Desired
+        LastDesired = information.Runtime
     End Function
 
     Private Async Sub Act(action As Func(Of Task))

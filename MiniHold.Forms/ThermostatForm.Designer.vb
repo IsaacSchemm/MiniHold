@@ -66,10 +66,6 @@ Partial Class ThermostatForm
         Label14 = New Label()
         CoolAt = New Label()
         GroupBox6 = New GroupBox()
-        Label13 = New Label()
-        CoolFan = New Label()
-        Label8 = New Label()
-        HeatFan = New Label()
         ProgramName = New Label()
         Label4 = New Label()
         ProgramHeat = New Label()
@@ -560,10 +556,6 @@ Partial Class ThermostatForm
         ' GroupBox6
         ' 
         GroupBox6.AutoSize = True
-        GroupBox6.Controls.Add(Label13)
-        GroupBox6.Controls.Add(CoolFan)
-        GroupBox6.Controls.Add(Label8)
-        GroupBox6.Controls.Add(HeatFan)
         GroupBox6.Controls.Add(ProgramName)
         GroupBox6.Controls.Add(Label4)
         GroupBox6.Controls.Add(ProgramHeat)
@@ -575,42 +567,6 @@ Partial Class ThermostatForm
         GroupBox6.TabIndex = 7
         GroupBox6.TabStop = False
         GroupBox6.Text = "Program"
-        ' 
-        ' Label13
-        ' 
-        Label13.AutoSize = True
-        Label13.Location = New Point(6, 96)
-        Label13.Name = "Label13"
-        Label13.Size = New Size(60, 15)
-        Label13.TabIndex = 16
-        Label13.Text = "Fan (cool)"
-        ' 
-        ' CoolFan
-        ' 
-        CoolFan.AutoSize = True
-        CoolFan.Location = New Point(72, 96)
-        CoolFan.Name = "CoolFan"
-        CoolFan.Size = New Size(22, 15)
-        CoolFan.TabIndex = 17
-        CoolFan.Text = "---"
-        ' 
-        ' Label8
-        ' 
-        Label8.AutoSize = True
-        Label8.Location = New Point(6, 81)
-        Label8.Name = "Label8"
-        Label8.Size = New Size(60, 15)
-        Label8.TabIndex = 14
-        Label8.Text = "Fan (heat)"
-        ' 
-        ' HeatFan
-        ' 
-        HeatFan.AutoSize = True
-        HeatFan.Location = New Point(72, 81)
-        HeatFan.Name = "HeatFan"
-        HeatFan.Size = New Size(22, 15)
-        HeatFan.TabIndex = 15
-        HeatFan.Text = "---"
         ' 
         ' ProgramName
         ' 
@@ -1007,10 +963,6 @@ Partial Class ThermostatForm
     Friend WithEvents Button10 As Button
     Friend WithEvents Button16 As Button
     Friend WithEvents Button9 As Button
-    Friend WithEvents Label13 As Label
-    Friend WithEvents CoolFan As Label
-    Friend WithEvents Label8 As Label
-    Friend WithEvents HeatFan As Label
     Friend WithEvents TabPage3 As TabPage
     Friend WithEvents DataGridView1 As DataGridView
     Friend WithEvents DataGridViewTextBoxColumn1 As DataGridViewTextBoxColumn

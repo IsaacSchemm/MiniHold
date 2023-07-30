@@ -11,7 +11,7 @@
 
     foreach (var f in ti.Information.DailyForecasts)
     {
-        <h3>@f.Date.ToString("dddd, MMM d")</h3>
+        <h5 style="font-weight: bold">@f.Date.ToString("dddd, MMM d")</h5>
         <TemperatureDisplayBox UserInterfaceReading="@f" />
         <hr />
     }

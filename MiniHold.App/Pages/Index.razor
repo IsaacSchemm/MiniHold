@@ -26,7 +26,7 @@
     if (equipment.Any())
     {
         <hr />
-        <div title="Running Equipment">
+        <div>
             <span class="visually-hidden">
                 Running equipment:
             </span>
@@ -53,20 +53,8 @@
     <div class="container-fluid indexPage">
         <div class="row">
             <div class="col-md-6 col-lg-4">
+                <h4 class="visually-hidden">Apply Hold</h4>
                 <hr />
-                <h4 class="visually-hidden">Temperature Readings</h4>
-                <h5>Outdoor</h5>
-                <TemperatureDisplayBox UserInterfaceReading="@info.Weather" />
-                <hr />
-                <h5>Indoor</h5>
-                <TemperatureDisplayBox UserInterfaceReading="@info.Actual" />
-                <hr />
-                <h5>Runtime</h5>
-                <TemperatureDisplayBox UserInterfaceReading="@info.Desired" />
-            </div>
-            <div class="col-md-6 col-lg-4">
-                <hr />
-                <h4 class="visually-hidden">Temperature Controls</h4>
                 <div style="display: grid; row-gap: 1em; column-gap: 1em">
                     <h5 style="grid-row: 1; grid-column: 1">
                         15m Hold
@@ -82,24 +70,40 @@
                     <GridButton Position="(3, 2)" OnClick="ti.Hold30Cool" Text="-2°F" Suffix="for 30 minutes" />
                     <GridButton Position="(4, 2)" OnClick="ti.Hold30Fan" Text="Fan" Suffix="for 30 minutes" />
 
-                    <h5 style="grid-row: 6; grid-column: 1 / 3">
+                    <h5 style="grid-row: 5; grid-column: 1 / 3">
                         Away
                     </h5>
-                    <GridButton Position="(7, 1)" OnClick="ti.Hold1HAway" Text="for 1 hour" Prefix="Away" />
-                    <GridButton Position="(8, 1)" OnClick="ti.Hold1DAway" Text="for 1 day" Prefix="Away" />
-                    <GridButton Position="(9, 1)" OnClick="ti.Hold7DAway" Text="for 1 week" Prefix="Away" />
-                    <GridButton Position="(7, 2)" OnClick="ti.Hold7AAway" Text="until 7 am" Prefix="Away" />
-                    <GridButton Position="(8, 2)" OnClick="ti.Hold4PAway" Text="until 4 pm" Prefix="Away" />
-                    <GridButton Position="(9, 2)" OnClick="ti.Hold9PAway" Text="until 9 pm" Prefix="Away" />
+                    <GridButton Position="(6, 1)" OnClick="ti.Hold1HAway" Text="for 1 hour" Prefix="Away" />
+                    <GridButton Position="(7, 1)" OnClick="ti.Hold1DAway" Text="for 1 day" Prefix="Away" />
+                    <GridButton Position="(8, 1)" OnClick="ti.Hold7DAway" Text="for 1 week" Prefix="Away" />
+                    <GridButton Position="(6, 2)" OnClick="ti.Hold7AAway" Text="until 7 am" Prefix="Away" />
+                    <GridButton Position="(7, 2)" OnClick="ti.Hold4PAway" Text="until 4 pm" Prefix="Away" />
+                    <GridButton Position="(8, 2)" OnClick="ti.Hold9PAway" Text="until 9 pm" Prefix="Away" />
 
-                    <div style="grid-row: 10; grid-column: 1 / 3" class="text-muted">
+                    <div style="grid-row: 9; grid-column: 1 / 3" class="text-muted">
                         (or until cancelled)
                     </div>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
+                <h4 class="visually-hidden">Outdoor Temperature</h4>
                 <hr />
-                <h4 class="visually-hidden">Current Thermostat Settings</h4>
+                <h5>Weather</h5>
+                <TemperatureDisplayBox UserInterfaceReading="@info.Weather" />
+                @foreach (var f in info.DailyForecasts.Take(1))
+                {
+                    <hr />
+                    <h5>Forecast</h5>
+                    <div>@f.Date.ToString("dddd, MMM d")</div>
+                    <TemperatureDisplayBox UserInterfaceReading="@f" />
+                }
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <h4 class="visually-hidden">Indoor Temperature</h4>
+                <hr />
+                <h5>Current</h5>
+                <TemperatureDisplayBox UserInterfaceReading="@info.Actual" />
+                <hr />
                 <h5>Program</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.Program" />
                 @if (activeHold != null)
@@ -121,8 +125,10 @@
                     </center>
                 }
             </div>
-            <div class="col-xl-6">
+            <div class="col-12">
                 <hr />
+            </div>
+            <div class="col-xl-6">
                 <h4>Sensors</h4>
 
                 <table class="table">
@@ -173,12 +179,11 @@
                 </table>
             </div>
             <div class="col-xl-6">
-                <hr />
                 <h4>Comfort Settings</h4>
 
                 <table class="table">
                     <thead>
-                        <tr>
+                        <tr style="white-space: nowrap">
                             <th scope="col">Name</th>
                             <th scope="col">
                                 Heat at
@@ -195,37 +200,18 @@
                         @foreach (var s in ti.Information.ComfortLevels)
                         {
                             <tr>
-                                <td>
-                                    @s.Name
-                                    @if (s.Active) {
-                                        <span class="visually-hidden">(active)</span>
-                                        <span aria-hidden="true">✓</span>
-                                    }
-                                </td>
-                                <td>@info.ApplyHeatDelta(s.Min)</td>
-                                <td>@s.Min – @s.Max</td>
-                                <td>@info.ApplyCoolDelta(s.Max)</td>
+                                <td>@s.Name</td>
+                                <td>@info.ApplyHeatDelta(s.HeatTemp)</td>
+                                <td>@s.HeatTemp – @s.CoolTemp</td>
+                                <td>@info.ApplyCoolDelta(s.CoolTemp)</td>
                             </tr>
                         }
-                        @if (activeHold != null)
-                        {
-                            foreach (var t in activeHold.AbsoluteTemperatureRanges)
-                            {
-                                <tr class="text-muted">
-                                    <td>
-                                        Hold
-                                        @if (activeHold.Running)
-                                        {
-                                            <span class="visually-hidden">(running)</span>
-                                            <span aria-hidden="true">✓</span>
-                                        }
-                                    </td>
-                                    <td>@info.ApplyHeatDelta(t.HeatTemp)</td>
-                                    <td>@t.HeatTemp – @t.CoolTemp</td>
-                                    <td>@info.ApplyCoolDelta(t.CoolTemp)</td>
-                                </tr>
-                            }
-                        }
+                        <tr class="text-muted">
+                            <td>Runtime</td>
+                            <td>@info.ApplyHeatDelta(info.Runtime.HeatTemp)</td>
+                            <td>@info.Runtime.HeatTemp – @info.Runtime.CoolTemp</td>
+                            <td>@info.ApplyCoolDelta(info.Runtime.CoolTemp)</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

@@ -14,6 +14,14 @@
             MainPage = new MainPage();
         }
 
+        protected override Window CreateWindow(IActivationState activationState)
+        {
+            var w = base.CreateWindow(activationState);
+            if (w != null)
+                w.Title = "MiniHold";
+            return w;
+        }
+
         public static async Task Act(Func<Task> func)
         {
             _jobs++;

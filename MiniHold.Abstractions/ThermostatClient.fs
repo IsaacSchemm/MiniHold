@@ -12,15 +12,15 @@ open I8Beef.Ecobee.Protocol
 type Temperature = Temperature of int
 with
     member this.Tenths = let (Temperature x) = this in x
+
     member this.Farenheit = (decimal this.Tenths / 10m)
     member this.FarenheitString = sprintf "%.0f°F" this.Farenheit
     member this.PreciseFarenheitString = sprintf "%.1f°F" this.Farenheit
 
-    member this.Celsius = (decimal this.Farenheit - 32m) / 1.8m
-
     static member FromFarenheit degrees = degrees * 10m |> Math.Round |> int |> Temperature
 
-    member this.AddFarenheit degrees = Temperature.FromFarenheit (this.Farenheit + degrees)
+    static member (+) (Temperature a, Temperature b) = Temperature (a + b)
+    static member (-) (Temperature a, Temperature b) = Temperature (a - b)
 
 [<StructuredFormatDisplay("{PercentageString}")>]
 type Percentage = Percentage of int
@@ -92,24 +92,15 @@ type Program = {
     Name: string
     CoolTemp: Temperature
     HeatTemp: Temperature
-    CoolFan: string
-    HeatFan: string
 }
 with
     interface IUserInterfaceReading with
         member this.Temperatures = ["Heat", this.HeatTemp; "Cool", this.CoolTemp]
-        member this.OtherReadings = ["Comfort Setting", this.Name; "Fan (heat)", this.HeatFan; "Fan (cool)", this.CoolFan]
+        member this.OtherReadings = ["Comfort Setting", this.Name]
 
 type Alert = {
     DateTime: DateTime
     Text: string
-}
-
-type Override = {
-    At: TempRange
-    StartDate: DateTime
-    EndDate: DateTime
-    Running: bool
 }
 
 type Event = {
@@ -124,8 +115,8 @@ type Event = {
 type ComfortLevel = {
     Name: string
     Active: bool
-    Min: Temperature
-    Max: Temperature
+    HeatTemp: Temperature
+    CoolTemp: Temperature
 }
 
 type ThermostatInformation = {
@@ -139,7 +130,7 @@ type ThermostatInformation = {
     HeatRangeHigh: Temperature
     HeatRangeLow: Temperature
     EquipmentStatus: string list
-    Desired: TempRange
+    Runtime: TempRange
     Actual: Readings
     Sensors: Sensor list
     Weather: Weather
@@ -148,8 +139,8 @@ type ThermostatInformation = {
     Alerts: Alert list
     Events: Event list
 } with
-    member this.ApplyHeatDelta (t: Temperature) = Temperature (t.Tenths - this.HeatDelta.Tenths)
-    member this.ApplyCoolDelta (t: Temperature) = Temperature (t.Tenths + this.CoolDelta.Tenths)
+    member this.ApplyHeatDelta (t: Temperature) = t - this.HeatDelta
+    member this.ApplyCoolDelta (t: Temperature) = t + this.CoolDelta
 
 type ThermostatClient(client: IClient, thermostat: Thermostat) =
     let timeZone = TimeZoneInfo.FindSystemTimeZoneById(thermostat.Location.TimeZone)
@@ -187,8 +178,8 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                     {
                         Name = c.Name
                         Active = t.Program.CurrentClimateRef = c.ClimateRef
-                        Min = Temperature c.HeatTemp.Value
-                        Max = Temperature c.CoolTemp.Value
+                        HeatTemp = Temperature c.HeatTemp.Value
+                        CoolTemp = Temperature c.CoolTemp.Value
                     }
             ]
             CoolRangeHigh = Temperature t.Settings.CoolRangeHigh.Value
@@ -196,7 +187,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
             HeatRangeHigh = Temperature t.Settings.HeatRangeHigh.Value
             HeatRangeLow = Temperature t.Settings.HeatRangeLow.Value
             EquipmentStatus = t.EquipmentStatus.Split(',') |> Seq.except [""] |> Seq.toList
-            Desired = {
+            Runtime = {
                 HeatTemp = Temperature t.Runtime.DesiredHeat.Value
                 CoolTemp = Temperature t.Runtime.DesiredCool.Value
                 Fan = t.Runtime.DesiredFanMode
@@ -255,8 +246,6 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                             Name = c.Name
                             CoolTemp = Temperature c.CoolTemp.Value
                             HeatTemp = Temperature c.HeatTemp.Value
-                            CoolFan = c.CoolFan
-                            HeatFan = c.HeatFan
                         }
             })
             Alerts = [

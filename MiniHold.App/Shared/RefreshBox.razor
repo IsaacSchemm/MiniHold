@@ -30,9 +30,15 @@
         @Thermostat.Information.Mode
     </div>
 
+    <div style="display: flex; flex-direction: row; justify-content: center">
+        <div style="flex: 0 1 auto">
+            <TemperatureDisplayBox UserInterfaceReading="@Thermostat.Information.Runtime" />
+        </div>
+    </div>
+
     <hr />
 
-    <p align="center">
+    <center>
         Last updated:
         <br />
         @Thermostat.LastUpdated.ToLocalTime().ToString("h:mm tt on MMMM d, yyyy")
@@ -40,7 +46,7 @@
         <button class="btn btn-primary mt-2" @onclick="Thermostat.Refresh">
             Refresh
         </button>
-    </p>
+    </center>
 }
 
 @code {

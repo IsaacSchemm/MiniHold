@@ -8,9 +8,9 @@ module QuickActions =
         let endTime = startTime + duration
         let! info = client.GetInformationAsync()
         do! client.HoldAsync({
-            info.Desired with
-                HeatTemp = info.Desired.HeatTemp.AddFarenheit offsetFarenheit
-                CoolTemp = info.Desired.CoolTemp.AddFarenheit offsetFarenheit
+            info.Runtime with
+                HeatTemp = info.Runtime.HeatTemp + Temperature.FromFarenheit offsetFarenheit
+                CoolTemp = info.Runtime.CoolTemp + Temperature.FromFarenheit offsetFarenheit
         }, startTime, endTime)
     }
 
@@ -19,7 +19,7 @@ module QuickActions =
         let endTime = startTime + duration
         let! info = client.GetInformationAsync()
         do! client.HoldAsync({
-            info.Desired with
+            info.Runtime with
                 Fan = if fan then "on" else "auto"
         }, startTime, endTime)
     }
