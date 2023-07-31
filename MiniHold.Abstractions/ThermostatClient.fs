@@ -85,7 +85,7 @@ type Weather = {
 with
     interface IUserInterfaceReading with
         member this.Temperatures = ["", this.Temperature]
-        member this.OtherReadings = ["Condition", this.Condition; "Humidity", this.Humidity.PercentageString]
+        member this.OtherReadings = ["Condition", this.Condition]
 
 type DailyForecast = {
     Date: DateTime

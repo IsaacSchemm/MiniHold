@@ -17,7 +17,7 @@
     var thermostatClient = ti.ThermostatClient;
     var info = ti.Information;
 
-    var activeHold = info.Events.Where(x => x.Running).Take(1).Where(e => e.EventType == "hold").FirstOrDefault();
+    var activeEvent = info.Events.Where(x => x.Running).FirstOrDefault();
 
     var equipment = EquipmentModule.FromThermostatInformation(info);
 
@@ -101,29 +101,27 @@
             <div class="col-md-6 col-lg-4">
                 <h4 class="visually-hidden">Indoor Temperature</h4>
                 <hr />
-                <h5>Program</h5>
-                <TemperatureDisplayBox UserInterfaceReading="@info.Program" />
-                @if (activeHold != null)
-                {
-                    var temp = activeHold.AbsoluteTemperatureRanges.SingleOrDefault();
-                    <hr />
-                    <h5>Hold</h5>
-                    <TemperatureDisplayBox UserInterfaceReading="@temp" />
-                    <div>
-                        <strong>Start:</strong> @activeHold.StartDate?.ToString("h:mm tt M/d/yy")
-                    </div>
-                    <div>
-                        <strong>End:</strong> @activeHold.EndDate?.ToString("h:mm tt M/d/yy")
-                    </div>
-                    <center>
-                        <button class="btn btn-secondary mt-2" @onclick="ti.ClearHold">
-                            Cancel Hold
-                        </button>
-                    </center>
-                }
-                <hr />
                 <h5>Runtime</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.Runtime" />
+                @if (activeEvent != null)
+                {
+                    <hr />
+                    <h5>@System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(activeEvent.EventType)</h5>
+                    <div>
+                        <strong>Start:</strong> @activeEvent.StartDate?.ToString("h:mm tt M/d/yy")
+                    </div>
+                    <div>
+                        <strong>End:</strong> @activeEvent.EndDate?.ToString("h:mm tt M/d/yy")
+                    </div>
+                    if (activeEvent.EventType == "hold")
+                    {
+                        <center>
+                            <button class="btn btn-secondary mt-2" @onclick="ti.ClearHold">
+                                Cancel Hold
+                            </button>
+                        </center>
+                    }
+                }
             </div>
             <div class="col-12">
                 <hr />
