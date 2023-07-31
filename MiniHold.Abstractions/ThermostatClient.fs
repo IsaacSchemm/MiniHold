@@ -105,16 +105,6 @@ with
                 "Chance of Precipitation", this.Pop.PercentageString
         ]
 
-type Program = {
-    Name: string
-    CoolTemp: Temperature
-    HeatTemp: Temperature
-}
-with
-    interface IUserInterfaceReading with
-        member this.Temperatures = ["Heat", this.HeatTemp; "Cool", this.CoolTemp]
-        member this.OtherReadings = ["Comfort Setting", this.Name]
-
 type Alert = {
     DateTime: DateTime
     Text: string
@@ -152,10 +142,13 @@ type ThermostatInformation = {
     Sensors: Sensor list
     Weather: Weather
     DailyForecasts: DailyForecast list
-    Program: Program
     Alerts: Alert list
     Events: Event list
 } with
+    member this.Program =
+        this.ComfortLevels
+        |> Seq.where (fun x -> x.Active)
+        |> Seq.exactlyOne
     member this.ApplyHeatDelta (t: Temperature) = t - this.HeatDelta
     member this.ApplyCoolDelta (t: Temperature) = t + this.CoolDelta
 
@@ -260,15 +253,6 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                             Pop = Percentage w.Pop.Value
                         }
             ]
-            Program = Seq.head (seq {
-                for c in t.Program.Climates do
-                    if c.ClimateRef = t.Program.CurrentClimateRef then
-                        {
-                            Name = c.Name
-                            CoolTemp = Temperature c.CoolTemp.Value
-                            HeatTemp = Temperature c.HeatTemp.Value
-                        }
-            })
             Alerts = [
                 for a in t.Alerts do {
                     DateTime = DateTime.Parse($"{a.Date} {a.Time}", CultureInfo.InvariantCulture)
