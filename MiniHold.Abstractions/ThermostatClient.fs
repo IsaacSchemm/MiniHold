@@ -49,7 +49,6 @@ type Runtime = {
     TempRange: TempRange
     DesiredHumidity: Percentage
     DesiredDehumidity: Percentage
-    LastStatusModified: DateTime
 } with
     interface IUserInterfaceReading with
         member this.Temperatures = [
@@ -213,7 +212,6 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                 }
                 DesiredHumidity = Percentage t.Runtime.DesiredHumidity.Value
                 DesiredDehumidity = Percentage t.Runtime.DesiredDehumidity.Value
-                LastStatusModified = DateTime.Parse(t.Runtime.LastStatusModified, CultureInfo.InvariantCulture)
             }
             Readings = {
                 Temperature = [

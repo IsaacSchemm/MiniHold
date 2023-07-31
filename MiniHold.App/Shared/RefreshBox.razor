@@ -23,11 +23,28 @@
         _ => "bg-secondary"
     };
 
-    <div class="badge @cssClass">
-        <span class="visually-hidden">
-            Thermostat mode:
-        </span>
-        @Thermostat.Information.Mode
+    <div id="equipment-status">
+        <div class="badge @cssClass">
+            <span class="visually-hidden">
+                Thermostat mode:
+            </span>
+            @System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Thermostat.Information.Mode)
+        </div>
+        @foreach (var eq in MiniHold.Abstractions.EquipmentModule.FromThermostatInformation(Thermostat.Information))
+        {
+            string icon = eq.Comp ? "transfer" : eq.Heat ? "fire" : "";
+            <div class="badge @(eq.Heat ? "bg-danger" : eq.Cool ? "bg-primary" : "bg-secondary")">
+                <span class="visually-hidden">
+                    Running equipment:
+                </span>
+                @if (icon != "")
+                {
+                    <span class="oi oi-@icon" aria-hidden="true"></span>
+                    @:&nbsp;
+                }
+                @eq.Name
+            </div>
+        }
     </div>
 
     <div style="display: flex; flex-direction: row; justify-content: center">
