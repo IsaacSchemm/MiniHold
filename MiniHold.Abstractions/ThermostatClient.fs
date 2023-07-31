@@ -44,6 +44,19 @@ type TempRange = {
         member this.Temperatures = ["Heat", this.HeatTemp; "Cool", this.CoolTemp]
         member this.OtherReadings = ["Fan", this.Fan]
 
+type Runtime = {
+    TempRange: TempRange
+    DesiredHumidity: Percentage
+    DesiredDehumidity: Percentage
+} with
+    interface IUserInterfaceReading with
+        member this.Temperatures = (this.TempRange :> IUserInterfaceReading).Temperatures
+        member this.OtherReadings = [
+            "Min Humidity", this.DesiredHumidity.PercentageString
+            "Max Humidity", this.DesiredDehumidity.PercentageString
+            yield! (this.TempRange :> IUserInterfaceReading).OtherReadings
+        ]
+
 type Readings = {
     Temperature: Temperature list
     Humidity: Percentage list
@@ -130,7 +143,7 @@ type ThermostatInformation = {
     HeatRangeHigh: Temperature
     HeatRangeLow: Temperature
     EquipmentStatus: string list
-    Runtime: TempRange
+    Runtime: Runtime
     Actual: Readings
     Sensors: Sensor list
     Weather: Weather
@@ -188,9 +201,13 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
             HeatRangeLow = Temperature t.Settings.HeatRangeLow.Value
             EquipmentStatus = t.EquipmentStatus.Split(',') |> Seq.except [""] |> Seq.toList
             Runtime = {
-                HeatTemp = Temperature t.Runtime.DesiredHeat.Value
-                CoolTemp = Temperature t.Runtime.DesiredCool.Value
-                Fan = t.Runtime.DesiredFanMode
+                TempRange = {
+                    HeatTemp = Temperature t.Runtime.DesiredHeat.Value
+                    CoolTemp = Temperature t.Runtime.DesiredCool.Value
+                    Fan = t.Runtime.DesiredFanMode
+                }
+                DesiredHumidity = Percentage t.Runtime.DesiredHumidity.Value
+                DesiredDehumidity = Percentage t.Runtime.DesiredDehumidity.Value
             }
             Actual = {
                 Temperature = [

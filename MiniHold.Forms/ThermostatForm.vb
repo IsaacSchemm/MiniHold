@@ -17,9 +17,9 @@ Public Class ThermostatForm
         OutdoorHumidity.Text = information.Weather.Humidity.PercentageString
         IndoorTemp.Text = information.Actual.Temperature.Select(Function(x) x.FarenheitString).SingleOrDefault()
         IndoorHumidity.Text = information.Actual.Humidity.Select(Function(x) x.PercentageString).SingleOrDefault()
-        HeatAt.Text = information.Runtime.HeatTemp.FarenheitString
-        CoolAt.Text = information.Runtime.CoolTemp.FarenheitString
-        FanState.Text = $"{information.Runtime.Fan}"
+        HeatAt.Text = information.Runtime.TempRange.HeatTemp.FarenheitString
+        CoolAt.Text = information.Runtime.TempRange.CoolTemp.FarenheitString
+        FanState.Text = $"{information.Runtime.TempRange.Fan}"
 
         ProgramName.Text = information.Program.Name
         ProgramHeat.Text = information.Program.HeatTemp.FarenheitString
@@ -80,7 +80,7 @@ Public Class ThermostatForm
 
         TextBox1.Text = $"{information}".Replace(vbLf, vbCrLf)
 
-        LastDesired = information.Runtime
+        LastDesired = information.Runtime.TempRange
     End Function
 
     Private Async Sub Act(action As Func(Of Task))

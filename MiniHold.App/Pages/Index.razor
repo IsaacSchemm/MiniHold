@@ -208,9 +208,9 @@
                         }
                         <tr class="text-muted">
                             <td>Runtime</td>
-                            <td>@info.ApplyHeatDelta(info.Runtime.HeatTemp)</td>
-                            <td>@info.Runtime.HeatTemp – @info.Runtime.CoolTemp</td>
-                            <td>@info.ApplyCoolDelta(info.Runtime.CoolTemp)</td>
+                            <td>@info.ApplyHeatDelta(info.Runtime.TempRange.HeatTemp)</td>
+                            <td>@info.Runtime.TempRange.HeatTemp – @info.Runtime.TempRange.CoolTemp</td>
+                            <td>@info.ApplyCoolDelta(info.Runtime.TempRange.CoolTemp)</td>
                         </tr>
                     </tbody>
                 </table>
