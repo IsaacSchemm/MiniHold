@@ -7,6 +7,7 @@ open I8Beef.Ecobee.Protocol.Objects
 open I8Beef.Ecobee.Protocol.Thermostat
 open I8Beef.Ecobee.Protocol.Functions
 open I8Beef.Ecobee.Protocol
+open System.Globalization
 
 [<StructuredFormatDisplay("{PreciseFarenheitString}")>]
 type Temperature = Temperature of int
@@ -48,13 +49,17 @@ type Runtime = {
     TempRange: TempRange
     DesiredHumidity: Percentage
     DesiredDehumidity: Percentage
+    LastStatusModified: DateTime
 } with
     interface IUserInterfaceReading with
-        member this.Temperatures = (this.TempRange :> IUserInterfaceReading).Temperatures
+        member this.Temperatures = [
+            "Heat", this.TempRange.HeatTemp
+            "Cool", this.TempRange.CoolTemp
+        ]
         member this.OtherReadings = [
             "Min Humidity", this.DesiredHumidity.PercentageString
             "Max Humidity", this.DesiredDehumidity.PercentageString
-            yield! (this.TempRange :> IUserInterfaceReading).OtherReadings
+            "Fan", this.TempRange.Fan
         ]
 
 type Readings = {
@@ -144,7 +149,7 @@ type ThermostatInformation = {
     HeatRangeLow: Temperature
     EquipmentStatus: string list
     Runtime: Runtime
-    Actual: Readings
+    Readings: Readings
     Sensors: Sensor list
     Weather: Weather
     DailyForecasts: DailyForecast list
@@ -208,8 +213,9 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                 }
                 DesiredHumidity = Percentage t.Runtime.DesiredHumidity.Value
                 DesiredDehumidity = Percentage t.Runtime.DesiredDehumidity.Value
+                LastStatusModified = DateTime.Parse(t.Runtime.LastStatusModified, CultureInfo.InvariantCulture)
             }
-            Actual = {
+            Readings = {
                 Temperature = [
                     if t.Runtime.ActualTemperature.HasValue then
                         Temperature t.Runtime.ActualTemperature.Value
@@ -249,7 +255,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                 for w in t.Weather.Forecasts do
                     if w.TempHigh <> Nullable -5002 && w.TempLow <> Nullable -5002 then
                         {
-                            Date = DateTime.Parse w.DateTime
+                            Date = DateTime.Parse(w.DateTime, CultureInfo.InvariantCulture)
                             High = Temperature w.TempHigh.Value
                             Low = Temperature w.TempLow.Value
                             Condition = w.Condition
@@ -267,7 +273,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
             })
             Alerts = [
                 for a in t.Alerts do {
-                    DateTime = DateTime.Parse($"{a.Date} {a.Time}")
+                    DateTime = DateTime.Parse($"{a.Date} {a.Time}", CultureInfo.InvariantCulture)
                     Text = a.Text
                 }
             ]

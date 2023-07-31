@@ -32,17 +32,20 @@
 
     <div style="display: flex; flex-direction: row; justify-content: center">
         <div style="flex: 0 1 auto">
-            <TemperatureDisplayBox UserInterfaceReading="@Thermostat.Information.Runtime" />
+            <h5>Current</h5>
+            <TemperatureDisplayBox UserInterfaceReading="@Thermostat.Information.Readings" />
+            @if (Thermostat.Information != null)
+            {
+                <div>
+                    <strong>Last updated:</strong> @Thermostat.ThermostatClient.ToThermostatTime(Thermostat.Information.Runtime.LastStatusModified).ToString("h:mm tt on MMMM d, yyyy")
+                </div>
+            }
         </div>
     </div>
 
-    <hr />
+    @*<hr />*@
 
     <center>
-        Last updated:
-        <br />
-        @Thermostat.LastUpdated.ToLocalTime().ToString("h:mm tt on MMMM d, yyyy")
-        <br />
         <button class="btn btn-primary mt-2" @onclick="Thermostat.Refresh">
             Refresh
         </button>

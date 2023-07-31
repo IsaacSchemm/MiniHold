@@ -15,8 +15,8 @@ Public Class ThermostatForm
         OutdoorCondition.Text = information.Weather.Condition
         OutdoorTemp.Text = information.Weather.Temperature.FarenheitString
         OutdoorHumidity.Text = information.Weather.Humidity.PercentageString
-        IndoorTemp.Text = information.Actual.Temperature.Select(Function(x) x.FarenheitString).SingleOrDefault()
-        IndoorHumidity.Text = information.Actual.Humidity.Select(Function(x) x.PercentageString).SingleOrDefault()
+        IndoorTemp.Text = information.Readings.Temperature.Select(Function(x) x.FarenheitString).SingleOrDefault()
+        IndoorHumidity.Text = information.Readings.Humidity.Select(Function(x) x.PercentageString).SingleOrDefault()
         HeatAt.Text = information.Runtime.TempRange.HeatTemp.FarenheitString
         CoolAt.Text = information.Runtime.TempRange.CoolTemp.FarenheitString
         FanState.Text = $"{information.Runtime.TempRange.Fan}"
@@ -27,7 +27,7 @@ Public Class ThermostatForm
 
         DataGridView2.Rows.Clear()
         For Each s In information.Sensors
-            Dim average = information.Actual.Temperature.Select(Function(x) x.Farenheit).SingleOrDefault()
+            Dim average = information.Readings.Temperature.Select(Function(x) x.Farenheit).SingleOrDefault()
             Dim specific = s.Readings.Temperature.Select(Function(x) x.Farenheit).SingleOrDefault()
             Dim offset = specific - average
             DataGridView2.Rows.Add({s.Name, $"{specific:0.0}°F", s.Occupied, $"{offset:0.0}°F"})

@@ -101,9 +101,6 @@
             <div class="col-md-6 col-lg-4">
                 <h4 class="visually-hidden">Indoor Temperature</h4>
                 <hr />
-                <h5>Current Indoor Temperature</h5>
-                <TemperatureDisplayBox UserInterfaceReading="@info.Actual" />
-                <hr />
                 <h5>Program</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.Program" />
                 @if (activeHold != null)
@@ -124,6 +121,9 @@
                         </button>
                     </center>
                 }
+                <hr />
+                <h5>Runtime</h5>
+                <TemperatureDisplayBox UserInterfaceReading="@info.Runtime" />
             </div>
             <div class="col-12">
                 <hr />
@@ -141,40 +141,36 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var s in ti.Information.Sensors)
-                        {
-                            var average = ti.Information.Actual.Temperature.SingleOrDefault();
-                            var specific = s.Readings.Temperature.SingleOrDefault();
-                            var offset = Temperature.FromFarenheit(specific.Farenheit - average.Farenheit);
-                            <tr>
-                                <td>@s.Name</td>
-                                <td>@specific</td>
-                                <td>
-                                    @if (s.Occupied)
-                                    {
-                                        <span class="visually-hidden">yes</span>
-                                        <span aria-hidden="true">✓</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="visually-hidden">no</span>
-                                    }
-                                </td>
-                                <td>@offset</td>
-                            </tr>
-                        }
-                        @if (ti.Information.Sensors.Length > 1)
-                        {
-                            foreach (var t in ti.Information.Actual.Temperature)
+                        @{
+                            var average = ti.Information.Readings.Temperature.SingleOrDefault();
+                            foreach (var s in ti.Information.Sensors)
                             {
-                                <tr class="text-muted">
-                                    <td>All</td>
-                                    <td>@t</td>
-                                    <td></td>
-                                    <td></td>
+                                var specific = s.Readings.Temperature.SingleOrDefault();
+                                var offset = Temperature.FromFarenheit(specific.Farenheit - average.Farenheit);
+                                <tr>
+                                    <td>@s.Name</td>
+                                    <td>@specific</td>
+                                    <td>
+                                        @if (s.Occupied)
+                                        {
+                                            <span class="visually-hidden">yes</span>
+                                            <span aria-hidden="true">✓</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="visually-hidden">no</span>
+                                        }
+                                    </td>
+                                    <td>@offset</td>
                                 </tr>
                             }
                         }
+                        <tr class="text-muted">
+                            <td>All</td>
+                            <td>@average</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
