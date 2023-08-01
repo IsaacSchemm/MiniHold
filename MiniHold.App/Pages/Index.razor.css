@@ -1,0 +1,15 @@
+﻿h5 {
+    margin-top: 1em;
+    margin-bottom: 0.25em;
+    font-weight: bold;
+}
+
+.grid {
+    display: grid;
+    row-gap: 1em;
+    column-gap: 1em
+}
+
+.grid h5 {
+    margin: 0.25em 0;
+}

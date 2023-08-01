@@ -1,0 +1,8 @@
+﻿.temp {
+    font-size: 150%;
+}
+
+.tempBlock {
+    display: inline-block;
+    margin-right: 0.5em;
+}
