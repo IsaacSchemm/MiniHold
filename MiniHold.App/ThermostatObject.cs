@@ -31,19 +31,19 @@ namespace MiniHold.App
             Act(() => Task.CompletedTask);
 
         public Task Hold15Heat() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(15)));
+            Act(async () => await QuickActions.SetHeatAsync(ThermostatClient, TimeSpan.FromMinutes(15)));
 
         public Task Hold15Cool() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, -2, TimeSpan.FromMinutes(15)));
+            Act(async () => await QuickActions.SetCoolAsync(ThermostatClient, TimeSpan.FromMinutes(15)));
 
         public Task Hold15Fan() =>
             Act(async () => await QuickActions.SetFanAsync(ThermostatClient, true, TimeSpan.FromMinutes(15)));
 
         public Task Hold30Heat() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(30)));
+            Act(async () => await QuickActions.SetHeatAsync(ThermostatClient, TimeSpan.FromMinutes(30)));
 
         public Task Hold30Cool() =>
-            Act(async () => await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, -2, TimeSpan.FromMinutes(30)));
+            Act(async () => await QuickActions.SetCoolAsync(ThermostatClient, TimeSpan.FromMinutes(30)));
 
         public Task Hold30Fan() =>
             Act(async () => await QuickActions.SetFanAsync(ThermostatClient, true, TimeSpan.FromMinutes(30)));

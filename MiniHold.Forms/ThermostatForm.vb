@@ -106,13 +106,13 @@ Public Class ThermostatForm
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         Act(Async Function()
-                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(15))
+                Await QuickActions.SetHeatAsync(ThermostatClient, TimeSpan.FromMinutes(15))
             End Function)
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         Act(Async Function()
-                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, -2, TimeSpan.FromMinutes(15))
+                Await QuickActions.SetCoolAsync(ThermostatClient, TimeSpan.FromMinutes(15))
             End Function)
     End Sub
 
@@ -124,13 +124,13 @@ Public Class ThermostatForm
 
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
         Act(Async Function()
-                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, 2, TimeSpan.FromMinutes(30))
+                Await QuickActions.SetHeatAsync(ThermostatClient, TimeSpan.FromMinutes(30))
             End Function)
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
         Act(Async Function()
-                Await QuickActions.SetTemperatureOffsetAsync(ThermostatClient, -2, TimeSpan.FromMinutes(30))
+                Await QuickActions.SetCoolAsync(ThermostatClient, TimeSpan.FromMinutes(30))
             End Function)
     End Sub
 

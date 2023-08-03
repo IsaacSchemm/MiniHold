@@ -20,6 +20,6 @@
     [Parameter]
     public string Suffix { get; set; }
 
-    public bool Positive => Text.StartsWith("+");
-    public bool Negative => Text.StartsWith("-");
+    public bool Positive => Text == "Heat" || Text.StartsWith("+");
+    public bool Negative => Text == "Cool" || Text.StartsWith("-");
 }
