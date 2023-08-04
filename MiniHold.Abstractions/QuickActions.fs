@@ -7,7 +7,7 @@ module QuickActions =
         let startTime = client.ToThermostatTime(DateTime.Now)
         let endTime = startTime + duration
         let! info = client.GetInformationAsync()
-        let newSetPoint = List.head info.Readings.Temperature + info.HeatDelta + Temperature.FromFarenheit 0.5m
+        let newSetPoint = List.head info.Readings.Temperature + info.HeatDelta + Temperature.FromFarenheit 1.5m
         do! client.HoldAsync({
             info.Runtime.TempRange with
                 HeatTemp = newSetPoint
@@ -19,7 +19,7 @@ module QuickActions =
         let startTime = client.ToThermostatTime(DateTime.Now)
         let endTime = startTime + duration
         let! info = client.GetInformationAsync()
-        let newSetPoint = List.head info.Readings.Temperature - info.CoolDelta - Temperature.FromFarenheit 0.5m
+        let newSetPoint = List.head info.Readings.Temperature - info.CoolDelta - Temperature.FromFarenheit 1.5m
         do! client.HoldAsync({
             info.Runtime.TempRange with
                 HeatTemp = newSetPoint - Temperature.FromFarenheit 5m
