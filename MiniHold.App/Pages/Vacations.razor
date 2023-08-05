@@ -42,7 +42,7 @@
                 {
                     if (await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to remove the vacation \"{v.Name}\" from the thermostat \"{ti.ThermostatClient.Name}\"?"))
                     {
-                        await ti.DeleteVacation(v.Name);
+                        await ti.Act(async () => await ti.ThermostatClient.DeleteVacationAsync(v.Name));
                     }
                 }
             }
@@ -150,14 +150,18 @@
     {
         foreach (var t in ClientStatic.ThermostatObjects)
         {
-            await t.CreateVacation(
-                name,
-                new TempRange(
-                    heatTemp: Temperature.FromFarenheit(heatAt),
-                    coolTemp: Temperature.FromFarenheit(coolAt),
-                    fan: fan ? "on" : "auto"),
-                startDate.Date + startTime.TimeOfDay,
-                endDate.Date + endTime.TimeOfDay);
+            await t.Act(async () =>
+            {
+                await t.ThermostatClient.CreateVacationAsync(
+                    name,
+                    new TempRange(
+                        heatTemp: Temperature.FromFarenheit(heatAt),
+                        coolTemp: Temperature.FromFarenheit(coolAt),
+                        fan: fan ? "on" : "auto"),
+                    t.ThermostatClient.ToThermostatTime(startDate.Date + startTime.TimeOfDay),
+                    t.ThermostatClient.ToThermostatTime(endDate.Date + endTime.TimeOfDay),
+                    0);
+            });
         }
     }
 }

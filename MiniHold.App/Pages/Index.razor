@@ -88,7 +88,7 @@
                     if (activeEvent.EventType == "hold")
                     {
                         <center>
-                            <button class="btn btn-secondary mt-2" @onclick="ti.ClearHold">
+                            <button class="btn btn-secondary mt-2" @onclick="() => clearHold(ti)">
                                 Cancel Hold
                             </button>
                         </center>
@@ -188,62 +188,67 @@
 <div class="mb-4"></div>
 
 @code {
-        async Task holdHeat(ThermostatObject ti, int minutes)
+    async Task holdHeat(ThermostatObject ti, int minutes)
+    {
+        await ti.Act(async () =>
         {
-            await ti.Act(async () =>
+            var info = ti.Information;
+            var newSetPoint = info.Readings.Temperature.First() + info.HeatDelta + Temperature.FromFarenheit(1.5m);
+            if (!info.Runtime.TempRange.Contains(newSetPoint))
             {
-                var info = ti.Information;
-                var newSetPoint = info.Readings.Temperature.First() + info.HeatDelta + Temperature.FromFarenheit(1.5m);
-                if (!info.Runtime.TempRange.Contains(newSetPoint))
+                if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the heating set point to {newSetPoint}, which is outside the current range. Continue anyway?"))
                 {
-                    if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the heating set point to {newSetPoint}, which is outside the current range. Continue anyway?"))
-                    {
-                        return;
-                    }
+                    return;
                 }
-                await QuickActions.SetHoldAsync(
-                    ti.ThermostatClient,
-                    info.Runtime.TempRange
-                        .WithHeatTemp(newSetPoint)
-                        .WithCoolTemp(newSetPoint + Temperature.FromFarenheit(10)),
-                    TimeSpan.FromMinutes(minutes));
-            });
-        }
+            }
+            await QuickActions.SetHoldAsync(
+                ti.ThermostatClient,
+                info.Runtime.TempRange
+                    .WithHeatTemp(newSetPoint)
+                    .WithCoolTemp(newSetPoint + Temperature.FromFarenheit(10)),
+                TimeSpan.FromMinutes(minutes));
+        });
+    }
 
-        async Task holdCool(ThermostatObject ti, int minutes)
+    async Task holdCool(ThermostatObject ti, int minutes)
+    {
+        await ti.Act(async () =>
         {
-            await ti.Act(async () =>
+            var info = ti.Information;
+            var newSetPoint = info.Readings.Temperature.First() - info.CoolDelta - Temperature.FromFarenheit(1.5m);
+            if (!info.Runtime.TempRange.Contains(newSetPoint))
             {
-                var info = ti.Information;
-                var newSetPoint = info.Readings.Temperature.First() - info.CoolDelta - Temperature.FromFarenheit(1.5m);
-                if (!info.Runtime.TempRange.Contains(newSetPoint))
+                if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the cooling set point to {newSetPoint}, which is outside the current range. Continue anyway?"))
                 {
-                    if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the cooling set point to {newSetPoint}, which is outside the current range. Continue anyway?"))
-                    {
-                        return;
-                    }
+                    return;
                 }
-                await QuickActions.SetHoldAsync(
-                    ti.ThermostatClient,
-                    info.Runtime.TempRange
-                        .WithCoolTemp(newSetPoint)
-                        .WithHeatTemp(newSetPoint - Temperature.FromFarenheit(10)),
-                    TimeSpan.FromMinutes(minutes));
-            });
-        }
+            }
+            await QuickActions.SetHoldAsync(
+                ti.ThermostatClient,
+                info.Runtime.TempRange
+                    .WithCoolTemp(newSetPoint)
+                    .WithHeatTemp(newSetPoint - Temperature.FromFarenheit(10)),
+                TimeSpan.FromMinutes(minutes));
+        });
+    }
 
-        async Task holdFan(ThermostatObject ti, int minutes)
-        {
-            await ti.Act(async () => await QuickActions.SetFanAsync(ti.ThermostatClient, true, TimeSpan.FromMinutes(minutes)));
-        }
+    async Task holdFan(ThermostatObject ti, int minutes)
+    {
+        await ti.Act(async () => await QuickActions.SetFanAsync(ti.ThermostatClient, true, TimeSpan.FromMinutes(minutes)));
+    }
 
-        async Task holdAway(ThermostatObject ti, int hours)
-        {
-            await ti.Act(async () => await QuickActions.SetAwayAsync(ti.ThermostatClient, TimeSpan.FromHours(hours)));
-        }
+    async Task holdAway(ThermostatObject ti, int hours)
+    {
+        await ti.Act(async () => await QuickActions.SetAwayAsync(ti.ThermostatClient, TimeSpan.FromHours(hours)));
+    }
 
-        async Task holdAwayTo(ThermostatObject ti, int hour)
-        {
-            await ti.Act(async () => await QuickActions.SetAwayUntilClockAsync(ti.ThermostatClient, TimeSpan.FromHours(hour)));
-        }
+    async Task holdAwayTo(ThermostatObject ti, int hour)
+    {
+        await ti.Act(async () => await QuickActions.SetAwayUntilClockAsync(ti.ThermostatClient, TimeSpan.FromHours(hour)));
+    }
+
+    async Task clearHold(ThermostatObject ti)
+    {
+        await ti.Act(async () => await ti.ThermostatClient.CancelHoldAsync());
+    }
 }

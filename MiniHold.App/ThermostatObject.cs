@@ -26,21 +26,6 @@ namespace MiniHold.App
             });
         }
 
-        public Task Refresh() =>
-            Act(() => Task.CompletedTask);
-
-        public Task ClearHold() =>
-            Act(async () => await ThermostatClient.CancelHoldAsync());
-
-        public Task CreateVacation(string name, TempRange tempRange, DateTime startDate, DateTime endDate) =>
-            Act(async () => await ThermostatClient.CreateVacationAsync(
-                name,
-                tempRange,
-                ThermostatClient.ToThermostatTime(startDate),
-                ThermostatClient.ToThermostatTime(endDate),
-                0));
-
-        public Task DeleteVacation(string name) =>
-            Act(async () => await ThermostatClient.DeleteVacationAsync(name));
+        public Task Refresh() => Act(() => Task.CompletedTask);
     }
 }
