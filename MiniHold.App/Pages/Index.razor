@@ -1,5 +1,6 @@
 ﻿@inherits MiniHoldPage
 @page "/"
+@inject IJSRuntime JsRuntime
 @using I8Beef.Ecobee;
 @using MiniHold.Abstractions;
 
@@ -30,26 +31,26 @@
                     <h5 style="grid-row: 1; grid-column: 1">
                         15m Hold
                     </h5>
-                    <GridButton Position="(2, 1)" OnClick="ti.Hold15Heat" Text="Heat" Suffix="for 15 minutes" />
-                    <GridButton Position="(3, 1)" OnClick="ti.Hold15Cool" Text="Cool" Suffix="for 15 minutes" />
-                    <GridButton Position="(4, 1)" OnClick="ti.Hold15Fan" Text="Fan" Suffix="for 15 minutes" />
+                    <GridButton Position="(2, 1)" OnClick="() => holdHeat(ti, 15)" Text="Heat" Suffix="for 15 minutes" />
+                    <GridButton Position="(3, 1)" OnClick="() => holdCool(ti, 15)" Text="Cool" Suffix="for 15 minutes" />
+                    <GridButton Position="(4, 1)" OnClick="() => holdFan(ti, 15)" Text="Fan" Suffix="for 15 minutes" />
 
                     <h5 style="grid-row: 1; grid-column: 2">
                         30m Hold
                     </h5>
-                    <GridButton Position="(2, 2)" OnClick="ti.Hold30Heat" Text="Heat" Suffix="for 30 minutes" />
-                    <GridButton Position="(3, 2)" OnClick="ti.Hold30Cool" Text="Cool" Suffix="for 30 minutes" />
-                    <GridButton Position="(4, 2)" OnClick="ti.Hold30Fan" Text="Fan" Suffix="for 30 minutes" />
+                    <GridButton Position="(2, 2)" OnClick="() => holdHeat(ti, 30)" Text="Heat" Suffix="for 30 minutes" />
+                    <GridButton Position="(3, 2)" OnClick="() => holdCool(ti, 30)" Text="Cool" Suffix="for 30 minutes" />
+                    <GridButton Position="(4, 2)" OnClick="() => holdFan(ti, 30)" Text="Fan" Suffix="for 30 minutes" />
 
                     <h5 style="grid-row: 5; grid-column: 1 / 3">
                         Away
                     </h5>
-                    <GridButton Position="(6, 1)" OnClick="ti.Hold1HAway" Text="for 1 hour" Prefix="Away" />
-                    <GridButton Position="(7, 1)" OnClick="ti.Hold1DAway" Text="for 1 day" Prefix="Away" />
-                    <GridButton Position="(8, 1)" OnClick="ti.Hold7DAway" Text="for 1 week" Prefix="Away" />
-                    <GridButton Position="(6, 2)" OnClick="ti.Hold7AAway" Text="until 7 am" Prefix="Away" />
-                    <GridButton Position="(7, 2)" OnClick="ti.Hold4PAway" Text="until 4 pm" Prefix="Away" />
-                    <GridButton Position="(8, 2)" OnClick="ti.Hold9PAway" Text="until 9 pm" Prefix="Away" />
+                    <GridButton Position="(6, 1)" OnClick="() => holdAway(ti, 1)" Text="for 1 hour" Prefix="Away" />
+                    <GridButton Position="(7, 1)" OnClick="() => holdAway(ti, 24)" Text="for 1 day" Prefix="Away" />
+                    <GridButton Position="(8, 1)" OnClick="() => holdAway(ti, 168)" Text="for 1 week" Prefix="Away" />
+                    <GridButton Position="(6, 2)" OnClick="() => holdAwayTo(ti, 7)" Text="until 7 am" Prefix="Away" />
+                    <GridButton Position="(7, 2)" OnClick="() => holdAwayTo(ti, 16)" Text="until 4 pm" Prefix="Away" />
+                    <GridButton Position="(8, 2)" OnClick="() => holdAwayTo(ti, 21)" Text="until 9 pm" Prefix="Away" />
 
                     <div style="grid-row: 9; grid-column: 1 / 3" class="text-muted">
                         (or until cancelled)
@@ -185,3 +186,64 @@
 }
 
 <div class="mb-4"></div>
+
+@code {
+        async Task holdHeat(ThermostatObject ti, int minutes)
+        {
+            await ti.Act(async () =>
+            {
+                var info = ti.Information;
+                var newSetPoint = info.Readings.Temperature.First() + info.HeatDelta + Temperature.FromFarenheit(1.5m);
+                if (!info.Runtime.TempRange.Contains(newSetPoint))
+                {
+                    if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the heating set point to {newSetPoint}, which is outside the current range. Continue anyway?"))
+                    {
+                        return;
+                    }
+                }
+                await QuickActions.SetHoldAsync(
+                    ti.ThermostatClient,
+                    info.Runtime.TempRange
+                        .WithHeatTemp(newSetPoint)
+                        .WithCoolTemp(newSetPoint + Temperature.FromFarenheit(10)),
+                    TimeSpan.FromMinutes(minutes));
+            });
+        }
+
+        async Task holdCool(ThermostatObject ti, int minutes)
+        {
+            await ti.Act(async () =>
+            {
+                var info = ti.Information;
+                var newSetPoint = info.Readings.Temperature.First() - info.CoolDelta - Temperature.FromFarenheit(1.5m);
+                if (!info.Runtime.TempRange.Contains(newSetPoint))
+                {
+                    if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the cooling set point to {newSetPoint}, which is outside the current range. Continue anyway?"))
+                    {
+                        return;
+                    }
+                }
+                await QuickActions.SetHoldAsync(
+                    ti.ThermostatClient,
+                    info.Runtime.TempRange
+                        .WithCoolTemp(newSetPoint)
+                        .WithHeatTemp(newSetPoint - Temperature.FromFarenheit(10)),
+                    TimeSpan.FromMinutes(minutes));
+            });
+        }
+
+        async Task holdFan(ThermostatObject ti, int minutes)
+        {
+            await ti.Act(async () => await QuickActions.SetFanAsync(ti.ThermostatClient, true, TimeSpan.FromMinutes(minutes)));
+        }
+
+        async Task holdAway(ThermostatObject ti, int hours)
+        {
+            await ti.Act(async () => await QuickActions.SetAwayAsync(ti.ThermostatClient, TimeSpan.FromHours(hours)));
+        }
+
+        async Task holdAwayTo(ThermostatObject ti, int hour)
+        {
+            await ti.Act(async () => await QuickActions.SetAwayUntilClockAsync(ti.ThermostatClient, TimeSpan.FromHours(hour)));
+        }
+}

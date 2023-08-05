@@ -41,6 +41,7 @@ type TempRange = {
     member this.WithHeatTemp x = { this with HeatTemp = x }
     member this.WithCoolTemp x = { this with CoolTemp = x }
     member this.WithFan x = { this with Fan = x }
+    member this.Contains t = this.HeatTemp < t && t < this.CoolTemp
     interface IUserInterfaceReading with
         member this.Temperatures = ["Heat", this.HeatTemp; "Cool", this.CoolTemp]
         member this.OtherReadings = ["Fan", this.Fan]
@@ -84,7 +85,7 @@ type Weather = {
 with
     interface IUserInterfaceReading with
         member this.Temperatures = ["", this.Temperature]
-        member this.OtherReadings = ["Condition", this.Condition]
+        member this.OtherReadings = ["Condition", this.Condition; "Humidity", this.Humidity.PercentageString]
 
 type DailyForecast = {
     Date: DateTime
