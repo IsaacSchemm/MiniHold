@@ -1,11 +1,5 @@
-﻿<button class="btn btn-secondary @(Positive ? "heat" : Negative ? "cool" : "")" style="grid-row: @Position.row; grid-column: @Position.col" @onclick="OnClick">
-    <span class="visually-hidden">
-        @Prefix
-    </span>
+﻿<button class="btn btn-secondary @(Positive ? "heat" : Negative ? "cool" : "")" style="grid-row: @Position.row; grid-column: @Position.col" @onclick="OnClick" title="@Title">
     @Text
-    <span class="visually-hidden">
-        (@Suffix)
-    </span>
 </button>
 
 @code {
@@ -16,9 +10,7 @@
     [Parameter]
     public string Text { get; set; }
     [Parameter]
-    public string Prefix { get; set; }
-    [Parameter]
-    public string Suffix { get; set; }
+    public string Title { get; set; }
 
     public bool Positive => Text == "Heat" || Text.StartsWith("+");
     public bool Negative => Text == "Cool" || Text.StartsWith("-");
