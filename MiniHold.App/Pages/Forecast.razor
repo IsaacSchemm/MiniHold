@@ -9,6 +9,8 @@
 {
     <RefreshBox Thermostat="@ti" />
 
+    <hr />
+
     foreach (var f in ti.Information.DailyForecasts)
     {
         <h5 style="font-weight: bold">@f.Date.ToString("dddd, MMM d")</h5>

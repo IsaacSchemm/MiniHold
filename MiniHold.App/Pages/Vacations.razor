@@ -138,9 +138,9 @@
         .First();
 
     private string name = "Vacation";
-    private DateTime startDate = DateTime.Today.AddDays(1);
+    private DateTime startDate = DateTime.Today;
     private DateTime startTime = new DateTime(2000, 1, 1, 12, 0, 0);
-    private DateTime endDate = DateTime.Today.AddDays(3);
+    private DateTime endDate = DateTime.Today;
     private DateTime endTime = new DateTime(2000, 1, 1, 12, 0, 0);
     private decimal heatAt = getTemplate().HeatTemp.Farenheit;
     private decimal coolAt = getTemplate().CoolTemp.Farenheit;
