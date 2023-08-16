@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Include="Keys.fs" />
     <Compile Include="ThermostatClient.fs" />
+    <Compile Include="SimulatedThermostat.fs" />
     <Compile Include="ThermostatEnumerator.fs" />
     <Compile Include="QuickActions.fs" />
     <Compile Include="Equipment.fs" />

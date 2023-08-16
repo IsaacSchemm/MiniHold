@@ -122,6 +122,7 @@ type Event = {
 }
 
 type ComfortLevel = {
+    Ref: string
     Name: string
     Active: bool
     HeatTemp: Temperature
@@ -199,6 +200,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                 ComfortLevels = [
                     for c in t.Program.Climates do
                         {
+                            Ref = c.ClimateRef
                             Name = c.Name
                             Active = t.Program.CurrentClimateRef = c.ClimateRef
                             HeatTemp = Temperature c.HeatTemp.Value
