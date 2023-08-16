@@ -138,14 +138,17 @@ type ThermostatInformation = {
     Alerts: Alert list
     Events: Event list
 } with
-    member this.DisplayMode = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(this.Mode)
+    member this.Heat = this.Mode = "auto" || this.Mode = "heat" || this.Mode = "auxHeatOnly"
+    member this.Cool = this.Mode = "auto" || this.Mode = "cool"
+    member this.DisplayMode =
+        match this.Mode with
+        | "auxHeatOnly" -> "Aux"
+        | _ -> CultureInfo.CurrentCulture.TextInfo.ToTitleCase(this.Mode)
     member this.RuntimeDisplay = {
         new IUserInterfaceReading with
             member _.Temperatures = [
-                if List.contains this.Mode ["auto"; "heat"; "aux"] then
-                    "Heat", this.Runtime.TempRange.HeatTemp
-                if List.contains this.Mode ["auto"; "cool"] then
-                    "Cool", this.Runtime.TempRange.CoolTemp
+                if this.Heat then "Heat", this.Runtime.TempRange.HeatTemp
+                if this.Cool then "Cool", this.Runtime.TempRange.CoolTemp
             ]
             member _.OtherReadings = [
                 "Min Humidity", this.Runtime.DesiredHumidity.PercentageString
@@ -167,6 +170,7 @@ type IThermostatClient =
     abstract member HoldAsync: parameters: TempRange * startTime: DateTime * endTime: DateTime -> Task
     abstract member HoldComfortSettingAsync: holdClimateRef: string * startTime: DateTime * endTime: DateTime -> Task
     abstract member CancelHoldAsync: unit -> Task
+    abstract member SetModeAsync: string -> Task
     abstract member CreateVacationAsync: name: string * tempRange: TempRange * startTime: DateTime * endTime: DateTime * fanMinOnTime: int -> Task
     abstract member DeleteVacationAsync: name: string -> Task
 
@@ -356,6 +360,19 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
             request.Functions <- [|
                 yield new ResumeProgramFunction(Params = new ResumeProgramParams(ResumeAll = false))
             |]
+            let! response = client.PostAsync<ThermostatUpdateRequest, Response>(request)
+            if response.Status.Code.HasValue && response.Status.Code.Value <> 0 then
+                failwithf "%d: %s" response.Status.Code.Value response.Status.Message
+        }
+
+        member _.SetModeAsync(mode: string) = task {
+            let request = new ThermostatUpdateRequest()
+            request.Selection <- new Selection(SelectionType = "thermostats", SelectionMatch = thermostat.Identifier)
+            request.Thermostat <- {|
+                settings = {|
+                    hvacMode = mode
+                |}
+            |}
             let! response = client.PostAsync<ThermostatUpdateRequest, Response>(request)
             if response.Status.Code.HasValue && response.Status.Code.Value <> 0 then
                 failwithf "%d: %s" response.Status.Code.Value response.Status.Message

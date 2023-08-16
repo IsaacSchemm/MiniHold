@@ -173,6 +173,10 @@ type SimulatedThermostat(name: string) =
 
             Task.CompletedTask
 
+        member _.SetModeAsync(mode) =
+            current <- { current with Mode = mode }
+            Task.CompletedTask
+
         member _.CreateVacationAsync(name, tempRange, startTime, endTime, fanMinOnTime) =
             let (activeHolds, otherEvents) =
                 match current.Events with

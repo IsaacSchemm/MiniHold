@@ -29,15 +29,15 @@
                     <h5 style="grid-row: 1; grid-column: 1">
                         15m Hold
                     </h5>
-                    <GridButton Position="(2, 1)" OnClick="() => holdHeat(ti, 15)" Text="Heat" Title="Heat to 1.5°F past current threshold" />
-                    <GridButton Position="(3, 1)" OnClick="() => holdCool(ti, 15)" Text="Cool" Title="Cool to 1.5°F past current threshold" />
+                    <GridButton Position="(2, 1)" OnClick="() => holdHeat(ti, 15)" Text="Heat" Title="Heat to 1.5°F past current threshold" ClassName="heat" Disabled="!info.Heat" />
+                    <GridButton Position="(3, 1)" OnClick="() => holdCool(ti, 15)" Text="Cool" Title="Cool to 1.5°F past current threshold" ClassName="cool" Disabled="!info.Cool" />
                     <GridButton Position="(4, 1)" OnClick="() => holdFan(ti, 15)" Text="Fan" Title="Keep air handler fan running" />
 
                     <h5 style="grid-row: 1; grid-column: 2">
                         30m Hold
                     </h5>
-                    <GridButton Position="(2, 2)" OnClick="() => holdHeat(ti, 30)" Text="Heat" Title="Heat to 1.5°F past current threshold" />
-                    <GridButton Position="(3, 2)" OnClick="() => holdCool(ti, 30)" Text="Cool" Title="Cool to 1.5°F past current threshold" />
+                    <GridButton Position="(2, 2)" OnClick="() => holdHeat(ti, 30)" Text="Heat" Title="Heat to 1.5°F past current threshold" ClassName="heat" Disabled="!info.Heat" />
+                    <GridButton Position="(3, 2)" OnClick="() => holdCool(ti, 30)" Text="Cool" Title="Cool to 1.5°F past current threshold" ClassName="cool" Disabled="!info.Cool" />
                     <GridButton Position="(4, 2)" OnClick="() => holdFan(ti, 30)" Text="Fan" Title="Keep air handler fan running" />
 
                     <h5 style="grid-row: 5; grid-column: 1 / 3">
@@ -53,6 +53,17 @@
                     <div style="grid-row: 9; grid-column: 1 / 3" class="text-muted">
                         (or until cancelled)
                     </div>
+
+                    @if (info.Mode != "auto")
+                    {
+                        <h5 style="grid-row: 10; grid-column: 1 / 3">
+                            Mode
+                        </h5>
+                        <GridButton Position="(11, 1)" OnClick='() => setMode(ti, "heat")' Text="Heat" ClassName="heat" />
+                        <GridButton Position="(12, 1)" OnClick='() => setMode(ti, "auxHeatOnly")' Text="Aux" ClassName="heat" />
+                        <GridButton Position="(11, 2)" OnClick='() => setMode(ti, "cool")' Text="Cool" ClassName="cool" />
+                        <GridButton Position="(12, 2)" OnClick='() => setMode(ti, "off")' Text="Off" />
+                    }
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
@@ -248,5 +259,10 @@
     async Task clearHold(ThermostatObject ti)
     {
         await ti.Act(async () => await ti.ThermostatClient.CancelHoldAsync());
+    }
+
+    async Task setMode(ThermostatObject ti, string mode)
+    {
+        await ti.Act(async () => await ti.ThermostatClient.SetModeAsync(mode));
     }
 }
