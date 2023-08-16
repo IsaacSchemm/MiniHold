@@ -146,6 +146,7 @@ type ThermostatInformation = {
     Alerts: Alert list
     Events: Event list
 } with
+    member this.DisplayMode = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(this.Mode)
     member this.Program =
         this.ComfortLevels
         |> Seq.where (fun x -> x.Active)
