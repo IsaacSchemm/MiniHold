@@ -4,12 +4,12 @@ namespace MiniHold.App
 {
     public class ThermostatObject
     {
-        public ThermostatObject(ThermostatClient t)
+        public ThermostatObject(IThermostatClient t)
         {
             ThermostatClient = t;
         }
 
-        public ThermostatClient ThermostatClient { get; }
+        public IThermostatClient ThermostatClient { get; }
         public ThermostatInformation Information { get; private set; }
 
         public DateTimeOffset LastUpdated { get; private set; }

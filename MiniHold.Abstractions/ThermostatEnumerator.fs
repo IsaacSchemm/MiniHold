@@ -18,7 +18,7 @@ module ThermostatEnumerator =
             request.Selection.IncludeVersion <- true
             let! response = client.GetAsync<ThermostatRequest, ThermostatResponse>(request, ct) |> Async.AwaitTask
             for t in response.ThermostatList do
-                yield new ThermostatClient(client, t)
+                yield new ThermostatClient(client, t) :> IThermostatClient
             if request.Page.TotalPages.HasValue && request.Page.TotalPages.Value <= page then
                 page <- request.Page.TotalPages.Value
             else

@@ -6,13 +6,6 @@
 
 <LoadingSpinner Busy="@App.Busy" />
 
-@if (ClientStatic.ThermostatObjects.Count == 0)
-{
-    <p>
-        Use the Setup page to set up the app.
-    </p>
-}
-
 @foreach (var ti in ClientStatic.ThermostatObjects)
 {
     var thermostatClient = ti.ThermostatClient;
