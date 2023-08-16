@@ -51,17 +51,7 @@ type Runtime = {
     TempRange: TempRange
     DesiredHumidity: Percentage
     DesiredDehumidity: Percentage
-} with
-    interface IUserInterfaceReading with
-        member this.Temperatures = [
-            "Heat", this.TempRange.HeatTemp
-            "Cool", this.TempRange.CoolTemp
-        ]
-        member this.OtherReadings = [
-            "Min Humidity", this.DesiredHumidity.PercentageString
-            "Max Humidity", this.DesiredDehumidity.PercentageString
-            "Fan", this.TempRange.Fan
-        ]
+}
 
 type Readings = {
     Temperature: Temperature list
@@ -149,6 +139,20 @@ type ThermostatInformation = {
     Events: Event list
 } with
     member this.DisplayMode = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(this.Mode)
+    member this.RuntimeDisplay = {
+        new IUserInterfaceReading with
+            member _.Temperatures = [
+                if List.contains this.Mode ["auto"; "heat"; "aux"] then
+                    "Heat", this.Runtime.TempRange.HeatTemp
+                if List.contains this.Mode ["auto"; "cool"] then
+                    "Cool", this.Runtime.TempRange.CoolTemp
+            ]
+            member _.OtherReadings = [
+                "Min Humidity", this.Runtime.DesiredHumidity.PercentageString
+                "Max Humidity", this.Runtime.DesiredDehumidity.PercentageString
+                "Fan", this.Runtime.TempRange.Fan
+            ]
+    }
     member this.Program =
         this.ComfortLevels
         |> Seq.where (fun x -> x.Active)

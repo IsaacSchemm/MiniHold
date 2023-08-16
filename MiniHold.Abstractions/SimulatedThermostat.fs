@@ -3,7 +3,7 @@
 open System
 open System.Threading.Tasks
 
-type SimulatedThermostat() =
+type SimulatedThermostat(name: string) =
     let mutable current: ThermostatInformation = {
         Mode = "auto"
         AuxCrossover = (Temperature 200, Temperature 400)
@@ -56,7 +56,7 @@ type SimulatedThermostat() =
         }
         Sensors = [
             {
-                Name = "Simulated Thermostat"
+                Name = name
                 Occupied = true
                 Readings = {
                     Temperature = [
@@ -136,8 +136,10 @@ type SimulatedThermostat() =
                 current.ComfortLevels |> List.where (fun x -> x.Active) |> List.head |> toTempRange
         current <- { current with Runtime = { current.Runtime with TempRange = newTempRange } }
 
+    override _.ToString() = name
+
     interface IThermostatClient with
-        member _.Name = "Simulated Thermostat"
+        member _.Name = name
 
         member _.GetInformationAsync() =
             Task.FromResult(current)

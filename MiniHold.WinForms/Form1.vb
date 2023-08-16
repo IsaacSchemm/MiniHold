@@ -89,7 +89,7 @@ Enter this code in the My Apps > Add Application section of the customer portal,
             AbstractionBox.Text = Info.ToString().Replace(vbLf, vbCrLf)
 
             IndoorCurrent.Apply(Info.Readings)
-            IndoorRuntime.Apply(Info.Runtime)
+            IndoorRuntime.Apply(Info.RuntimeDisplay)
             OutdoorWeather.Apply(Info.Weather)
             OutdoorForecast.Apply(Info.DailyForecasts.First())
 
