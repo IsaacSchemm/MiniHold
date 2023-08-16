@@ -118,19 +118,20 @@ Enter this code in the My Apps > Add Application section of the customer portal,
             Exit Sub
         End If
 
-        DisableWhile(Async Function()
+        RunAndUpdate(Async Function()
                          Dim newSetPoint = Info.Readings.Temperature(0) + Info.HeatDelta + Temperature.FromFarenheit(1.5D)
                          If Not Info.Runtime.TempRange.Contains(newSetPoint) Then
                              Dim msg = $"This will set the heating set point to {newSetPoint}, which is outside the current range. Continue anyway?"
-                             If MsgBox(msg, MsgBoxStyle.OkCancel, Text) = MsgBoxResult.Ok Then
-                                 Await QuickActions.SetHoldAsync(
-                                    Thermostat,
-                                    Info.Runtime.TempRange.
-                                        WithHeatTemp(newSetPoint).
-                                        WithCoolTemp(newSetPoint + Temperature.FromFarenheit(10)),
-                                    ts)
+                             If MsgBox(msg, MsgBoxStyle.OkCancel, Text) <> MsgBoxResult.Ok Then
+                                 Exit Function
                              End If
                          End If
+                         Await QuickActions.SetHoldAsync(
+                            Thermostat,
+                            Info.Runtime.TempRange.
+                                WithHeatTemp(newSetPoint).
+                                WithCoolTemp(newSetPoint + Temperature.FromFarenheit(10)),
+                            ts)
                      End Function)
     End Sub
 
@@ -139,19 +140,20 @@ Enter this code in the My Apps > Add Application section of the customer portal,
             Exit Sub
         End If
 
-        DisableWhile(Async Function()
+        RunAndUpdate(Async Function()
                          Dim newSetPoint = Info.Readings.Temperature(0) - Info.CoolDelta - Temperature.FromFarenheit(1.5D)
                          If Not Info.Runtime.TempRange.Contains(newSetPoint) Then
                              Dim msg = $"This will set the cooling set point to {newSetPoint}, which is outside the current range. Continue anyway?"
-                             If MsgBox(msg, MsgBoxStyle.OkCancel, Text) = MsgBoxResult.Ok Then
-                                 Await QuickActions.SetHoldAsync(
-                                    Thermostat,
-                                    Info.Runtime.TempRange.
-                                        WithHeatTemp(newSetPoint - Temperature.FromFarenheit(10)).
-                                        WithCoolTemp(newSetPoint),
-                                    ts)
+                             If MsgBox(msg, MsgBoxStyle.OkCancel, Text) <> MsgBoxResult.Ok Then
+                                 Exit Function
                              End If
                          End If
+                         Await QuickActions.SetHoldAsync(
+                            Thermostat,
+                            Info.Runtime.TempRange.
+                                WithHeatTemp(newSetPoint - Temperature.FromFarenheit(10)).
+                                WithCoolTemp(newSetPoint),
+                            ts)
                      End Function)
     End Sub
 
