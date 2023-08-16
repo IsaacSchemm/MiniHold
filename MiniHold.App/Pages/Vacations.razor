@@ -109,14 +109,6 @@
                        step="0.1"
                 @bind-value="coolAt" />
             </div>
-            <div class="col-md-4 mb-3" style="vertical-align: bottom">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="fanLabel" @bind-value="fan">
-                    <label class="form-check-label" for="fanLabel">
-                        Keep fan on
-                    </label>
-                </div>
-            </div>
         </div>
         <div class="row">
             <div class="col-12 mb-3">
@@ -144,7 +136,6 @@
     private DateTime endTime = new DateTime(2000, 1, 1, 12, 0, 0);
     private decimal heatAt = getTemplate().HeatTemp.Farenheit;
     private decimal coolAt = getTemplate().CoolTemp.Farenheit;
-    private bool fan = getTemplate().Fan == "on";
 
     async Task submit()
     {
@@ -157,7 +148,7 @@
                     new TempRange(
                         heatTemp: Temperature.FromFarenheit(heatAt),
                         coolTemp: Temperature.FromFarenheit(coolAt),
-                        fan: fan ? "on" : "auto"),
+                        fan: "auto"),
                     t.ThermostatClient.ToThermostatTime(startDate.Date + startTime.TimeOfDay),
                     t.ThermostatClient.ToThermostatTime(endDate.Date + endTime.TimeOfDay),
                     0);
