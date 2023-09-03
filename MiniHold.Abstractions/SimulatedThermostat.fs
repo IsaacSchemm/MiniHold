@@ -48,7 +48,7 @@ type SimulatedThermostat(name: string) =
         }
         Readings = {
             Temperature = [
-                Temperature 724
+                Temperature 500
             ]
             Humidity = [
                 Percentage 50
@@ -82,23 +82,23 @@ type SimulatedThermostat(name: string) =
         ]
         Weather = {
             Condition = "Mostly Clear"
-            Temperature = Temperature 664
-            Humidity = Percentage 78
+            Temperature = Temperature 500
+            Humidity = Percentage 50
         }
         DailyForecasts = [
             {
                 Date = new DateTime(2022, 1, 2, 8, 30, 0, DateTimeKind.Local)
-                High = Temperature 834
-                Low = Temperature 596
+                High = Temperature 500
+                Low = Temperature 500
                 Condition = "Mostly Clear"
                 Pop = Percentage 0
             }
             {
                 Date = new DateTime(2022, 1, 3, 0, 0, 0, DateTimeKind.Local)
-                High = Temperature 898
-                Low = Temperature 679
+                High = Temperature 500
+                Low = Temperature 500
                 Condition = "Mostly Clear"
-                Pop = Percentage 37
+                Pop = Percentage 50
             }
         ]
         Alerts = [

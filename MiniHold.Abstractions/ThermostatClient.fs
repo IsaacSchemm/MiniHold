@@ -58,6 +58,12 @@ type Readings = {
     Humidity: Percentage list
 }
 with
+    member this.FarenheitString =
+        String.concat " / " [for t in this.Temperature do t.FarenheitString]
+    member this.PreciseFarenheitString =
+        String.concat " / " [for t in this.Temperature do t.PreciseFarenheitString]
+    member this.HumidityString =
+        String.concat " / " [for h in this.Humidity do h.PercentageString]
     interface IUserInterfaceReading with
         member this.Temperatures = [for x in this.Temperature do "", x]
         member this.OtherReadings = [for x in this.Humidity do "Humidity", x.PercentageString]
@@ -66,7 +72,9 @@ type Sensor = {
     Name: string
     Occupied: bool
     Readings: Readings
-}
+} with
+    member this.NameWithOccupancyIndicator =
+        String.concat " " [this.Name; if this.Occupied then "✓"]
 
 type Weather = {
     Condition: string
@@ -109,7 +117,13 @@ type Event = {
     StartDate: Nullable<DateTime>
     EndDate: Nullable<DateTime>
     Running: bool
-}
+} with
+    member this.Description = String.concat " " [
+        for t in this.AbsoluteTemperatureRanges do
+            $"{t.HeatTemp.FarenheitString}-{t.CoolTemp.FarenheitString}"
+            if t.Fan = "on" then
+                "(with fan)"
+    ]
 
 type ComfortLevel = {
     Ref: string
@@ -138,8 +152,10 @@ type ThermostatInformation = {
     Alerts: Alert list
     Events: Event list
 } with
-    member this.Heat = this.Mode = "auto" || this.Mode = "heat" || this.Mode = "auxHeatOnly"
-    member this.Cool = this.Mode = "auto" || this.Mode = "cool"
+    member this.Heat =
+        this.Mode = "auto" || this.Mode = "heat" || this.Mode = "auxHeatOnly"
+    member this.Cool =
+        this.Mode = "auto" || this.Mode = "cool"
     member this.DisplayMode =
         match this.Mode with
         | "auxHeatOnly" -> "Aux"
@@ -160,8 +176,10 @@ type ThermostatInformation = {
         this.ComfortLevels
         |> Seq.where (fun x -> x.Active)
         |> Seq.exactlyOne
-    member this.ApplyHeatDelta (t: Temperature) = t - this.HeatDelta
-    member this.ApplyCoolDelta (t: Temperature) = t + this.CoolDelta
+    member this.ApplyHeatDelta (t: Temperature) =
+        t - this.HeatDelta
+    member this.ApplyCoolDelta (t: Temperature) =
+        t + this.CoolDelta
 
 type IThermostatClient =
     abstract member Name: string with get
