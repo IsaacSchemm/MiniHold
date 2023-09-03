@@ -155,16 +155,14 @@ Enter this code in the My Apps > Add Application section of the customer portal,
             Exit Sub
         End If
 
-        Dim newSetPoint = LastInformation.Readings.Temperature(0) + LastInformation.HeatDelta + Temperature.FromFarenheit(1.5D)
-        If MsgBox($"This will set the heating set point to {newSetPoint}.", MsgBoxStyle.OkCancel, Text) <> MsgBoxResult.Ok Then
+        Dim newRange = QuickActions.DetermineNewRangeToApplyHeat(LastInformation)
+        If MsgBox($"This will set a hold for {newRange.ShortDescription}.", MsgBoxStyle.OkCancel, Text) <> MsgBoxResult.Ok Then
             Exit Sub
         End If
 
         Await QuickActions.SetHoldAsync(
            LastThermostat,
-           LastInformation.Runtime.TempRange.
-               WithHeatTemp(newSetPoint).
-               WithCoolTemp(newSetPoint + Temperature.FromFarenheit(10)),
+           newRange,
            TimeSpan.FromMinutes(15))
 
         UpdateCurrent()
@@ -180,16 +178,14 @@ Enter this code in the My Apps > Add Application section of the customer portal,
             Exit Sub
         End If
 
-        Dim newSetPoint = LastInformation.Readings.Temperature(0) - LastInformation.CoolDelta - Temperature.FromFarenheit(1.5D)
-        If MsgBox($"This will set the cooling set point to {newSetPoint}.", MsgBoxStyle.OkCancel, Text) <> MsgBoxResult.Ok Then
+        Dim newRange = QuickActions.DetermineNewRangeToApplyCool(LastInformation)
+        If MsgBox($"This will set a hold for {newRange.ShortDescription}.", MsgBoxStyle.OkCancel, Text) <> MsgBoxResult.Ok Then
             Exit Sub
         End If
 
         Await QuickActions.SetHoldAsync(
            LastThermostat,
-           LastInformation.Runtime.TempRange.
-                WithHeatTemp(newSetPoint - Temperature.FromFarenheit(10)).
-                WithCoolTemp(newSetPoint),
+           newRange,
            TimeSpan.FromMinutes(15))
 
         UpdateCurrent()

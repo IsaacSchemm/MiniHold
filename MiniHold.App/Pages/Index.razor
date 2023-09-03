@@ -6,6 +6,22 @@
 
 <LoadingSpinner Busy="@App.Busy" />
 
+@if (ClientStatic.EcobeePin != null)
+{
+    <p>
+        Your PIN code is: <strong>@ClientStatic.EcobeePin</strong>
+    </p>
+    <p>
+        Enter this code in the My Apps > Add Application section of the customer portal, and press OK when ready.
+    </p>
+
+    <form @onsubmit="ClientStatic.GetToken">
+        <button type="submit" class="btn btn-primary">
+            OK
+        </button>
+    </form>
+}
+
 @foreach (var ti in ClientStatic.ThermostatObjects)
 {
     var thermostatClient = ti.ThermostatClient;
@@ -202,19 +218,14 @@
         await ti.Act(async () =>
         {
             var info = ti.Information;
-            var newSetPoint = info.Readings.Temperature.First() + info.HeatDelta + Temperature.FromFarenheit(1.5m);
-            if (!info.Runtime.TempRange.Contains(newSetPoint))
+            var newRange = QuickActions.DetermineNewRangeToApplyHeat(info);
+            if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the temperature range to {newRange.ShortDescription}."))
             {
-                if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the heating set point to {newSetPoint}, which is outside the current range. Continue anyway?"))
-                {
-                    return;
-                }
+                return;
             }
             await QuickActions.SetHoldAsync(
                 ti.ThermostatClient,
-                info.Runtime.TempRange
-                    .WithHeatTemp(newSetPoint)
-                    .WithCoolTemp(newSetPoint + Temperature.FromFarenheit(10)),
+                newRange,
                 TimeSpan.FromMinutes(minutes));
         });
     }
@@ -224,19 +235,14 @@
         await ti.Act(async () =>
         {
             var info = ti.Information;
-            var newSetPoint = info.Readings.Temperature.First() - info.CoolDelta - Temperature.FromFarenheit(1.5m);
-            if (!info.Runtime.TempRange.Contains(newSetPoint))
+            var newRange = QuickActions.DetermineNewRangeToApplyCool(info);
+            if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the temperature range to {newRange.ShortDescription}."))
             {
-                if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the cooling set point to {newSetPoint}, which is outside the current range. Continue anyway?"))
-                {
-                    return;
-                }
+                return;
             }
             await QuickActions.SetHoldAsync(
                 ti.ThermostatClient,
-                info.Runtime.TempRange
-                    .WithCoolTemp(newSetPoint)
-                    .WithHeatTemp(newSetPoint - Temperature.FromFarenheit(10)),
+                newRange,
                 TimeSpan.FromMinutes(minutes));
         });
     }

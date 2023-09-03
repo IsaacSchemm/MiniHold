@@ -1,20 +1,4 @@
-﻿@if (ClientStatic.EcobeePin != null)
-{
-    <p>
-        Your PIN code is: <strong>@ClientStatic.EcobeePin</strong>
-    </p>
-    <p>
-        Enter this code in the My Apps > Add Application section of the customer portal, and press OK when ready.
-    </p>
-
-    <form @onsubmit="ClientStatic.GetToken">
-        <button type="submit" class="btn btn-primary">
-            OK
-        </button>
-    </form>
-}
-
-@if (Thermostat != null)
+﻿@if (Thermostat != null)
 {
     <h1>
         <span class="visually-hidden">

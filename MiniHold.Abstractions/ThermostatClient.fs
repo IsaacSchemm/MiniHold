@@ -42,6 +42,7 @@ type TempRange = {
     member this.WithHeatTemp x = { this with HeatTemp = x }
     member this.WithCoolTemp x = { this with CoolTemp = x }
     member this.WithFan x = { this with Fan = x }
+    member this.ShortDescription = $"{this.HeatTemp}-{this.CoolTemp} (fan: {this.Fan})"
     member this.Contains t = this.HeatTemp < t && t < this.CoolTemp
     interface IUserInterfaceReading with
         member this.Temperatures = ["Heat", this.HeatTemp; "Cool", this.CoolTemp]
