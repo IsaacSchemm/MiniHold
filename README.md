@@ -19,8 +19,9 @@ Windows 10+ and Android. The easiest way to build and install the app is to
 debug it from Visual Studio - for Android, this means enabling USB debugging
 on your device and using Visual Studio to debug the app remotely on it.
 
-**MiniHold.WinForms** is an experimental VB.NET WinForms version of MiniHold
-and does not contain all features of the main app.
+Also available is **MiniHold.Tray**, a VB.NET WinForms application that can be
+minimized to the system tray, shows the current indoor and outdoor temperature
+in a tooltip, and lets you set certain short-term holds.
 
 ## Display
 

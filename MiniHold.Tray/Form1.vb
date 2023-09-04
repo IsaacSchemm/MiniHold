@@ -68,16 +68,9 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         End If
     End Sub
 
-    Private Sub AddSimulatedThermostat()
-        ThermostatDropDown.Items.Add(New SimulatedThermostat("Simulated Thermostat"))
-        ThermostatDropDown.SelectedIndex = 0
-    End Sub
-
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
-        If Not String.IsNullOrEmpty(My.Settings.StoredAuthToken) Then
+        If False AndAlso Not String.IsNullOrEmpty(My.Settings.StoredAuthToken) Then
             AddRealThermostats()
-        Else
-            AddSimulatedThermostat()
         End If
     End Sub
 
@@ -89,7 +82,7 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         Dim result = MsgBox("This will clear your API credentials.", MsgBoxStyle.OkCancel, Text)
         If result = MsgBoxResult.Ok Then
             My.Settings.Reset()
-            AddSimulatedThermostat()
+            ThermostatDropDown.Items.Clear()
         End If
     End Sub
 
@@ -169,7 +162,7 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         Await QuickActions.SetHoldAsync(
            LastThermostat,
            newRange,
-           TimeSpan.FromMinutes(15))
+           TimeSpan.FromMinutes(30))
 
         UpdateCurrent()
     End Sub
@@ -192,7 +185,7 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         Await QuickActions.SetHoldAsync(
            LastThermostat,
            newRange,
-           TimeSpan.FromMinutes(15))
+           TimeSpan.FromMinutes(30))
 
         UpdateCurrent()
     End Sub
@@ -205,7 +198,7 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         Await QuickActions.SetHoldAsync(
            LastThermostat,
            LastInformation.Runtime.TempRange.WithFan("on"),
-           TimeSpan.FromMinutes(15))
+           TimeSpan.FromMinutes(30))
 
         UpdateCurrent()
     End Sub
@@ -215,7 +208,7 @@ Enter this code in the My Apps > Add Application section of the customer portal,
             Exit Sub
         End If
 
-        Await QuickActions.SetAwayAsync(LastThermostat, TimeSpan.FromMinutes(15))
+        Await QuickActions.SetAwayAsync(LastThermostat, TimeSpan.FromMinutes(30))
 
         UpdateCurrent()
     End Sub

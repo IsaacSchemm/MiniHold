@@ -328,15 +328,16 @@ Partial Class Form1
         TabPage2.Location = New Point(4, 24)
         TabPage2.Name = "TabPage2"
         TabPage2.Padding = New Padding(3)
-        TabPage2.Size = New Size(272, 251)
+        TabPage2.Size = New Size(272, 231)
         TabPage2.TabIndex = 1
         TabPage2.Text = "Advanced"
         TabPage2.UseVisualStyleBackColor = True
         ' 
         ' ActiveHoldLabel
         ' 
+        ActiveHoldLabel.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
         ActiveHoldLabel.AutoSize = True
-        ActiveHoldLabel.Location = New Point(6, 226)
+        ActiveHoldLabel.Location = New Point(6, 206)
         ActiveHoldLabel.Name = "ActiveHoldLabel"
         ActiveHoldLabel.Size = New Size(16, 15)
         ActiveHoldLabel.TabIndex = 5
@@ -345,7 +346,7 @@ Partial Class Form1
         ' ClearHoldButton
         ' 
         ClearHoldButton.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        ClearHoldButton.Location = New Point(201, 222)
+        ClearHoldButton.Location = New Point(201, 202)
         ClearHoldButton.Name = "ClearHoldButton"
         ClearHoldButton.Size = New Size(59, 23)
         ClearHoldButton.TabIndex = 4
@@ -356,12 +357,12 @@ Partial Class Form1
         ' 
         GroupBox5.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         GroupBox5.Controls.Add(TableLayoutPanel2)
-        GroupBox5.Location = New Point(6, 165)
+        GroupBox5.Location = New Point(6, 145)
         GroupBox5.Name = "GroupBox5"
         GroupBox5.Size = New Size(260, 51)
         GroupBox5.TabIndex = 1
         GroupBox5.TabStop = False
-        GroupBox5.Text = "15-Minute Hold"
+        GroupBox5.Text = "30-Minute Hold"
         ' 
         ' TableLayoutPanel2
         ' 
@@ -428,7 +429,7 @@ Partial Class Form1
         GroupBox4.Controls.Add(AbstractionTextBox)
         GroupBox4.Location = New Point(6, 6)
         GroupBox4.Name = "GroupBox4"
-        GroupBox4.Size = New Size(260, 153)
+        GroupBox4.Size = New Size(260, 133)
         GroupBox4.TabIndex = 0
         GroupBox4.TabStop = False
         GroupBox4.Text = "Abstraction"
@@ -441,7 +442,7 @@ Partial Class Form1
         AbstractionTextBox.Name = "AbstractionTextBox"
         AbstractionTextBox.ReadOnly = True
         AbstractionTextBox.ScrollBars = ScrollBars.Both
-        AbstractionTextBox.Size = New Size(254, 131)
+        AbstractionTextBox.Size = New Size(254, 111)
         AbstractionTextBox.TabIndex = 0
         AbstractionTextBox.WordWrap = False
         ' 
