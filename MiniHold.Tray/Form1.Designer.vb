@@ -60,6 +60,8 @@ Partial Class Form1
         GroupBox4 = New GroupBox()
         AbstractionTextBox = New TextBox()
         Timer1 = New Timer(components)
+        Panel1 = New Panel()
+        AlertLabel = New Label()
         GroupBox1.SuspendLayout()
         GroupBox2.SuspendLayout()
         GroupBox3.SuspendLayout()
@@ -71,6 +73,7 @@ Partial Class Form1
         GroupBox5.SuspendLayout()
         TableLayoutPanel2.SuspendLayout()
         GroupBox4.SuspendLayout()
+        Panel1.SuspendLayout()
         SuspendLayout()
         ' 
         ' NotifyIcon1
@@ -246,7 +249,7 @@ Partial Class Form1
         GroupBox3.Controls.Add(DataGridView1)
         GroupBox3.Location = New Point(6, 142)
         GroupBox3.Name = "GroupBox3"
-        GroupBox3.Size = New Size(260, 103)
+        GroupBox3.Size = New Size(260, 83)
         GroupBox3.TabIndex = 9
         GroupBox3.TabStop = False
         GroupBox3.Text = "Sensors"
@@ -261,7 +264,7 @@ Partial Class Form1
         DataGridView1.Location = New Point(3, 19)
         DataGridView1.Name = "DataGridView1"
         DataGridView1.RowTemplate.Height = 25
-        DataGridView1.Size = New Size(254, 81)
+        DataGridView1.Size = New Size(254, 61)
         DataGridView1.TabIndex = 0
         ' 
         ' Column1
@@ -301,7 +304,7 @@ Partial Class Form1
         TabControl1.Location = New Point(12, 70)
         TabControl1.Name = "TabControl1"
         TabControl1.SelectedIndex = 0
-        TabControl1.Size = New Size(280, 279)
+        TabControl1.Size = New Size(280, 259)
         TabControl1.TabIndex = 12
         ' 
         ' TabPage1
@@ -311,7 +314,7 @@ Partial Class Form1
         TabPage1.Location = New Point(4, 24)
         TabPage1.Name = "TabPage1"
         TabPage1.Padding = New Padding(3)
-        TabPage1.Size = New Size(272, 251)
+        TabPage1.Size = New Size(272, 231)
         TabPage1.TabIndex = 0
         TabPage1.Text = "Temperature"
         TabPage1.UseVisualStyleBackColor = True
@@ -447,16 +450,39 @@ Partial Class Form1
         Timer1.Enabled = True
         Timer1.Interval = 1800000
         ' 
+        ' Panel1
+        ' 
+        Panel1.Controls.Add(TabControl1)
+        Panel1.Controls.Add(ThermostatDropDown)
+        Panel1.Controls.Add(ResetButton)
+        Panel1.Controls.Add(Label1)
+        Panel1.Controls.Add(RefreshListButton)
+        Panel1.Dock = DockStyle.Fill
+        Panel1.Location = New Point(0, 0)
+        Panel1.Name = "Panel1"
+        Panel1.Size = New Size(304, 341)
+        Panel1.TabIndex = 13
+        ' 
+        ' AlertLabel
+        ' 
+        AlertLabel.BackColor = SystemColors.Highlight
+        AlertLabel.Dock = DockStyle.Bottom
+        AlertLabel.ForeColor = SystemColors.HighlightText
+        AlertLabel.Location = New Point(0, 341)
+        AlertLabel.Name = "AlertLabel"
+        AlertLabel.Size = New Size(304, 20)
+        AlertLabel.TabIndex = 14
+        AlertLabel.Text = "Alert active (see Abstraction tab)"
+        AlertLabel.TextAlign = ContentAlignment.MiddleCenter
+        AlertLabel.Visible = False
+        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(304, 361)
-        Controls.Add(TabControl1)
-        Controls.Add(ResetButton)
-        Controls.Add(ThermostatDropDown)
-        Controls.Add(RefreshListButton)
-        Controls.Add(Label1)
+        Controls.Add(Panel1)
+        Controls.Add(AlertLabel)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "Form1"
         Text = "MiniHold Tray Utility"
@@ -475,8 +501,9 @@ Partial Class Form1
         TableLayoutPanel2.ResumeLayout(False)
         GroupBox4.ResumeLayout(False)
         GroupBox4.PerformLayout()
+        Panel1.ResumeLayout(False)
+        Panel1.PerformLayout()
         ResumeLayout(False)
-        PerformLayout()
     End Sub
 
     Friend WithEvents NotifyIcon1 As NotifyIcon
@@ -515,4 +542,6 @@ Partial Class Form1
     Friend WithEvents TableLayoutPanel2 As TableLayoutPanel
     Friend WithEvents ActiveHoldLabel As Label
     Friend WithEvents Timer1 As Timer
+    Friend WithEvents Panel1 As Panel
+    Friend WithEvents AlertLabel As Label
 End Class

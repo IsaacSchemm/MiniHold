@@ -25,7 +25,7 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         If result <> MsgBoxResult.Ok Then
             Application.Exit()
         Else
-            Await EcobeeClient.GetAccessTokenAsync(pin.Code)
+            Await EcobeeClient.GetAccessTokenAsync(pin.Code, cancellationToken)
         End If
 
         Return Await GetToken(cancellationToken)
@@ -117,8 +117,6 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         OutdoorTemperatureLabel.Text = info.Weather.Temperature.FarenheitString
         OutdoorHumidityLabel.Text = info.Weather.Humidity.PercentageString
 
-        NotifyIcon1.Text = $"{thermostat.Name} ({Date.Now.ToShortTimeString()}): {info.Readings.FarenheitString} (Weather: {info.Weather.Temperature.FarenheitString})"
-
         Dim forecast = info.DailyForecasts.DefaultIfEmpty(Nothing).First()
 
         HighLabel.Text = forecast?.High?.FarenheitString
@@ -138,6 +136,14 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         Else
             ActiveHoldLabel.Text = ""
             ClearHoldButton.Enabled = False
+        End If
+
+        If info.Alerts.Length > 0 Then
+            AlertLabel.Visible = True
+            NotifyIcon1.Text = "Alert active"
+        Else
+            AlertLabel.Visible = False
+            NotifyIcon1.Text = $"{thermostat.Name} ({Date.Now.ToShortTimeString()}): {info.Readings.FarenheitString} (Weather: {info.Weather.Temperature.FarenheitString})"
         End If
     End Sub
 
