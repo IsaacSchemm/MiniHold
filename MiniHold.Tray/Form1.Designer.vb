@@ -51,14 +51,14 @@ Partial Class Form1
         TabPage2 = New TabPage()
         ActiveHoldLabel = New Label()
         ClearHoldButton = New Button()
-        GroupBox5 = New GroupBox()
-        TableLayoutPanel2 = New TableLayoutPanel()
-        AwayButton = New Button()
-        HeatButton = New Button()
-        CoolButton = New Button()
-        FanButton = New Button()
         GroupBox4 = New GroupBox()
         AbstractionTextBox = New TextBox()
+        GroupBox5 = New GroupBox()
+        TableLayoutPanel2 = New TableLayoutPanel()
+        OtherHoldButton = New Button()
+        HeatButton = New Button()
+        CoolButton = New Button()
+        AwayButton = New Button()
         Timer1 = New Timer(components)
         Panel1 = New Panel()
         AlertLabel = New Label()
@@ -71,9 +71,9 @@ Partial Class Form1
         TabControl1.SuspendLayout()
         TabPage1.SuspendLayout()
         TabPage2.SuspendLayout()
+        GroupBox4.SuspendLayout()
         GroupBox5.SuspendLayout()
         TableLayoutPanel2.SuspendLayout()
-        GroupBox4.SuspendLayout()
         Panel1.SuspendLayout()
         SuspendLayout()
         ' 
@@ -324,8 +324,8 @@ Partial Class Form1
         ' 
         TabPage2.Controls.Add(ActiveHoldLabel)
         TabPage2.Controls.Add(ClearHoldButton)
-        TabPage2.Controls.Add(GroupBox5)
         TabPage2.Controls.Add(GroupBox4)
+        TabPage2.Controls.Add(GroupBox5)
         TabPage2.Location = New Point(4, 24)
         TabPage2.Name = "TabPage2"
         TabPage2.Padding = New Padding(3)
@@ -336,29 +336,53 @@ Partial Class Form1
         ' 
         ' ActiveHoldLabel
         ' 
-        ActiveHoldLabel.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left
-        ActiveHoldLabel.AutoSize = True
-        ActiveHoldLabel.Location = New Point(6, 206)
+        ActiveHoldLabel.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        ActiveHoldLabel.AutoEllipsis = True
+        ActiveHoldLabel.Location = New Point(6, 207)
         ActiveHoldLabel.Name = "ActiveHoldLabel"
-        ActiveHoldLabel.Size = New Size(16, 15)
+        ActiveHoldLabel.Size = New Size(189, 23)
         ActiveHoldLabel.TabIndex = 5
         ActiveHoldLabel.Text = "   "
+        ActiveHoldLabel.TextAlign = ContentAlignment.MiddleLeft
         ' 
         ' ClearHoldButton
         ' 
         ClearHoldButton.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
-        ClearHoldButton.Location = New Point(201, 202)
+        ClearHoldButton.Location = New Point(201, 207)
         ClearHoldButton.Name = "ClearHoldButton"
         ClearHoldButton.Size = New Size(59, 23)
         ClearHoldButton.TabIndex = 4
         ClearHoldButton.Text = "Clear"
         ClearHoldButton.UseVisualStyleBackColor = True
         ' 
+        ' GroupBox4
+        ' 
+        GroupBox4.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        GroupBox4.Controls.Add(AbstractionTextBox)
+        GroupBox4.Location = New Point(6, 6)
+        GroupBox4.Name = "GroupBox4"
+        GroupBox4.Size = New Size(260, 138)
+        GroupBox4.TabIndex = 0
+        GroupBox4.TabStop = False
+        GroupBox4.Text = "Abstraction"
+        ' 
+        ' AbstractionTextBox
+        ' 
+        AbstractionTextBox.Dock = DockStyle.Fill
+        AbstractionTextBox.Location = New Point(3, 19)
+        AbstractionTextBox.Multiline = True
+        AbstractionTextBox.Name = "AbstractionTextBox"
+        AbstractionTextBox.ReadOnly = True
+        AbstractionTextBox.ScrollBars = ScrollBars.Both
+        AbstractionTextBox.Size = New Size(254, 116)
+        AbstractionTextBox.TabIndex = 0
+        AbstractionTextBox.WordWrap = False
+        ' 
         ' GroupBox5
         ' 
         GroupBox5.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         GroupBox5.Controls.Add(TableLayoutPanel2)
-        GroupBox5.Location = New Point(6, 145)
+        GroupBox5.Location = New Point(6, 150)
         GroupBox5.Name = "GroupBox5"
         GroupBox5.Size = New Size(260, 51)
         GroupBox5.TabIndex = 1
@@ -372,10 +396,10 @@ Partial Class Form1
         TableLayoutPanel2.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 25F))
         TableLayoutPanel2.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 25F))
         TableLayoutPanel2.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 25F))
-        TableLayoutPanel2.Controls.Add(AwayButton, 3, 0)
+        TableLayoutPanel2.Controls.Add(OtherHoldButton, 3, 0)
         TableLayoutPanel2.Controls.Add(HeatButton, 0, 0)
         TableLayoutPanel2.Controls.Add(CoolButton, 1, 0)
-        TableLayoutPanel2.Controls.Add(FanButton, 2, 0)
+        TableLayoutPanel2.Controls.Add(AwayButton, 2, 0)
         TableLayoutPanel2.Dock = DockStyle.Fill
         TableLayoutPanel2.Location = New Point(3, 19)
         TableLayoutPanel2.Name = "TableLayoutPanel2"
@@ -384,15 +408,15 @@ Partial Class Form1
         TableLayoutPanel2.Size = New Size(254, 29)
         TableLayoutPanel2.TabIndex = 4
         ' 
-        ' AwayButton
+        ' OtherHoldButton
         ' 
-        AwayButton.Dock = DockStyle.Fill
-        AwayButton.Location = New Point(192, 3)
-        AwayButton.Name = "AwayButton"
-        AwayButton.Size = New Size(59, 23)
-        AwayButton.TabIndex = 3
-        AwayButton.Text = "Away"
-        AwayButton.UseVisualStyleBackColor = True
+        OtherHoldButton.Dock = DockStyle.Fill
+        OtherHoldButton.Location = New Point(192, 3)
+        OtherHoldButton.Name = "OtherHoldButton"
+        OtherHoldButton.Size = New Size(59, 23)
+        OtherHoldButton.TabIndex = 6
+        OtherHoldButton.Text = "Other..."
+        OtherHoldButton.UseVisualStyleBackColor = True
         ' 
         ' HeatButton
         ' 
@@ -414,38 +438,15 @@ Partial Class Form1
         CoolButton.Text = "Cool"
         CoolButton.UseVisualStyleBackColor = True
         ' 
-        ' FanButton
+        ' AwayButton
         ' 
-        FanButton.Dock = DockStyle.Fill
-        FanButton.Location = New Point(129, 3)
-        FanButton.Name = "FanButton"
-        FanButton.Size = New Size(57, 23)
-        FanButton.TabIndex = 2
-        FanButton.Text = "Fan"
-        FanButton.UseVisualStyleBackColor = True
-        ' 
-        ' GroupBox4
-        ' 
-        GroupBox4.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        GroupBox4.Controls.Add(AbstractionTextBox)
-        GroupBox4.Location = New Point(6, 6)
-        GroupBox4.Name = "GroupBox4"
-        GroupBox4.Size = New Size(260, 133)
-        GroupBox4.TabIndex = 0
-        GroupBox4.TabStop = False
-        GroupBox4.Text = "Abstraction"
-        ' 
-        ' AbstractionTextBox
-        ' 
-        AbstractionTextBox.Dock = DockStyle.Fill
-        AbstractionTextBox.Location = New Point(3, 19)
-        AbstractionTextBox.Multiline = True
-        AbstractionTextBox.Name = "AbstractionTextBox"
-        AbstractionTextBox.ReadOnly = True
-        AbstractionTextBox.ScrollBars = ScrollBars.Both
-        AbstractionTextBox.Size = New Size(254, 111)
-        AbstractionTextBox.TabIndex = 0
-        AbstractionTextBox.WordWrap = False
+        AwayButton.Dock = DockStyle.Fill
+        AwayButton.Location = New Point(129, 3)
+        AwayButton.Name = "AwayButton"
+        AwayButton.Size = New Size(57, 23)
+        AwayButton.TabIndex = 3
+        AwayButton.Text = "Away"
+        AwayButton.UseVisualStyleBackColor = True
         ' 
         ' Timer1
         ' 
@@ -511,11 +512,10 @@ Partial Class Form1
         TabControl1.ResumeLayout(False)
         TabPage1.ResumeLayout(False)
         TabPage2.ResumeLayout(False)
-        TabPage2.PerformLayout()
-        GroupBox5.ResumeLayout(False)
-        TableLayoutPanel2.ResumeLayout(False)
         GroupBox4.ResumeLayout(False)
         GroupBox4.PerformLayout()
+        GroupBox5.ResumeLayout(False)
+        TableLayoutPanel2.ResumeLayout(False)
         Panel1.ResumeLayout(False)
         Panel1.PerformLayout()
         ResumeLayout(False)
@@ -548,8 +548,6 @@ Partial Class Form1
     Friend WithEvents TabPage2 As TabPage
     Friend WithEvents GroupBox5 As GroupBox
     Friend WithEvents ClearHoldButton As Button
-    Friend WithEvents AwayButton As Button
-    Friend WithEvents FanButton As Button
     Friend WithEvents CoolButton As Button
     Friend WithEvents HeatButton As Button
     Friend WithEvents GroupBox4 As GroupBox
@@ -560,4 +558,6 @@ Partial Class Form1
     Friend WithEvents Panel1 As Panel
     Friend WithEvents AlertLabel As Label
     Friend WithEvents EquipmentLabel As Label
+    Friend WithEvents OtherHoldButton As Button
+    Friend WithEvents AwayButton As Button
 End Class
