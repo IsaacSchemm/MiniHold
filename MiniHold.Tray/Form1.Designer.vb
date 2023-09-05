@@ -62,6 +62,7 @@ Partial Class Form1
         Timer1 = New Timer(components)
         Panel1 = New Panel()
         AlertLabel = New Label()
+        EquipmentLabel = New Label()
         GroupBox1.SuspendLayout()
         GroupBox2.SuspendLayout()
         GroupBox3.SuspendLayout()
@@ -249,7 +250,7 @@ Partial Class Form1
         GroupBox3.Controls.Add(DataGridView1)
         GroupBox3.Location = New Point(6, 142)
         GroupBox3.Name = "GroupBox3"
-        GroupBox3.Size = New Size(260, 83)
+        GroupBox3.Size = New Size(260, 88)
         GroupBox3.TabIndex = 9
         GroupBox3.TabStop = False
         GroupBox3.Text = "Sensors"
@@ -264,7 +265,7 @@ Partial Class Form1
         DataGridView1.Location = New Point(3, 19)
         DataGridView1.Name = "DataGridView1"
         DataGridView1.RowTemplate.Height = 25
-        DataGridView1.Size = New Size(254, 61)
+        DataGridView1.Size = New Size(254, 66)
         DataGridView1.TabIndex = 0
         ' 
         ' Column1
@@ -304,7 +305,7 @@ Partial Class Form1
         TabControl1.Location = New Point(12, 70)
         TabControl1.Name = "TabControl1"
         TabControl1.SelectedIndex = 0
-        TabControl1.Size = New Size(280, 259)
+        TabControl1.Size = New Size(280, 264)
         TabControl1.TabIndex = 12
         ' 
         ' TabPage1
@@ -314,7 +315,7 @@ Partial Class Form1
         TabPage1.Location = New Point(4, 24)
         TabPage1.Name = "TabPage1"
         TabPage1.Padding = New Padding(3)
-        TabPage1.Size = New Size(272, 231)
+        TabPage1.Size = New Size(272, 236)
         TabPage1.TabIndex = 0
         TabPage1.Text = "Temperature"
         TabPage1.UseVisualStyleBackColor = True
@@ -328,7 +329,7 @@ Partial Class Form1
         TabPage2.Location = New Point(4, 24)
         TabPage2.Name = "TabPage2"
         TabPage2.Padding = New Padding(3)
-        TabPage2.Size = New Size(272, 231)
+        TabPage2.Size = New Size(272, 236)
         TabPage2.TabIndex = 1
         TabPage2.Text = "Advanced"
         TabPage2.UseVisualStyleBackColor = True
@@ -345,12 +346,12 @@ Partial Class Form1
         ' 
         ' ClearHoldButton
         ' 
-        ClearHoldButton.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+        ClearHoldButton.Anchor = AnchorStyles.Bottom Or AnchorStyles.Right
         ClearHoldButton.Location = New Point(201, 202)
         ClearHoldButton.Name = "ClearHoldButton"
         ClearHoldButton.Size = New Size(59, 23)
         ClearHoldButton.TabIndex = 4
-        ClearHoldButton.Text = "Clear Hold"
+        ClearHoldButton.Text = "Clear"
         ClearHoldButton.UseVisualStyleBackColor = True
         ' 
         ' GroupBox5
@@ -461,7 +462,7 @@ Partial Class Form1
         Panel1.Dock = DockStyle.Fill
         Panel1.Location = New Point(0, 0)
         Panel1.Name = "Panel1"
-        Panel1.Size = New Size(304, 341)
+        Panel1.Size = New Size(304, 346)
         Panel1.TabIndex = 13
         ' 
         ' AlertLabel
@@ -469,7 +470,7 @@ Partial Class Form1
         AlertLabel.BackColor = SystemColors.Highlight
         AlertLabel.Dock = DockStyle.Bottom
         AlertLabel.ForeColor = SystemColors.HighlightText
-        AlertLabel.Location = New Point(0, 341)
+        AlertLabel.Location = New Point(0, 366)
         AlertLabel.Name = "AlertLabel"
         AlertLabel.Size = New Size(304, 20)
         AlertLabel.TabIndex = 14
@@ -477,12 +478,25 @@ Partial Class Form1
         AlertLabel.TextAlign = ContentAlignment.MiddleCenter
         AlertLabel.Visible = False
         ' 
+        ' EquipmentLabel
+        ' 
+        EquipmentLabel.BackColor = SystemColors.Info
+        EquipmentLabel.Dock = DockStyle.Bottom
+        EquipmentLabel.ForeColor = SystemColors.InfoText
+        EquipmentLabel.Location = New Point(0, 346)
+        EquipmentLabel.Name = "EquipmentLabel"
+        EquipmentLabel.Size = New Size(304, 20)
+        EquipmentLabel.TabIndex = 15
+        EquipmentLabel.TextAlign = ContentAlignment.MiddleCenter
+        EquipmentLabel.Visible = False
+        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(304, 361)
+        ClientSize = New Size(304, 386)
         Controls.Add(Panel1)
+        Controls.Add(EquipmentLabel)
         Controls.Add(AlertLabel)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "Form1"
@@ -545,4 +559,5 @@ Partial Class Form1
     Friend WithEvents Timer1 As Timer
     Friend WithEvents Panel1 As Panel
     Friend WithEvents AlertLabel As Label
+    Friend WithEvents EquipmentLabel As Label
 End Class

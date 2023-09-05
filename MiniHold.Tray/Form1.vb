@@ -69,7 +69,7 @@ Enter this code in the My Apps > Add Application section of the customer portal,
     End Sub
 
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
-        If False AndAlso Not String.IsNullOrEmpty(My.Settings.StoredAuthToken) Then
+        If Not String.IsNullOrEmpty(My.Settings.StoredAuthToken) Then
             AddRealThermostats()
         End If
     End Sub
@@ -137,6 +137,15 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         Else
             AlertLabel.Visible = False
             NotifyIcon1.Text = $"{thermostat.Name} ({Date.Now.ToShortTimeString()}): {info.Readings.FarenheitString} (Weather: {info.Weather.Temperature.FarenheitString})"
+        End If
+
+        If info.EquipmentStatus.IsEmpty Then
+            EquipmentLabel.Visible = False
+        Else
+            Dim equipment = EquipmentModule.FromThermostatInformation(info)
+
+            EquipmentLabel.Visible = True
+            EquipmentLabel.Text = Date.Now.ToShortTimeString() & ": " & String.Join(", ", equipment.Select(Function(e) e.Name))
         End If
     End Sub
 
