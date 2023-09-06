@@ -25,6 +25,13 @@ Partial Class Form1
         components = New ComponentModel.Container()
         Dim resources As ComponentModel.ComponentResourceManager = New ComponentModel.ComponentResourceManager(GetType(Form1))
         NotifyIcon1 = New NotifyIcon(components)
+        ContextMenuStrip1 = New ContextMenuStrip(components)
+        RestoreToolStripMenuItem = New ToolStripMenuItem()
+        ToolStripMenuItem1 = New ToolStripSeparator()
+        WebPortalToolStripMenuItem = New ToolStripMenuItem()
+        BeestatToolStripMenuItem = New ToolStripMenuItem()
+        ToolStripMenuItem2 = New ToolStripSeparator()
+        QuitToolStripMenuItem = New ToolStripMenuItem()
         ThermostatDropDown = New ComboBox()
         RefreshListButton = New Button()
         Label1 = New Label()
@@ -63,6 +70,7 @@ Partial Class Form1
         Panel1 = New Panel()
         AlertLabel = New Label()
         EquipmentLabel = New Label()
+        ContextMenuStrip1.SuspendLayout()
         GroupBox1.SuspendLayout()
         GroupBox2.SuspendLayout()
         GroupBox3.SuspendLayout()
@@ -79,9 +87,50 @@ Partial Class Form1
         ' 
         ' NotifyIcon1
         ' 
+        NotifyIcon1.ContextMenuStrip = ContextMenuStrip1
         NotifyIcon1.Icon = CType(resources.GetObject("NotifyIcon1.Icon"), Icon)
         NotifyIcon1.Text = "MiniHold Tray Utility - No information loaded"
         NotifyIcon1.Visible = True
+        ' 
+        ' ContextMenuStrip1
+        ' 
+        ContextMenuStrip1.Items.AddRange(New ToolStripItem() {RestoreToolStripMenuItem, ToolStripMenuItem1, WebPortalToolStripMenuItem, BeestatToolStripMenuItem, ToolStripMenuItem2, QuitToolStripMenuItem})
+        ContextMenuStrip1.Name = "ContextMenuStrip1"
+        ContextMenuStrip1.Size = New Size(181, 126)
+        ' 
+        ' RestoreToolStripMenuItem
+        ' 
+        RestoreToolStripMenuItem.Name = "RestoreToolStripMenuItem"
+        RestoreToolStripMenuItem.Size = New Size(180, 22)
+        RestoreToolStripMenuItem.Text = "&Restore"
+        ' 
+        ' ToolStripMenuItem1
+        ' 
+        ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+        ToolStripMenuItem1.Size = New Size(177, 6)
+        ' 
+        ' WebPortalToolStripMenuItem
+        ' 
+        WebPortalToolStripMenuItem.Name = "WebPortalToolStripMenuItem"
+        WebPortalToolStripMenuItem.Size = New Size(180, 22)
+        WebPortalToolStripMenuItem.Text = "&ecobee web portal"
+        ' 
+        ' BeestatToolStripMenuItem
+        ' 
+        BeestatToolStripMenuItem.Name = "BeestatToolStripMenuItem"
+        BeestatToolStripMenuItem.Size = New Size(180, 22)
+        BeestatToolStripMenuItem.Text = "&beestat"
+        ' 
+        ' ToolStripMenuItem2
+        ' 
+        ToolStripMenuItem2.Name = "ToolStripMenuItem2"
+        ToolStripMenuItem2.Size = New Size(177, 6)
+        ' 
+        ' QuitToolStripMenuItem
+        ' 
+        QuitToolStripMenuItem.Name = "QuitToolStripMenuItem"
+        QuitToolStripMenuItem.Size = New Size(180, 22)
+        QuitToolStripMenuItem.Text = "&Quit"
         ' 
         ' ThermostatDropDown
         ' 
@@ -502,6 +551,7 @@ Partial Class Form1
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "Form1"
         Text = "MiniHold Tray Utility"
+        ContextMenuStrip1.ResumeLayout(False)
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
         GroupBox2.ResumeLayout(False)
@@ -560,4 +610,11 @@ Partial Class Form1
     Friend WithEvents EquipmentLabel As Label
     Friend WithEvents OtherHoldButton As Button
     Friend WithEvents AwayButton As Button
+    Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
+    Friend WithEvents RestoreToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem1 As ToolStripSeparator
+    Friend WithEvents BeestatToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripMenuItem2 As ToolStripSeparator
+    Friend WithEvents QuitToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents WebPortalToolStripMenuItem As ToolStripMenuItem
 End Class

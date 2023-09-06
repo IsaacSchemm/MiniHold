@@ -145,6 +145,7 @@ Partial Class SetHoldForm
         Controls.Add(HoldHeat)
         FormBorderStyle = FormBorderStyle.SizableToolWindow
         Name = "SetHoldForm"
+        StartPosition = FormStartPosition.CenterParent
         Text = "Set Hold"
         CType(HoldCool, ComponentModel.ISupportInitialize).EndInit()
         CType(HoldHeat, ComponentModel.ISupportInitialize).EndInit()

@@ -36,8 +36,8 @@ Public Class SetHoldForm
                 Temperature.FromFarenheit(HoldHeat.Value),
                 Temperature.FromFarenheit(HoldCool.Value),
                 If(HoldFanCheckBox.Checked, "on", "auto")),
-            HoldStartTimePicker.Value,
-            HoldEndTimePicker.Value)
+            Thermostat.ToThermostatTime(HoldStartTimePicker.Value),
+            Thermostat.ToThermostatTime(HoldEndTimePicker.Value))
 
         Enabled = True
 

@@ -53,8 +53,10 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         End If
     End Sub
 
-    Private Sub NotifyIcon1_Click(sender As Object, e As EventArgs) Handles NotifyIcon1.Click
-        WindowState = FormWindowState.Normal
+    Private Sub NotifyIcon1_MouseClick(sender As Object, e As MouseEventArgs) Handles NotifyIcon1.MouseClick
+        If e.Button = MouseButtons.Left Then
+            WindowState = FormWindowState.Normal
+        End If
     End Sub
 
     Private Async Sub AddRealThermostats()
@@ -232,5 +234,21 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         SetHoldForm.Thermostat = LastThermostat
         SetHoldForm.ShowDialog(Me)
         UpdateCurrent()
+    End Sub
+
+    Private Sub RestoreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RestoreToolStripMenuItem.Click
+        WindowState = FormWindowState.Normal
+    End Sub
+
+    Private Sub WebPortalToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles WebPortalToolStripMenuItem.Click
+        Process.Start("explorer.exe", "https://www.ecobee.com/consumerportal/index.html")
+    End Sub
+
+    Private Sub BeestatToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BeestatToolStripMenuItem.Click
+        Process.Start("explorer.exe", "https://app.beestat.io")
+    End Sub
+
+    Private Sub QuitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles QuitToolStripMenuItem.Click
+        Application.Exit()
     End Sub
 End Class
