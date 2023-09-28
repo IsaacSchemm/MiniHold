@@ -70,6 +70,8 @@ Partial Class Form1
         Panel1 = New Panel()
         AlertLabel = New Label()
         EquipmentLabel = New Label()
+        AlertPanel = New Panel()
+        AlertButton = New Button()
         ContextMenuStrip1.SuspendLayout()
         GroupBox1.SuspendLayout()
         GroupBox2.SuspendLayout()
@@ -83,6 +85,7 @@ Partial Class Form1
         GroupBox5.SuspendLayout()
         TableLayoutPanel2.SuspendLayout()
         Panel1.SuspendLayout()
+        AlertPanel.SuspendLayout()
         SuspendLayout()
         ' 
         ' NotifyIcon1
@@ -96,40 +99,40 @@ Partial Class Form1
         ' 
         ContextMenuStrip1.Items.AddRange(New ToolStripItem() {RestoreToolStripMenuItem, ToolStripMenuItem1, WebPortalToolStripMenuItem, BeestatToolStripMenuItem, ToolStripMenuItem2, QuitToolStripMenuItem})
         ContextMenuStrip1.Name = "ContextMenuStrip1"
-        ContextMenuStrip1.Size = New Size(181, 126)
+        ContextMenuStrip1.Size = New Size(172, 104)
         ' 
         ' RestoreToolStripMenuItem
         ' 
         RestoreToolStripMenuItem.Name = "RestoreToolStripMenuItem"
-        RestoreToolStripMenuItem.Size = New Size(180, 22)
+        RestoreToolStripMenuItem.Size = New Size(171, 22)
         RestoreToolStripMenuItem.Text = "&Restore"
         ' 
         ' ToolStripMenuItem1
         ' 
         ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-        ToolStripMenuItem1.Size = New Size(177, 6)
+        ToolStripMenuItem1.Size = New Size(168, 6)
         ' 
         ' WebPortalToolStripMenuItem
         ' 
         WebPortalToolStripMenuItem.Name = "WebPortalToolStripMenuItem"
-        WebPortalToolStripMenuItem.Size = New Size(180, 22)
+        WebPortalToolStripMenuItem.Size = New Size(171, 22)
         WebPortalToolStripMenuItem.Text = "&ecobee web portal"
         ' 
         ' BeestatToolStripMenuItem
         ' 
         BeestatToolStripMenuItem.Name = "BeestatToolStripMenuItem"
-        BeestatToolStripMenuItem.Size = New Size(180, 22)
+        BeestatToolStripMenuItem.Size = New Size(171, 22)
         BeestatToolStripMenuItem.Text = "&beestat"
         ' 
         ' ToolStripMenuItem2
         ' 
         ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-        ToolStripMenuItem2.Size = New Size(177, 6)
+        ToolStripMenuItem2.Size = New Size(168, 6)
         ' 
         ' QuitToolStripMenuItem
         ' 
         QuitToolStripMenuItem.Name = "QuitToolStripMenuItem"
-        QuitToolStripMenuItem.Size = New Size(180, 22)
+        QuitToolStripMenuItem.Size = New Size(171, 22)
         QuitToolStripMenuItem.Text = "&Quit"
         ' 
         ' ThermostatDropDown
@@ -299,7 +302,7 @@ Partial Class Form1
         GroupBox3.Controls.Add(DataGridView1)
         GroupBox3.Location = New Point(6, 142)
         GroupBox3.Name = "GroupBox3"
-        GroupBox3.Size = New Size(260, 88)
+        GroupBox3.Size = New Size(260, 93)
         GroupBox3.TabIndex = 9
         GroupBox3.TabStop = False
         GroupBox3.Text = "Sensors"
@@ -314,7 +317,7 @@ Partial Class Form1
         DataGridView1.Location = New Point(3, 19)
         DataGridView1.Name = "DataGridView1"
         DataGridView1.RowTemplate.Height = 25
-        DataGridView1.Size = New Size(254, 66)
+        DataGridView1.Size = New Size(254, 71)
         DataGridView1.TabIndex = 0
         ' 
         ' Column1
@@ -354,7 +357,7 @@ Partial Class Form1
         TabControl1.Location = New Point(12, 70)
         TabControl1.Name = "TabControl1"
         TabControl1.SelectedIndex = 0
-        TabControl1.Size = New Size(280, 264)
+        TabControl1.Size = New Size(280, 269)
         TabControl1.TabIndex = 12
         ' 
         ' TabPage1
@@ -364,7 +367,7 @@ Partial Class Form1
         TabPage1.Location = New Point(4, 24)
         TabPage1.Name = "TabPage1"
         TabPage1.Padding = New Padding(3)
-        TabPage1.Size = New Size(272, 236)
+        TabPage1.Size = New Size(272, 241)
         TabPage1.TabIndex = 0
         TabPage1.Text = "Temperature"
         TabPage1.UseVisualStyleBackColor = True
@@ -378,7 +381,7 @@ Partial Class Form1
         TabPage2.Location = New Point(4, 24)
         TabPage2.Name = "TabPage2"
         TabPage2.Padding = New Padding(3)
-        TabPage2.Size = New Size(272, 236)
+        TabPage2.Size = New Size(272, 241)
         TabPage2.TabIndex = 1
         TabPage2.Text = "Advanced"
         TabPage2.UseVisualStyleBackColor = True
@@ -512,33 +515,54 @@ Partial Class Form1
         Panel1.Dock = DockStyle.Fill
         Panel1.Location = New Point(0, 0)
         Panel1.Name = "Panel1"
-        Panel1.Size = New Size(304, 346)
+        Panel1.Size = New Size(304, 342)
         Panel1.TabIndex = 13
         ' 
         ' AlertLabel
         ' 
         AlertLabel.BackColor = SystemColors.Highlight
-        AlertLabel.Dock = DockStyle.Bottom
+        AlertLabel.Dock = DockStyle.Fill
         AlertLabel.ForeColor = SystemColors.HighlightText
-        AlertLabel.Location = New Point(0, 366)
+        AlertLabel.Location = New Point(0, 0)
         AlertLabel.Name = "AlertLabel"
-        AlertLabel.Size = New Size(304, 20)
+        AlertLabel.Size = New Size(229, 24)
         AlertLabel.TabIndex = 14
-        AlertLabel.Text = "Alert active (see Abstraction tab)"
+        AlertLabel.Text = "Alert active"
         AlertLabel.TextAlign = ContentAlignment.MiddleCenter
-        AlertLabel.Visible = False
         ' 
         ' EquipmentLabel
         ' 
         EquipmentLabel.BackColor = SystemColors.Info
         EquipmentLabel.Dock = DockStyle.Bottom
         EquipmentLabel.ForeColor = SystemColors.InfoText
-        EquipmentLabel.Location = New Point(0, 346)
+        EquipmentLabel.Location = New Point(0, 342)
         EquipmentLabel.Name = "EquipmentLabel"
         EquipmentLabel.Size = New Size(304, 20)
         EquipmentLabel.TabIndex = 15
         EquipmentLabel.TextAlign = ContentAlignment.MiddleCenter
         EquipmentLabel.Visible = False
+        ' 
+        ' AlertPanel
+        ' 
+        AlertPanel.BackColor = SystemColors.Highlight
+        AlertPanel.Controls.Add(AlertLabel)
+        AlertPanel.Controls.Add(AlertButton)
+        AlertPanel.Dock = DockStyle.Bottom
+        AlertPanel.Location = New Point(0, 362)
+        AlertPanel.Name = "AlertPanel"
+        AlertPanel.Size = New Size(304, 24)
+        AlertPanel.TabIndex = 13
+        AlertPanel.Visible = False
+        ' 
+        ' AlertButton
+        ' 
+        AlertButton.Dock = DockStyle.Right
+        AlertButton.Location = New Point(229, 0)
+        AlertButton.Name = "AlertButton"
+        AlertButton.Size = New Size(75, 24)
+        AlertButton.TabIndex = 15
+        AlertButton.Text = "View"
+        AlertButton.UseVisualStyleBackColor = True
         ' 
         ' Form1
         ' 
@@ -547,7 +571,7 @@ Partial Class Form1
         ClientSize = New Size(304, 386)
         Controls.Add(Panel1)
         Controls.Add(EquipmentLabel)
-        Controls.Add(AlertLabel)
+        Controls.Add(AlertPanel)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "Form1"
         Text = "MiniHold Tray Utility"
@@ -568,6 +592,7 @@ Partial Class Form1
         TableLayoutPanel2.ResumeLayout(False)
         Panel1.ResumeLayout(False)
         Panel1.PerformLayout()
+        AlertPanel.ResumeLayout(False)
         ResumeLayout(False)
     End Sub
 
@@ -617,4 +642,6 @@ Partial Class Form1
     Friend WithEvents ToolStripMenuItem2 As ToolStripSeparator
     Friend WithEvents QuitToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents WebPortalToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AlertPanel As Panel
+    Friend WithEvents AlertButton As Button
 End Class

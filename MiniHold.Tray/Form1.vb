@@ -137,10 +137,10 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         End If
 
         If info.Alerts.Length > 0 Then
-            AlertLabel.Visible = True
+            AlertPanel.Visible = True
             NotifyIcon1.Text = "Alert active"
         Else
-            AlertLabel.Visible = False
+            AlertPanel.Visible = False
             NotifyIcon1.Text = $"{thermostat.Name} ({Date.Now.ToShortTimeString()}): {info.Readings.FarenheitString} (Weather: {info.Weather.Temperature.FarenheitString})"
         End If
 
@@ -250,5 +250,23 @@ Enter this code in the My Apps > Add Application section of the customer portal,
 
     Private Sub QuitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles QuitToolStripMenuItem.Click
         Application.Exit()
+    End Sub
+
+    Private Sub AlertButton_Click(sender As Object, e As EventArgs) Handles AlertButton.Click
+        Using form As New Form
+            form.FormBorderStyle = FormBorderStyle.SizableToolWindow
+            form.Text = Me.Text
+
+            Dim textBox As New TextBox With {
+                .ScrollBars = ScrollBars.Both,
+                .Multiline = True,
+                .ReadOnly = True,
+                .Dock = DockStyle.Fill,
+                .Text = LastInformation.Alerts.ToString().Replace(vbLf, vbCrLf)
+            }
+
+            form.Controls.Add(textBox)
+            form.ShowDialog(Me)
+        End Using
     End Sub
 End Class
