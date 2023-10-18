@@ -12,7 +12,7 @@ with
             | "heatPump3" -> "Heat 3 (A/C)"
             | "compCool1" -> "Cool 1 (A/C)"
             | "compCool2" -> "Cool 2 (A/C)"
-            | "auxHeat" -> "Heat 1 (Aux)"
+            | "auxHeat1" -> "Heat 1 (Aux)"
             | "auxHeat2" -> "Heat 2 (Aux)"
             | "auxHeat3" -> "Heat 3 (Aux)"
             | "fan" -> "Fan"
