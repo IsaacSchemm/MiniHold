@@ -65,7 +65,7 @@ Partial Class Form1
         OtherHoldButton = New Button()
         HeatButton = New Button()
         CoolButton = New Button()
-        AwayButton = New Button()
+        FanButton = New Button()
         Timer1 = New Timer(components)
         Panel1 = New Panel()
         AlertLabel = New Label()
@@ -451,7 +451,7 @@ Partial Class Form1
         TableLayoutPanel2.Controls.Add(OtherHoldButton, 3, 0)
         TableLayoutPanel2.Controls.Add(HeatButton, 0, 0)
         TableLayoutPanel2.Controls.Add(CoolButton, 1, 0)
-        TableLayoutPanel2.Controls.Add(AwayButton, 2, 0)
+        TableLayoutPanel2.Controls.Add(FanButton, 2, 0)
         TableLayoutPanel2.Dock = DockStyle.Fill
         TableLayoutPanel2.Location = New Point(3, 19)
         TableLayoutPanel2.Name = "TableLayoutPanel2"
@@ -490,15 +490,15 @@ Partial Class Form1
         CoolButton.Text = "Cool"
         CoolButton.UseVisualStyleBackColor = True
         ' 
-        ' AwayButton
+        ' FanButton
         ' 
-        AwayButton.Dock = DockStyle.Fill
-        AwayButton.Location = New Point(129, 3)
-        AwayButton.Name = "AwayButton"
-        AwayButton.Size = New Size(57, 23)
-        AwayButton.TabIndex = 3
-        AwayButton.Text = "Away"
-        AwayButton.UseVisualStyleBackColor = True
+        FanButton.Dock = DockStyle.Fill
+        FanButton.Location = New Point(129, 3)
+        FanButton.Name = "FanButton"
+        FanButton.Size = New Size(57, 23)
+        FanButton.TabIndex = 3
+        FanButton.Text = "Fan"
+        FanButton.UseVisualStyleBackColor = True
         ' 
         ' Timer1
         ' 
@@ -634,7 +634,7 @@ Partial Class Form1
     Friend WithEvents AlertLabel As Label
     Friend WithEvents EquipmentLabel As Label
     Friend WithEvents OtherHoldButton As Button
-    Friend WithEvents AwayButton As Button
+    Friend WithEvents FanButton As Button
     Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
     Friend WithEvents RestoreToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem1 As ToolStripSeparator

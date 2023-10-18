@@ -204,12 +204,12 @@ Enter this code in the My Apps > Add Application section of the customer portal,
         UpdateCurrent()
     End Sub
 
-    Private Async Sub AwayButton_Click(sender As Object, e As EventArgs) Handles AwayButton.Click
+    Private Async Sub FanButton_Click(sender As Object, e As EventArgs) Handles FanButton.Click
         If LastThermostat Is Nothing OrElse LastInformation Is Nothing Then
             Exit Sub
         End If
 
-        Await QuickActions.SetAwayAsync(LastThermostat, TimeSpan.FromMinutes(30))
+        Await QuickActions.SetFanAsync(LastThermostat, True, TimeSpan.FromMinutes(30))
 
         UpdateCurrent()
     End Sub
