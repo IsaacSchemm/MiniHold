@@ -33,7 +33,7 @@ namespace SetbackEnforcer
         }
 
         [FunctionName("Function1")]
-        public async Task Run([TimerTrigger("55 */30 * * * *")]TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("55 */5 * * * *")]TimerInfo myTimer, ILogger log)
         {
             var client = new Client(Constants.ApiKey, GetTokenAsync, SetTokenAsync);
             await foreach (var thermostat in ThermostatEnumerator.FindAsync(client))
@@ -54,34 +54,42 @@ namespace SetbackEnforcer
                 if (sleep == null)
                     continue;
 
-                if (!sleep.Active)
+                var setbackEnforcer = info.ComfortLevels
+                    .Where(x => x.Name == "DynSetback")
+                    .SingleOrDefault();
+                if (setbackEnforcer == null)
                     continue;
 
-                var currentTemp = Temperature.FromFarenheit(
-                    Math.Max(
-                        info.Runtime.TempRange.HeatTemp.Farenheit,
-                        info.Readings.Temperature.Single().Farenheit));
-                var desiredTemp = Temperature.FromFarenheit(
-                    Math.Min(
-                        home.HeatTemp.Farenheit,
-                        currentTemp.Farenheit + 1));
-                if (desiredTemp.Farenheit >= home.HeatTemp.Farenheit)
+                if (!setbackEnforcer.Active)
                     continue;
+
+                log.LogInformation($"{setbackEnforcer.Name} comfort setting is active at {info.Runtime.TempRange}");
 
                 var outdoorTemp = info.Weather.Temperature;
                 var compressorMinOutdoorTemp = info.AuxCrossover.Item1;
-                if (outdoorTemp.Farenheit < compressorMinOutdoorTemp.Farenheit)
-                    continue;
 
-                log.LogInformation($"{sleep.Name} comfort setting is active at {currentTemp}");
-                log.LogInformation($"Outdoor temperature {outdoorTemp} is not less than {compressorMinOutdoorTemp}");
-                log.LogInformation($"Raising temperature to {desiredTemp}");
+                log.LogInformation($"Comparing outdoor temperature {outdoorTemp} to {compressorMinOutdoorTemp}");
 
-                await thermostat.HoldAsync(
-                    info.Runtime.TempRange
-                        .WithHeatTemp(desiredTemp)
-                        .WithCoolTemp(home.CoolTemp),
-                    HoldType.NextTransition);
+                var desiredComfortLevel = outdoorTemp.Farenheit < compressorMinOutdoorTemp.Farenheit
+                    ? sleep
+                    : home;
+
+                var desiredRange = new TempRange(
+                    heatTemp: desiredComfortLevel.HeatTemp,
+                    coolTemp: desiredComfortLevel.CoolTemp,
+                    fan: info.Runtime.TempRange.Fan);
+
+                log.LogInformation($"Current: {info.Runtime.TempRange}");
+                log.LogInformation($"Desired: {desiredRange}");
+
+                if (!desiredRange.Equals(info.Runtime.TempRange))
+                {
+                    log.LogInformation($"Setting hold for {desiredRange}");
+
+                    await thermostat.HoldAsync(
+                        desiredRange,
+                        HoldType.NextTransition);
+                }
             }
         }
     }
