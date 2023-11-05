@@ -111,15 +111,14 @@ type SimulatedThermostat(name: string) =
             {
                 Name = "Example Hold"
                 EventType = "hold"
-                AbsoluteTemperatureRanges = [
-                    {
-                        HeatTemp = Temperature 720
-                        CoolTemp = Temperature 770
-                        Fan = "auto"
-                    }
-                ]
+                AbsoluteTemperatureRange = Some {
+                    HeatTemp = Temperature 720
+                    CoolTemp = Temperature 770
+                    Fan = "auto"
+                }
                 StartDate = Nullable(new DateTime(2022, 1, 2, 8, 25, 0, DateTimeKind.Local))
                 EndDate = Nullable(new DateTime(2022, 1, 2, 8, 55, 0, DateTimeKind.Local))
+                ComfortLevelRef = null
                 Running = true
             }
         ]
@@ -169,9 +168,10 @@ type SimulatedThermostat(name: string) =
             let newHold: Event = {
                 Name = "New Example Hold"
                 EventType = "hold"
-                AbsoluteTemperatureRanges = [parameters]
+                AbsoluteTemperatureRange = Some parameters
                 StartDate = startTime
                 EndDate = endTime
+                ComfortLevelRef = null
                 Running = true
             }
 
@@ -201,9 +201,10 @@ type SimulatedThermostat(name: string) =
             let vacation: Event = {
                 Name = name
                 EventType = "vacation"
-                AbsoluteTemperatureRanges = [tempRange]
+                AbsoluteTemperatureRange = Some tempRange
                 StartDate = Nullable startTime
                 EndDate = Nullable endTime
+                ComfortLevelRef = null
                 Running = DateTime.Now > startTime
             }
 

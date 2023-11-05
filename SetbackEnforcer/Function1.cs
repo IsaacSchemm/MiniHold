@@ -1,6 +1,3 @@
-#nullable enable
-
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,63 +30,48 @@ namespace SetbackEnforcer
         }
 
         [FunctionName("Function1")]
-        public async Task Run([TimerTrigger("55 */5 * * * *")]TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("55 */30 * * * *")] TimerInfo myTimer, ILogger log)
         {
             var client = new Client(Constants.ApiKey, GetTokenAsync, SetTokenAsync);
             await foreach (var thermostat in ThermostatEnumerator.FindAsync(client))
             {
                 var info = await thermostat.GetInformationAsync();
-                if (info.Mode != "heat")
+
+                string activeComfortLevelRef = info.ComfortLevels
+                    .Where(x => x.Active)
+                    .Select(x => x.Ref)
+                    .FirstOrDefault();
+
+                if (activeComfortLevelRef != "DynSetback")
                     continue;
 
-                var home = info.ComfortLevels
-                    .Where(x => x.Name == "Home")
-                    .SingleOrDefault();
-                if (home == null)
-                    continue;
+                var manualHoldActive = info.Events
+                    .Where(x => x.Running)
+                    .Where(x => x.ComfortLevelRef != "home")
+                    .Where(x => x.ComfortLevelRef != "sleep")
+                    .Any();
 
-                var sleep = info.ComfortLevels
-                    .Where(x => x.Name == "Sleep")
-                    .SingleOrDefault();
-                if (sleep == null)
+                if (manualHoldActive)
                     continue;
-
-                var setbackEnforcer = info.ComfortLevels
-                    .Where(x => x.Name == "DynSetback")
-                    .SingleOrDefault();
-                if (setbackEnforcer == null)
-                    continue;
-
-                if (!setbackEnforcer.Active)
-                    continue;
-
-                log.LogInformation($"{setbackEnforcer.Name} comfort setting is active at {info.Runtime.TempRange}");
 
                 var outdoorTemp = info.Weather.Temperature;
                 var compressorMinOutdoorTemp = info.AuxCrossover.Item1;
 
-                log.LogInformation($"Comparing outdoor temperature {outdoorTemp} to {compressorMinOutdoorTemp}");
+                string desiredComfortLevelRef = outdoorTemp.Farenheit < compressorMinOutdoorTemp.Farenheit
+                    ? "sleep"
+                    : "home";
 
-                var desiredComfortLevel = outdoorTemp.Farenheit < compressorMinOutdoorTemp.Farenheit
-                    ? sleep
-                    : home;
+                string activeHoldComfortLevelRef = info.Events
+                    .Where(x => x.Running)
+                    .Select(x => x.ComfortLevelRef)
+                    .FirstOrDefault();
 
-                var desiredRange = new TempRange(
-                    heatTemp: desiredComfortLevel.HeatTemp,
-                    coolTemp: desiredComfortLevel.CoolTemp,
-                    fan: info.Runtime.TempRange.Fan);
+                if (activeHoldComfortLevelRef == desiredComfortLevelRef)
+                    continue;
 
-                log.LogInformation($"Current: {info.Runtime.TempRange}");
-                log.LogInformation($"Desired: {desiredRange}");
-
-                if (!desiredRange.Equals(info.Runtime.TempRange))
-                {
-                    log.LogInformation($"Setting hold for {desiredRange}");
-
-                    await thermostat.HoldAsync(
-                        desiredRange,
-                        HoldType.NextTransition);
-                }
+                await thermostat.HoldAsync(
+                    HoldType.NewComfortLevel(desiredComfortLevelRef),
+                    HoldDuration.NextTransition);
             }
         }
     }

@@ -116,13 +116,23 @@ type Alert = {
 type Event = {
     Name: string
     EventType: string
-    AbsoluteTemperatureRanges: TempRange list
+    AbsoluteTemperatureRange: TempRange option
     StartDate: Nullable<DateTime>
     EndDate: Nullable<DateTime>
+    ComfortLevelRef: string
     Running: bool
 } with
+    member this.AbsoluteTemperatureRanges =
+        [this.AbsoluteTemperatureRange]
+        |> List.choose id
+
     member this.Description = String.concat " " [
-        for t in this.AbsoluteTemperatureRanges do
+        if not (isNull this.ComfortLevelRef) then
+            $"({this.ComfortLevelRef})"
+
+        match this.AbsoluteTemperatureRange with
+        | None -> ()
+        | Some t ->
             $"{t.HeatTemp.FarenheitString}-{t.CoolTemp.FarenheitString}"
             if t.Fan = "on" then
                 "(with fan)"
@@ -319,13 +329,14 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                         {
                             Name = e.Name
                             EventType = e.Type
-                            AbsoluteTemperatureRanges = [
-                                if e.IsTemperatureAbsolute = Nullable(true) then {
+                            AbsoluteTemperatureRange =
+                                if e.IsTemperatureAbsolute = Nullable(true)
+                                then Some {
                                     HeatTemp = Temperature e.HeatHoldTemp.Value
                                     CoolTemp = Temperature e.CoolHoldTemp.Value
                                     Fan = e.Fan
                                 }
-                            ]
+                                else None
                             StartDate =
                                 match DateTime.TryParse($"{e.StartDate} {e.StartTime}") with
                                 | (true, x) -> Nullable(x)
@@ -334,6 +345,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                                 match DateTime.TryParse($"{e.EndDate} {e.EndTime}") with
                                 | (true, x) -> Nullable(x)
                                 | (false, _) -> Nullable()
+                            ComfortLevelRef = e.HoldClimateRef
                             Running = e.Running = Nullable(true)
                         }
                 ]
