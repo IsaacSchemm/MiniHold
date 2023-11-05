@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,41 +29,59 @@ namespace SetbackEnforcer
         {
             var credential = new DefaultAzureCredential();
             var client = new SecretClient(Constants.VaultUri, credential);
-            await client.SetSecretAsync("ecobeeJson", JsonConvert.SerializeObject(token));
+            await client.SetSecretAsync("ecobeeJson", JsonConvert.SerializeObject(token), cancellationToken);
         }
 
-        private static readonly string ComfortLevelName = "Sleep";
-        private static readonly Temperature SetbackTemperature = Temperature.FromFarenheit(65);
-
         [FunctionName("Function1")]
-        public async Task Run([TimerTrigger("33 */1 * * * *")]TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("55 */30 * * * *")]TimerInfo myTimer, ILogger log)
         {
             var client = new Client(Constants.ApiKey, GetTokenAsync, SetTokenAsync);
             await foreach (var thermostat in ThermostatEnumerator.FindAsync(client))
             {
                 var info = await thermostat.GetInformationAsync();
-                var active = info.ComfortLevels
-                    .Where(x => x.Active)
-                    .SingleOrDefault();
-                if (active != null && active.Name == ComfortLevelName)
-                {
-                    var heatTemp = info.Runtime.TempRange.HeatTemp;
-                    var outdoorTemp = info.Weather.Temperature;
-                    var compressorMinOutdoorTemp = info.AuxCrossover.Item1;
-                    if (heatTemp.Farenheit > SetbackTemperature.Farenheit)
-                    {
-                        log.LogInformation($"{active.Name} comfort setting is active at {heatTemp}");
-                        if (outdoorTemp.Farenheit < compressorMinOutdoorTemp.Farenheit)
-                        {
-                            log.LogInformation($"Outdoor temperature {outdoorTemp} is less than {compressorMinOutdoorTemp}");
-                            log.LogInformation($"Setting a hold for {SetbackTemperature}");
+                if (info.Mode != "heat")
+                    continue;
 
-                            await thermostat.HoldAsync(
-                                info.Runtime.TempRange.WithHeatTemp(SetbackTemperature),
-                                HoldType.NextTransition);
-                        }
-                    }
-                }
+                var home = info.ComfortLevels
+                    .Where(x => x.Name == "Home")
+                    .SingleOrDefault();
+                if (home == null)
+                    continue;
+
+                var sleep = info.ComfortLevels
+                    .Where(x => x.Name == "Sleep")
+                    .SingleOrDefault();
+                if (sleep == null)
+                    continue;
+
+                if (!sleep.Active)
+                    continue;
+
+                var currentTemp = Temperature.FromFarenheit(
+                    Math.Max(
+                        info.Runtime.TempRange.HeatTemp.Farenheit,
+                        info.Readings.Temperature.Single().Farenheit));
+                var desiredTemp = Temperature.FromFarenheit(
+                    Math.Min(
+                        home.HeatTemp.Farenheit,
+                        currentTemp.Farenheit + 1));
+                if (desiredTemp.Farenheit >= home.HeatTemp.Farenheit)
+                    continue;
+
+                var outdoorTemp = info.Weather.Temperature;
+                var compressorMinOutdoorTemp = info.AuxCrossover.Item1;
+                if (outdoorTemp.Farenheit < compressorMinOutdoorTemp.Farenheit)
+                    continue;
+
+                log.LogInformation($"{sleep.Name} comfort setting is active at {currentTemp}");
+                log.LogInformation($"Outdoor temperature {outdoorTemp} is not less than {compressorMinOutdoorTemp}");
+                log.LogInformation($"Raising temperature to {desiredTemp}");
+
+                await thermostat.HoldAsync(
+                    info.Runtime.TempRange
+                        .WithHeatTemp(desiredTemp)
+                        .WithCoolTemp(home.CoolTemp),
+                    HoldType.NextTransition);
             }
         }
     }

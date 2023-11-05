@@ -211,3 +211,6 @@ type SimulatedThermostat(name: string) =
         member this.HoldComfortSettingAsync(holdClimateRef, startTime, endTime) =
             let climateRef = current.ComfortLevels |> List.where (fun x -> x.Ref = holdClimateRef) |> List.head
             (this :> IThermostatClient).HoldAsync(toTempRange climateRef, HoldType.Range (startTime, endTime))
+
+        member _.SendMessageAsync(text) =
+            raise (new NotImplementedException())
