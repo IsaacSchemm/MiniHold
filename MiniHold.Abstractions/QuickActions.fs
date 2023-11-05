@@ -34,7 +34,7 @@ module QuickActions =
     let SetHoldAsync(client: IThermostatClient, tempRange, duration) = task {
         let startTime = client.ToThermostatTime(DateTime.Now)
         let endTime = startTime + duration
-        do! client.HoldAsync(tempRange, startTime, endTime)
+        do! client.HoldAsync(tempRange, HoldType.Range (startTime, endTime))
     }
 
     let SetFanAsync(client: IThermostatClient, fan, duration) = task {
@@ -44,7 +44,7 @@ module QuickActions =
         do! client.HoldAsync({
             info.Runtime.TempRange with
                 Fan = if fan then "on" else "auto"
-        }, startTime, endTime)
+        }, HoldType.Range (startTime, endTime))
     }
 
     let SetAwayAsync(client: IThermostatClient, duration) = task {

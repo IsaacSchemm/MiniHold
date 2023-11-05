@@ -182,11 +182,17 @@ type ThermostatInformation = {
     member this.ApplyCoolDelta (t: Temperature) =
         t + this.CoolDelta
 
+[<RequireQualifiedAccess>]
+type HoldType =
+| Range of startDate: DateTime * endDate: DateTime
+| NextTransition
+| Indefinite
+
 type IThermostatClient =
     abstract member Name: string with get
     abstract member ToThermostatTime: time: DateTime -> DateTime
     abstract member GetInformationAsync: unit -> Task<ThermostatInformation>
-    abstract member HoldAsync: parameters: TempRange * startTime: DateTime * endTime: DateTime -> Task
+    abstract member HoldAsync: parameters: TempRange * holdType: HoldType -> Task
     abstract member HoldComfortSettingAsync: holdClimateRef: string * startTime: DateTime * endTime: DateTime -> Task
     abstract member CancelHoldAsync: unit -> Task
     abstract member SetModeAsync: string -> Task
@@ -327,7 +333,7 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
             }
         }
 
-        member _.HoldAsync(parameters: TempRange, startTime: DateTime, endTime: DateTime) = task {
+        member _.HoldAsync(parameters: TempRange, holdType: HoldType) = task {
             let request = new ThermostatUpdateRequest()
             request.Selection <- new Selection(SelectionType = "thermostats", SelectionMatch = thermostat.Identifier)
             request.Functions <- [|
@@ -339,11 +345,17 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                 if not (String.IsNullOrEmpty parameters.Fan) then
                     ps.Fan <- parameters.Fan
 
-                ps.HoldType <- "dateTime"
-                ps.StartDate <- startTime.ToString("yyyy-MM-dd")
-                ps.StartTime <- startTime.ToString("HH:mm:ss")
-                ps.EndDate <- endTime.ToString("yyyy-MM-dd")
-                ps.EndTime <- endTime.ToString("HH:mm:ss")
+                match holdType with
+                | HoldType.Range (startTime, endTime) ->
+                    ps.HoldType <- "dateTime"
+                    ps.StartDate <- startTime.ToString("yyyy-MM-dd")
+                    ps.StartTime <- startTime.ToString("HH:mm:ss")
+                    ps.EndDate <- endTime.ToString("yyyy-MM-dd")
+                    ps.EndTime <- endTime.ToString("HH:mm:ss")
+                | HoldType.NextTransition ->
+                    ps.HoldType <- "nextTransition"
+                | HoldType.Indefinite ->
+                    ps.HoldType <- "indefinite"
 
                 yield new SetHoldFunction(Params = ps) :> Function
             |]
