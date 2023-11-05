@@ -147,13 +147,23 @@ type SimulatedThermostat(name: string) =
         member _.ToThermostatTime(time) =
             TimeZoneInfo.ConvertTime(time, TimeZoneInfo.Local)
 
-        member _.HoldAsync(parameters, holdType) =
+        member _.HoldAsync(holdType, holdDuration) =
             while not current.Events.IsEmpty && current.Events.Head.EventType = "hold" do
                 current <- { current with Events = List.tail current.Events }
 
-            let startTime, endTime =
+            let parameters =
                 match holdType with
-                | HoldType.Range (s, e) -> Nullable s, Nullable e
+                | HoldType.TempRange r -> r
+                | HoldType.ComfortLevel c ->
+                    let climateRef =
+                        current.ComfortLevels 
+                        |> List.where (fun x -> x.Ref = c)
+                        |> List.head
+                    { HeatTemp = climateRef.HeatTemp; CoolTemp = climateRef.CoolTemp; Fan = "auto" }
+
+            let startTime, endTime =
+                match holdDuration with
+                | HoldDuration.Range (s, e) -> Nullable s, Nullable e
                 | _ -> Nullable(), Nullable()
 
             let newHold: Event = {
@@ -207,10 +217,6 @@ type SimulatedThermostat(name: string) =
             updateRuntime()
 
             Task.CompletedTask
-
-        member this.HoldComfortSettingAsync(holdClimateRef, startTime, endTime) =
-            let climateRef = current.ComfortLevels |> List.where (fun x -> x.Ref = holdClimateRef) |> List.head
-            (this :> IThermostatClient).HoldAsync(toTempRange climateRef, HoldType.Range (startTime, endTime))
 
         member _.SendMessageAsync(text) =
             raise (new NotImplementedException())

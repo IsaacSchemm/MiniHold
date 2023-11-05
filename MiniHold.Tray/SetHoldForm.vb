@@ -32,11 +32,12 @@ Public Class SetHoldForm
         Enabled = False
 
         Await Thermostat.HoldAsync(
-            New TempRange(
-                Temperature.FromFarenheit(HoldHeat.Value),
-                Temperature.FromFarenheit(HoldCool.Value),
-                If(HoldFanCheckBox.Checked, "on", "auto")),
-            HoldType.NewRange(
+            HoldType.NewTempRange(
+                New TempRange(
+                    Temperature.FromFarenheit(HoldHeat.Value),
+                    Temperature.FromFarenheit(HoldCool.Value),
+                    If(HoldFanCheckBox.Checked, "on", "auto"))),
+            HoldDuration.NewRange(
                 Thermostat.ToThermostatTime(HoldStartTimePicker.Value),
                 Thermostat.ToThermostatTime(HoldEndTimePicker.Value)))
 
