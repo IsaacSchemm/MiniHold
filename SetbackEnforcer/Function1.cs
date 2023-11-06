@@ -30,7 +30,7 @@ namespace SetbackEnforcer
         }
 
         [FunctionName("Function1")]
-        public async Task Run([TimerTrigger("55 */20 * * * *")] TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("55 */30 * * * *")] TimerInfo myTimer, ILogger log)
         {
             var client = new Client(Constants.ApiKey, GetTokenAsync, SetTokenAsync);
             await foreach (var thermostat in ThermostatEnumerator.FindAsync(client))
