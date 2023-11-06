@@ -24,8 +24,6 @@ with
     static member (+) (Temperature a, Temperature b) = Temperature (a + b)
     static member (-) (Temperature a, Temperature b) = Temperature (a - b)
 
-    member this.AddFarenheit x = this + Temperature.FromFarenheit x
-
 [<StructuredFormatDisplay("{PercentageString}")>]
 type Percentage = Percentage of int
 with
@@ -127,15 +125,14 @@ type Event = {
         |> List.choose id
 
     member this.Description = String.concat " " [
-        if not (isNull this.ComfortLevelRef) then
-            $"({this.ComfortLevelRef})"
-
         match this.AbsoluteTemperatureRange with
         | None -> ()
         | Some t ->
             $"{t.HeatTemp.FarenheitString}-{t.CoolTemp.FarenheitString}"
             if t.Fan = "on" then
                 "(with fan)"
+        if not (isNull this.ComfortLevelRef) then
+            $"({this.ComfortLevelRef})"
     ]
 
 type ComfortLevel = {
