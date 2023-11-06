@@ -218,6 +218,3 @@ type SimulatedThermostat(name: string) =
             updateRuntime()
 
             Task.CompletedTask
-
-        member _.SendMessageAsync(text) =
-            raise (new NotImplementedException())
