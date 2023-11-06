@@ -37,12 +37,12 @@ namespace SetbackEnforcer
             {
                 var info = await thermostat.GetInformationAsync();
 
-                string activeComfortLevelRef = info.ComfortLevels
+                var activeComfortLevelName = info.ComfortLevels
                     .Where(x => x.Active)
-                    .Select(x => x.Ref)
+                    .Select(x => x.Name)
                     .FirstOrDefault();
 
-                if (activeComfortLevelRef != "DynSetback")
+                if (activeComfortLevelName != "DynSetback")
                     continue;
 
                 var manualHoldActive = info.Events
