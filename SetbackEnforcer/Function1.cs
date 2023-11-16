@@ -32,7 +32,7 @@ namespace SetbackEnforcer
         private static readonly Temperature MinAuxSetback = Temperature.FromFarenheit(62);
 
         [FunctionName("Function1")]
-        public async Task Run([TimerTrigger("0 2,32,51 * * * *")] TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 2,32 * * * *")] TimerInfo myTimer, ILogger log)
         {
             var client = new Client(Keys.ApiKey, GetTokenAsync, SetTokenAsync);
             await foreach (var thermostat in ThermostatEnumerator.FindAsync(client))
@@ -62,7 +62,7 @@ namespace SetbackEnforcer
 
                 bool isAuxHeat = info.Mode switch
                 {
-                    "aux" => true,
+                    "auxHeatOnly" => true,
                     "heat" => outdoorTemp.Farenheit <= compressorMin.Farenheit,
                     "auto" => outdoorTemp.Farenheit <= compressorMin.Farenheit,
                     _ => false
