@@ -16,7 +16,7 @@ namespace SetbackEnforcer
         private async Task<StoredAuthToken> GetTokenAsync(CancellationToken cancellationToken)
         {
             var credential = new DefaultAzureCredential();
-            var client = new SecretClient(Constants.VaultUri, credential);
+            var client = new SecretClient(Keys.VaultUri, credential);
             var response = await client.GetSecretAsync("ecobeeJson", cancellationToken: cancellationToken);
             string json = response.Value.Value;
             return JsonConvert.DeserializeObject<StoredAuthToken>(json);
@@ -25,28 +25,28 @@ namespace SetbackEnforcer
         private async Task SetTokenAsync(StoredAuthToken token, CancellationToken cancellationToken)
         {
             var credential = new DefaultAzureCredential();
-            var client = new SecretClient(Constants.VaultUri, credential);
+            var client = new SecretClient(Keys.VaultUri, credential);
             await client.SetSecretAsync("ecobeeJson", JsonConvert.SerializeObject(token), cancellationToken);
         }
 
         private static readonly Temperature MinAuxSetback = Temperature.FromFarenheit(62);
 
         [FunctionName("Function1")]
-        public async Task Run([TimerTrigger("0 2,32 * * * *")] TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 2,32,51 * * * *")] TimerInfo myTimer, ILogger log)
         {
-            var client = new Client(Constants.ApiKey, GetTokenAsync, SetTokenAsync);
+            var client = new Client(Keys.ApiKey, GetTokenAsync, SetTokenAsync);
             await foreach (var thermostat in ThermostatEnumerator.FindAsync(client))
             {
                 // Get current thermostat state
                 var info = await thermostat.GetInformationAsync();
 
-                // Find comfort setting used by this function
-                var customComfortSetting = info.ComfortLevels
-                    .Where(x => x.Ref == "sleep")
-                    .FirstOrDefault();
-
                 // Skip if the Sleep comfort setting is missing or not currently active
-                if (customComfortSetting == null || !customComfortSetting.Active)
+                bool isSleepActive = info.ComfortLevels
+                    .Where(x => x.Ref == "sleep")
+                    .Where(x => x.Active)
+                    .Any();
+
+                if (!isSleepActive)
                     continue;
 
                 // Skip if a hold is set (either by this function or by the user)
@@ -58,13 +58,13 @@ namespace SetbackEnforcer
 
                 // Determine whether the aux heat will run or not
                 var outdoorTemp = info.Weather.Temperature;
-                var compressorMinOutdoorTemp = info.AuxCrossover.Item1;
+                var compressorMin = info.AuxCrossover.Item1;
 
                 bool isAuxHeat = info.Mode switch
                 {
                     "aux" => true,
-                    "heat" => outdoorTemp.Farenheit <= compressorMinOutdoorTemp.Farenheit,
-                    "auto" => outdoorTemp.Farenheit <= compressorMinOutdoorTemp.Farenheit,
+                    "heat" => outdoorTemp.Farenheit <= compressorMin.Farenheit,
+                    "auto" => outdoorTemp.Farenheit <= compressorMin.Farenheit,
                     _ => false
                 };
 
@@ -84,7 +84,7 @@ namespace SetbackEnforcer
 
                 // Set hold for new temperature range
                 await thermostat.HoldAsync(
-                    HoldType.NewComfortLevel(customComfortSetting.Ref),
+                    HoldType.NewTempRange(newRange),
                     HoldDuration.NextTransition);
             }
         }

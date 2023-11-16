@@ -365,3 +365,4 @@ FodyWeavers.xsd
 local.settings.json
 ServiceDependencies
 Keys.fs
+Keys.cs
