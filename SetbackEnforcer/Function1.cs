@@ -29,48 +29,62 @@ namespace SetbackEnforcer
             await client.SetSecretAsync("ecobeeJson", JsonConvert.SerializeObject(token), cancellationToken);
         }
 
+        private static readonly Temperature MinAuxSetback = Temperature.FromFarenheit(62);
+
         [FunctionName("Function1")]
-        public async Task Run([TimerTrigger("55 */30 * * * *")] TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 2,32 * * * *")] TimerInfo myTimer, ILogger log)
         {
             var client = new Client(Constants.ApiKey, GetTokenAsync, SetTokenAsync);
             await foreach (var thermostat in ThermostatEnumerator.FindAsync(client))
             {
+                // Get current thermostat state
                 var info = await thermostat.GetInformationAsync();
 
-                var activeComfortLevelName = info.ComfortLevels
-                    .Where(x => x.Active)
-                    .Select(x => x.Name)
+                // Find comfort setting used by this function
+                var customComfortSetting = info.ComfortLevels
+                    .Where(x => x.Ref == "sleep")
                     .FirstOrDefault();
 
-                if (activeComfortLevelName != "DynSetback")
+                // Skip if the Sleep comfort setting is missing or not currently active
+                if (customComfortSetting == null || !customComfortSetting.Active)
                     continue;
 
-                var manualHoldActive = info.Events
+                // Skip if a hold is set (either by this function or by the user)
+                bool manualHoldActive = info.Events
                     .Where(x => x.Running)
-                    .Where(x => x.ComfortLevelRef != "home")
-                    .Where(x => x.ComfortLevelRef != "sleep")
                     .Any();
-
                 if (manualHoldActive)
                     continue;
 
+                // Determine whether the aux heat will run or not
                 var outdoorTemp = info.Weather.Temperature;
                 var compressorMinOutdoorTemp = info.AuxCrossover.Item1;
 
-                string desiredComfortLevelRef = outdoorTemp.Farenheit < compressorMinOutdoorTemp.Farenheit
-                    ? "sleep"
-                    : "home";
+                bool isAuxHeat = info.Mode switch
+                {
+                    "aux" => true,
+                    "heat" => outdoorTemp.Farenheit <= compressorMinOutdoorTemp.Farenheit,
+                    "auto" => outdoorTemp.Farenheit <= compressorMinOutdoorTemp.Farenheit,
+                    _ => false
+                };
 
-                string activeHoldComfortLevelRef = info.Events
-                    .Where(x => x.Running)
-                    .Select(x => x.ComfortLevelRef)
-                    .FirstOrDefault();
-
-                if (activeHoldComfortLevelRef == desiredComfortLevelRef)
+                // If the aux heat is not needed, keep the current setpoint
+                if (!isAuxHeat)
                     continue;
 
+                // Check current thermostat setting
+                var currentRange = info.Runtime.TempRange;
+
+                // If the current setback is already sufficient, keep it
+                if (currentRange.HeatTemp.Farenheit <= MinAuxSetback.Farenheit)
+                    continue;
+
+                // Determine new temperature range
+                var newRange = info.Runtime.TempRange.WithHeatTemp(MinAuxSetback);
+
+                // Set hold for new temperature range
                 await thermostat.HoldAsync(
-                    HoldType.NewComfortLevel(desiredComfortLevelRef),
+                    HoldType.NewComfortLevel(customComfortSetting.Ref),
                     HoldDuration.NextTransition);
             }
         }
