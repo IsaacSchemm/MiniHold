@@ -114,16 +114,25 @@ type Alert = {
 type Event = {
     Name: string
     EventType: string
-    AbsoluteTemperatureRanges: TempRange list
+    AbsoluteTemperatureRange: TempRange option
     StartDate: Nullable<DateTime>
     EndDate: Nullable<DateTime>
+    ComfortLevelRef: string
     Running: bool
 } with
+    member this.AbsoluteTemperatureRanges =
+        [this.AbsoluteTemperatureRange]
+        |> List.choose id
+
     member this.Description = String.concat " " [
-        for t in this.AbsoluteTemperatureRanges do
+        match this.AbsoluteTemperatureRange with
+        | None -> ()
+        | Some t ->
             $"{t.HeatTemp.FarenheitString}-{t.CoolTemp.FarenheitString}"
             if t.Fan = "on" then
                 "(with fan)"
+        if not (isNull this.ComfortLevelRef) then
+            $"({this.ComfortLevelRef})"
     ]
 
 type ComfortLevel = {
@@ -182,12 +191,22 @@ type ThermostatInformation = {
     member this.ApplyCoolDelta (t: Temperature) =
         t + this.CoolDelta
 
+[<RequireQualifiedAccess>]
+type HoldType =
+| TempRange of TempRange
+| ComfortLevel of string
+
+[<RequireQualifiedAccess>]
+type HoldDuration =
+| Range of startDate: DateTime * endDate: DateTime
+| NextTransition
+| Indefinite
+
 type IThermostatClient =
     abstract member Name: string with get
     abstract member ToThermostatTime: time: DateTime -> DateTime
     abstract member GetInformationAsync: unit -> Task<ThermostatInformation>
-    abstract member HoldAsync: parameters: TempRange * startTime: DateTime * endTime: DateTime -> Task
-    abstract member HoldComfortSettingAsync: holdClimateRef: string * startTime: DateTime * endTime: DateTime -> Task
+    abstract member HoldAsync: ``type``: HoldType * duration: HoldDuration -> Task
     abstract member CancelHoldAsync: unit -> Task
     abstract member SetModeAsync: string -> Task
     abstract member CreateVacationAsync: name: string * tempRange: TempRange * startTime: DateTime * endTime: DateTime * fanMinOnTime: int -> Task
@@ -306,13 +325,14 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                         {
                             Name = e.Name
                             EventType = e.Type
-                            AbsoluteTemperatureRanges = [
-                                if e.IsTemperatureAbsolute = Nullable(true) then {
+                            AbsoluteTemperatureRange =
+                                if e.IsTemperatureAbsolute = Nullable(true)
+                                then Some {
                                     HeatTemp = Temperature e.HeatHoldTemp.Value
                                     CoolTemp = Temperature e.CoolHoldTemp.Value
                                     Fan = e.Fan
                                 }
-                            ]
+                                else None
                             StartDate =
                                 match DateTime.TryParse($"{e.StartDate} {e.StartTime}") with
                                 | (true, x) -> Nullable(x)
@@ -321,50 +341,40 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
                                 match DateTime.TryParse($"{e.EndDate} {e.EndTime}") with
                                 | (true, x) -> Nullable(x)
                                 | (false, _) -> Nullable()
+                            ComfortLevelRef = e.HoldClimateRef
                             Running = e.Running = Nullable(true)
                         }
                 ]
             }
         }
 
-        member _.HoldAsync(parameters: TempRange, startTime: DateTime, endTime: DateTime) = task {
+        member _.HoldAsync(holdType: HoldType, holdDuration: HoldDuration) = task {
             let request = new ThermostatUpdateRequest()
             request.Selection <- new Selection(SelectionType = "thermostats", SelectionMatch = thermostat.Identifier)
             request.Functions <- [|
                 let ps = new SetHoldParams()
 
-                ps.HeatHoldTemp <- parameters.HeatTemp.Tenths
-                ps.CoolHoldTemp <- parameters.CoolTemp.Tenths
+                match holdType with
+                | HoldType.TempRange parameters ->
+                    ps.HeatHoldTemp <- parameters.HeatTemp.Tenths
+                    ps.CoolHoldTemp <- parameters.CoolTemp.Tenths
 
-                if not (String.IsNullOrEmpty parameters.Fan) then
-                    ps.Fan <- parameters.Fan
+                    if not (String.IsNullOrEmpty parameters.Fan) then
+                        ps.Fan <- parameters.Fan
+                | HoldType.ComfortLevel holdClimateRef ->
+                    ps.HoldClimateRef <- holdClimateRef
 
-                ps.HoldType <- "dateTime"
-                ps.StartDate <- startTime.ToString("yyyy-MM-dd")
-                ps.StartTime <- startTime.ToString("HH:mm:ss")
-                ps.EndDate <- endTime.ToString("yyyy-MM-dd")
-                ps.EndTime <- endTime.ToString("HH:mm:ss")
-
-                yield new SetHoldFunction(Params = ps) :> Function
-            |]
-            let! response = client.PostAsync<ThermostatUpdateRequest, Response>(request)
-            if response.Status.Code.HasValue && response.Status.Code.Value <> 0 then
-                failwithf "%d: %s" response.Status.Code.Value response.Status.Message
-        }
-
-        member _.HoldComfortSettingAsync(holdClimateRef: string, startTime: DateTime, endTime: DateTime) = task {
-            let request = new ThermostatUpdateRequest()
-            request.Selection <- new Selection(SelectionType = "thermostats", SelectionMatch = thermostat.Identifier)
-            request.Functions <- [|
-                let ps = new SetHoldParams()
-
-                ps.HoldClimateRef <- holdClimateRef
-
-                ps.HoldType <- "dateTime"
-                ps.StartDate <- startTime.ToString("yyyy-MM-dd")
-                ps.StartTime <- startTime.ToString("HH:mm:ss")
-                ps.EndDate <- endTime.ToString("yyyy-MM-dd")
-                ps.EndTime <- endTime.ToString("HH:mm:ss")
+                match holdDuration with
+                | HoldDuration.Range (startTime, endTime) ->
+                    ps.HoldType <- "dateTime"
+                    ps.StartDate <- startTime.ToString("yyyy-MM-dd")
+                    ps.StartTime <- startTime.ToString("HH:mm:ss")
+                    ps.EndDate <- endTime.ToString("yyyy-MM-dd")
+                    ps.EndTime <- endTime.ToString("HH:mm:ss")
+                | HoldDuration.NextTransition ->
+                    ps.HoldType <- "nextTransition"
+                | HoldDuration.Indefinite ->
+                    ps.HoldType <- "indefinite"
 
                 yield new SetHoldFunction(Params = ps) :> Function
             |]
