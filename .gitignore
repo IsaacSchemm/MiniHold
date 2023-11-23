@@ -364,5 +364,6 @@ FodyWeavers.xsd
 
 local.settings.json
 ServiceDependencies
+serviceDependencies.* - Zip Deploy.json
 Keys.fs
 Keys.cs
