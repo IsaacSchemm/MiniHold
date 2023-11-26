@@ -57,8 +57,6 @@ namespace SetbackEnforcer
                 var compressorMin = info.CompressorProtectionMinTemp;
                 var currentRange = info.Runtime.TempRange;
 
-                compressorMin = Temperature.FromFarenheit(30);
-
                 // If the current setback is already sufficient, keep it
                 if (currentRange.HeatTemp.Farenheit <= MinAuxSetback.Farenheit)
                     continue;
