@@ -69,6 +69,17 @@
                 {
                     <hr />
                     <h5>@System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(activeEvent.EventType)</h5>
+                    if (activeEvent.ComfortLevelRef != null)
+                    {
+                        string comfortLevelName = info.ComfortLevels
+                            .Where(c => c.Ref == activeEvent.ComfortLevelRef)
+                            .Select(c => c.Name)
+                            .DefaultIfEmpty(activeEvent.ComfortLevelRef)
+                            .First();
+                        <div>
+                            <strong>@comfortLevelName</strong>
+                        </div>
+                    }
                     <div>
                         <strong>Start:</strong> @activeEvent.StartDate?.ToString("h:mm tt M/d/yy")
                     </div>
