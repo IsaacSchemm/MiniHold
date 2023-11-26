@@ -6,7 +6,8 @@ open System.Threading.Tasks
 type SimulatedThermostat(name: string) =
     let mutable current: ThermostatInformation = {
         Mode = "auto"
-        AuxCrossover = (Temperature 200, Temperature 400)
+        CompressorProtectionMinTemp = Temperature 200
+        AuxMaxOutdoorTemp = Temperature 400
         CoolDelta = Temperature 5
         HeatDelta = Temperature 5
         ComfortLevels = [

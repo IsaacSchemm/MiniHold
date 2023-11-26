@@ -145,7 +145,8 @@ type ComfortLevel = {
 
 type ThermostatInformation = {
     Mode: string
-    AuxCrossover: Temperature * Temperature
+    CompressorProtectionMinTemp: Temperature
+    AuxMaxOutdoorTemp: Temperature
     CoolDelta: Temperature
     HeatDelta: Temperature
     ComfortLevels: ComfortLevel list
@@ -240,7 +241,8 @@ type ThermostatClient(client: IClient, thermostat: Thermostat) =
             let currentWeather = Seq.head t.Weather.Forecasts
             return {
                 Mode = t.Settings.HvacMode
-                AuxCrossover = (Temperature t.Settings.CompressorProtectionMinTemp.Value, Temperature t.Settings.AuxMaxOutdoorTemp.Value)
+                CompressorProtectionMinTemp = Temperature t.Settings.CompressorProtectionMinTemp.Value
+                AuxMaxOutdoorTemp = Temperature t.Settings.AuxMaxOutdoorTemp.Value
                 CoolDelta = Temperature t.Settings.Stage1CoolingDifferentialTemp.Value
                 HeatDelta = Temperature t.Settings.Stage1HeatingDifferentialTemp.Value
                 ComfortLevels = [

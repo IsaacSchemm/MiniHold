@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,8 +32,19 @@ namespace SetbackEnforcer
 
         private static readonly Temperature MinAuxSetback = Temperature.FromFarenheit(62);
 
+        private static string GetActiveComfortLevelRef(ThermostatInformation information)
+        {
+            foreach (var e in information.Events)
+                if (e.Running)
+                    return e.ComfortLevelRef;
+            foreach (var c in information.ComfortLevels)
+                if (c.Active)
+                    return c.Ref;
+            return null;
+        }
+
         [FunctionName("Function1")]
-        public async Task Run([TimerTrigger("0 2,32 * * * *")] TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 2,24,32 * * * *")] TimerInfo myTimer, ILogger log)
         {
             var client = new Client(Keys.ApiKey, GetTokenAsync, SetTokenAsync);
             await foreach (var thermostat in ThermostatEnumerator.FindAsync(client))
@@ -40,26 +52,18 @@ namespace SetbackEnforcer
                 // Get current thermostat state
                 var info = await thermostat.GetInformationAsync();
 
-                // Skip if the Sleep comfort setting is missing or not currently active
-                bool isSleepActive = info.ComfortLevels
-                    .Where(x => x.Ref == "sleep")
-                    .Where(x => x.Active)
-                    .Any();
-
-                if (!isSleepActive)
-                    continue;
-
-                // Skip if a hold is set (either by this function or by the user)
-                bool manualHoldActive = info.Events
-                    .Where(x => x.Running)
-                    .Any();
-                if (manualHoldActive)
-                    continue;
-
-                // Determine whether the aux heat will run or not
+                // Get current parameters
                 var outdoorTemp = info.Weather.Temperature;
-                var compressorMin = info.AuxCrossover.Item1;
+                var compressorMin = info.CompressorProtectionMinTemp;
+                var currentRange = info.Runtime.TempRange;
 
+                compressorMin = Temperature.FromFarenheit(30);
+
+                // If the current setback is already sufficient, keep it
+                if (currentRange.HeatTemp.Farenheit <= MinAuxSetback.Farenheit)
+                    continue;
+
+                // Check if the conditions are such that aux heat would be used
                 bool isAuxHeat = info.Mode switch
                 {
                     "auxHeatOnly" => true,
@@ -68,24 +72,36 @@ namespace SetbackEnforcer
                     _ => false
                 };
 
-                // If the aux heat is not needed, keep the current setpoint
+                // Determine whether the aux heat will run or not
                 if (!isAuxHeat)
                     continue;
 
-                // Check current thermostat setting
-                var currentRange = info.Runtime.TempRange;
-
-                // If the current setback is already sufficient, keep it
-                if (currentRange.HeatTemp.Farenheit <= MinAuxSetback.Farenheit)
-                    continue;
-
-                // Determine new temperature range
+                // Calculate desired temperature range
                 var newRange = info.Runtime.TempRange.WithHeatTemp(MinAuxSetback);
 
-                // Set hold for new temperature range
+                // Check whether the sleep comfort setting is active
+                if (GetActiveComfortLevelRef(info) != "sleep")
+                    continue;
+
+                // Find the active hold, if any
+                var activeEvent = info.Events
+                    .Where(e => e.Running)
+                    .FirstOrDefault();
+
+                var now = thermostat.ToThermostatTime(DateTime.Now);
+
+                // Determine the desired duration of the new hold, based on
+                // the duration of the existing hold (if any)
+                HoldDuration desiredHoldDuration =
+                    activeEvent == null
+                        ? HoldDuration.NextTransition
+                    : activeEvent.EndDate is DateTime end
+                        ? HoldDuration.NewRange(now, end)
+                    : HoldDuration.Indefinite;
+
                 await thermostat.HoldAsync(
                     HoldType.NewTempRange(newRange),
-                    HoldDuration.NextTransition);
+                    desiredHoldDuration);
             }
         }
     }
