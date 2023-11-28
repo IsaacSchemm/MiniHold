@@ -30,8 +30,6 @@ namespace SetbackEnforcer
             await client.SetSecretAsync("ecobeeJson", JsonConvert.SerializeObject(token), cancellationToken);
         }
 
-        private static readonly Temperature MinAuxSetback = Temperature.FromFarenheit(62);
-
         private static string GetActiveComfortLevelRef(ThermostatInformation information)
         {
             foreach (var e in information.Events)
@@ -54,28 +52,27 @@ namespace SetbackEnforcer
 
                 // Get current parameters
                 var outdoorTemp = info.Weather.Temperature;
-                var compressorMin = info.CompressorProtectionMinTemp;
                 var currentRange = info.Runtime.TempRange;
 
-                // If the current setback is already sufficient, keep it
-                if (currentRange.HeatTemp.Farenheit <= MinAuxSetback.Farenheit)
-                    continue;
-
-                // Check if the conditions are such that aux heat would be used
-                bool isAuxHeat = info.Mode switch
+                // Check if the conditions are such that we should proceed with setback
+                bool shouldProceed = info.Mode switch
                 {
                     "auxHeatOnly" => true,
-                    "heat" => outdoorTemp.Farenheit <= compressorMin.Farenheit,
-                    "auto" => outdoorTemp.Farenheit <= compressorMin.Farenheit,
+                    "heat" => outdoorTemp.Farenheit <= 25,
+                    "auto" => outdoorTemp.Farenheit <= 25,
                     _ => false
                 };
 
-                // Determine whether the aux heat will run or not
-                if (!isAuxHeat)
+                if (!shouldProceed)
                     continue;
 
                 // Calculate desired temperature range
-                var newRange = info.Runtime.TempRange.WithHeatTemp(MinAuxSetback);
+                var newRange = info.Runtime.TempRange.WithHeatTemp(
+                    Temperature.FromFarenheit(62));
+
+                // If the current setback is already sufficient, keep it
+                if (currentRange.HeatTemp.Farenheit <= newRange.HeatTemp.Farenheit)
+                    continue;
 
                 // Check whether the sleep comfort setting is active
                 if (GetActiveComfortLevelRef(info) != "sleep")
