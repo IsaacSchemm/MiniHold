@@ -24,6 +24,8 @@ with
     static member (+) (Temperature a, Temperature b) = Temperature (a + b)
     static member (-) (Temperature a, Temperature b) = Temperature (a - b)
 
+    member this.Add t = this + t
+
 [<StructuredFormatDisplay("{PercentageString}")>]
 type Percentage = Percentage of int
 with
