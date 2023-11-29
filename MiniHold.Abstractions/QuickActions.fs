@@ -3,33 +3,36 @@
 open System
 
 module QuickActions =
-    let farenheit = Temperature.FromFarenheit
+    let private farenheit = Temperature.FromFarenheit
+
+    let Interval = farenheit 2m
 
     let DetermineNewRangeToApplyHeat(info: ThermostatInformation) =
-        let newSetPoint = List.max [
-            for t in info.Readings.Temperature do
-                t + info.HeatDelta + farenheit 0.5m
-            info.Runtime.TempRange.HeatTemp + farenheit 1.0m
+        let current = List.max [
+            yield! info.Readings.Temperature
+            yield info.Runtime.TempRange.HeatTemp
         ]
 
-        {
-            info.Runtime.TempRange with
-                HeatTemp = newSetPoint
-                CoolTemp = newSetPoint + farenheit 10.0m
-        }
+        { info.Runtime.TempRange with
+            HeatTemp = current + Interval
+            CoolTemp = current + Interval + farenheit 10.0m }
 
     let DetermineNewRangeToApplyCool(info: ThermostatInformation) =
-        let newSetPoint = List.min [
-            for t in info.Readings.Temperature do
-                t - info.CoolDelta - farenheit 0.5m
-            info.Runtime.TempRange.CoolTemp - farenheit 1.0m
+        let current = List.min [
+            yield! info.Readings.Temperature
+            yield info.Runtime.TempRange.CoolTemp
         ]
 
-        {
-            info.Runtime.TempRange with
-                HeatTemp = newSetPoint - farenheit 10.0m
-                CoolTemp = newSetPoint
-        }
+        { info.Runtime.TempRange with
+            HeatTemp = current - Interval - farenheit 10.0m
+            CoolTemp = current - Interval }
+
+    let DetermineNewRangeToApplyBackoff(info: ThermostatInformation) =
+        let range = info.Runtime.TempRange
+
+        { range with
+            HeatTemp = range.HeatTemp - Interval
+            CoolTemp = range.CoolTemp + Interval }
 
     let SetHoldAsync(client: IThermostatClient, tempRange, duration) = task {
         let startTime = client.ToThermostatTime(DateTime.Now)
