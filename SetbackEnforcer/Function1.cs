@@ -54,7 +54,7 @@ namespace SetbackEnforcer
                 var outdoorTemp = info.Weather.Temperature;
                 var currentRange = info.Runtime.TempRange;
 
-                var threshold = info.CompressorProtectionMinTemp + Temperature.FromFarenheit(5);
+                var threshold = info.AuxMaxOutdoorTemp;
 
                 // Check if the conditions are such that we should proceed with setback
                 bool shouldProceed = info.Mode switch
