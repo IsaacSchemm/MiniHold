@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Identity;
@@ -34,7 +35,9 @@ namespace SetbackEnforcer
         {
             foreach (var e in information.Events)
                 if (e.Running)
-                    return e.ComfortLevelRef;
+                    return !string.IsNullOrEmpty(e.ComfortLevelRef)
+                        ? e.ComfortLevelRef
+                        : null;
             foreach (var c in information.ComfortLevels)
                 if (c.Active)
                     return c.Ref;
@@ -42,7 +45,7 @@ namespace SetbackEnforcer
         }
 
         [FunctionName("Function1")]
-        public async Task Run([TimerTrigger("0 2,24,32 * * * *")] TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 2,32 * * * *")] TimerInfo myTimer, ILogger log)
         {
             var client = new Client(Keys.ApiKey, GetTokenAsync, SetTokenAsync);
             await foreach (var thermostat in ThermostatEnumerator.FindAsync(client))
@@ -68,14 +71,6 @@ namespace SetbackEnforcer
                 if (!shouldProceed)
                     continue;
 
-                // Calculate desired temperature range
-                var newRange = info.Runtime.TempRange.WithHeatTemp(
-                    Temperature.FromFarenheit(62));
-
-                // If the current setback is already sufficient, keep it
-                if (currentRange.HeatTemp.Farenheit <= newRange.HeatTemp.Farenheit)
-                    continue;
-
                 // Check whether the sleep comfort setting is active
                 if (GetActiveComfortLevelRef(info) != "sleep")
                     continue;
@@ -97,7 +92,7 @@ namespace SetbackEnforcer
                     : HoldDuration.Indefinite;
 
                 await thermostat.HoldAsync(
-                    HoldType.NewTempRange(newRange),
+                    HoldType.NewComfortLevel("away"),
                     desiredHoldDuration);
             }
         }
