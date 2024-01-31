@@ -50,16 +50,16 @@ module QuickActions =
         }, HoldDuration.Range (startTime, endTime))
     }
 
-    let SetAwayAsync(client: IThermostatClient, duration) = task {
+    let SetRefAsync(client: IThermostatClient, ref, duration) = task {
         let startTime = client.ToThermostatTime(DateTime.Now)
         let endTime = startTime + duration
-        do! client.HoldAsync(HoldType.ComfortLevel "away", HoldDuration.Range (startTime, endTime))
+        do! client.HoldAsync(HoldType.ComfortLevel ref, HoldDuration.Range (startTime, endTime))
     }
 
-    let SetAwayUntilClockAsync(client: IThermostatClient, timeOfDay: TimeSpan) = task {
+    let SetRefUntilClockAsync(client: IThermostatClient, ref, timeOfDay: TimeSpan) = task {
         let startTime = client.ToThermostatTime(DateTime.UtcNow)
         let mutable endTime = startTime.Date + timeOfDay
         if endTime < startTime then
             endTime <- endTime.AddDays(1)
-        do! client.HoldAsync(HoldType.ComfortLevel "away", HoldDuration.Range (startTime, endTime))
+        do! client.HoldAsync(HoldType.ComfortLevel ref, HoldDuration.Range (startTime, endTime))
     }

@@ -104,25 +104,28 @@
                         Away
                     </h5>
                     <GridButton Position="(2, 1)" OnClick="() => holdAwayTo(ti, 6)" Text="until 6 am" />
-                    <GridButton Position="(2, 2)" OnClick="() => holdAwayTo(ti, 11)" Text="until 11 am" />
-                    <GridButton Position="(3, 1)" OnClick="() => holdAwayTo(ti, 15)" Text="until 3 pm" />
-                    <GridButton Position="(3, 2)" OnClick="() => holdAwayTo(ti, 20)" Text="until 8 pm" />
+                    <GridButton Position="(2, 2)" OnClick="() => holdAwayTo(ti, 15)" Text="until 3 pm" />
+                    <GridButton Position="(3, 1)" OnClick="() => holdAwayTo(ti, 20)" Text="until 8 pm" />
+                    <GridButton Position="(3, 2)" OnClick="() => holdAway(ti, 60)" Text="1 hour" />
 
-                    <div style="grid-row: 4; grid-column: 1 / 3" class="text-muted">
+                    <div style="grid-row: 5; grid-column: 1 / 3" class="text-muted">
                         (or until cancelled)
                     </div>
                 </div>
                 <hr />
                 <div class="grid">
-                    <h5 style="grid-row: 1; grid-column: 1 / 3">
-                        Backoff
-                    </h5>
-                    <GridButton Position="(2, 1)" OnClick="() => holdBackoff(ti, 60)" Text="1 hour" />
-                    <GridButton Position="(2, 2)" OnClick="() => holdBackoff(ti, 120)" Text="2 hours" />
+                    @foreach (var comfortLevel in info.ComfortLevels.Where(c => c.Active))
+                    {
+                        <h5 style="grid-row: 1; grid-column: 1 / 3">
+                            @comfortLevel.Name
+                        </h5>
+                        <GridButton Position="(2, 1)" OnClick="() => holdRefTo(ti, comfortLevel.Ref, 15)" Text="until 3 pm" />
+                        <GridButton Position="(2, 2)" OnClick="() => holdRefTo(ti, comfortLevel.Ref, 22)" Text="until 10 pm" />
 
-                    <div style="grid-row: 3; grid-column: 1 / 3" class="text-muted">
-                        (or until cancelled)
-                    </div>
+                        <div style="grid-row: 3; grid-column: 1 / 3" class="text-muted">
+                            (or until cancelled)
+                        </div>
+                    }
                 </div>
             </div>
             <div class="col-12">
@@ -257,26 +260,19 @@
         await ti.Act(async () => await QuickActions.SetFanAsync(ti.ThermostatClient, true, TimeSpan.FromMinutes(minutes)));
     }
 
-    async Task holdBackoff(ThermostatObject ti, int minutes)
+    async Task holdAway(ThermostatObject ti, int minutes)
     {
-        await ti.Act(async () =>
-        {
-            var info = ti.Information;
-            var newRange = QuickActions.DetermineNewRangeToApplyBackoff(info);
-            if (!await JsRuntime.InvokeAsync<bool>("confirm", $"This will set the temperature range to {newRange.ShortDescription}."))
-            {
-                return;
-            }
-            await QuickActions.SetHoldAsync(
-                ti.ThermostatClient,
-                newRange,
-                TimeSpan.FromMinutes(minutes));
-        });
+        await ti.Act(async () => await QuickActions.SetRefAsync(ti.ThermostatClient, "away", TimeSpan.FromMinutes(minutes)));
     }
 
     async Task holdAwayTo(ThermostatObject ti, int hour)
     {
-        await ti.Act(async () => await QuickActions.SetAwayUntilClockAsync(ti.ThermostatClient, TimeSpan.FromHours(hour)));
+        await ti.Act(async () => await QuickActions.SetRefUntilClockAsync(ti.ThermostatClient, "away", TimeSpan.FromHours(hour)));
+    }
+
+    async Task holdRefTo(ThermostatObject ti, string refName, int hour)
+    {
+        await ti.Act(async () => await QuickActions.SetRefUntilClockAsync(ti.ThermostatClient, refName, TimeSpan.FromHours(hour)));
     }
 
     async Task clearHold(ThermostatObject ti)
