@@ -117,8 +117,8 @@
                     <h5 style="grid-row: 1; grid-column: 1 / 3">
                         Sleep
                     </h5>
-                    <GridButton Position="(2, 1)" OnClick="() => holdSleep(ti, 6)" Text="until 6 am" />
-                    <GridButton Position="(2, 2)" OnClick="() => holdSleep(ti, 15)" Text="until 3 pm" />
+                    <GridButton Position="(2, 1)" OnClick="() => holdSleepTo(ti, 6)" Text="until 6 am" />
+                    <GridButton Position="(2, 2)" OnClick="() => holdSleepTo(ti, 15)" Text="until 3 pm" />
 
                     <div style="grid-row: 5; grid-column: 1 / 3" class="text-muted">
                         (or until cancelled)
@@ -267,9 +267,9 @@
         await ti.Act(async () => await QuickActions.SetRefUntilClockAsync(ti.ThermostatClient, "away", TimeSpan.FromHours(hour)));
     }
 
-    async Task holdSleep(ThermostatObject ti, int minutes)
+    async Task holdSleepTo(ThermostatObject ti, int hour)
     {
-        await ti.Act(async () => await QuickActions.SetRefAsync(ti.ThermostatClient, "away", TimeSpan.FromMinutes(minutes)));
+        await ti.Act(async () => await QuickActions.SetRefUntilClockAsync(ti.ThermostatClient, "sleep", TimeSpan.FromHours(hour)));
     }
 
     async Task holdRefTo(ThermostatObject ti, string refName, int hour)
