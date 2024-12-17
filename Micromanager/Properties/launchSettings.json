@@ -1,8 +1,8 @@
 {
   "profiles": {
-    "SetbackEnforcer": {
+    "Micromanager": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7295",
+      "commandLineArgs": "--port 7020",
       "launchBrowser": false
     }
   }
