@@ -27,7 +27,7 @@ namespace Micromanager
         }
 
         [Function("Function1")]
-        public async Task Run([TimerTrigger("55 31 20 * * *")] TimerInfo myTimer)
+        public async Task Run([TimerTrigger("0 1 */3 * * *")] TimerInfo myTimer)
         {
             var client = new Client(Keys.EcobeeApiKey, GetTokenAsync, SetTokenAsync);
             //var pin = await client.GetPinAsync();
