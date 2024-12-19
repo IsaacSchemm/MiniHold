@@ -48,5 +48,5 @@ module Algorithm =
 
         {|
             heatPumpCarbonIntensity = gridCarbonIntensity / currentCOP
-            furnaceCarbonIntensity = naturalGasHeat * furnaceEfficiency
+            furnaceCarbonIntensity = naturalGasHeat / furnaceEfficiency
         |}
