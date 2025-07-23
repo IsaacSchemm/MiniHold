@@ -45,7 +45,16 @@
                     <GridButton Position="(2, 1)" OnClick="() => holdHeat(ti, 60)" Text="Heat (+2 °F)" ClassName="heat" Disabled="!info.Heat" />
                     <GridButton Position="(3, 1)" OnClick="() => holdCool(ti, 60)" Text="Cool (-2 °F)" ClassName="cool" Disabled="!info.Cool" />
                     <GridButton Position="(4, 1)" OnClick="() => holdFan(ti, 60)" Text="Fan" Title="Keep air handler fan running" />
-                    <GridButton Position="(5, 1)" OnClick="() => holdSleep(ti, 60)" Text="Sleep" />
+
+                    <div style="grid-row: 6; grid-column: 1 / 2" class="text-muted">
+                        (or until cancelled)
+                    </div>
+                </div>
+                <h5>Away</h5>
+                <div class="grid">
+                    <GridButton Position="(2, 1)" OnClick="() => holdAway(ti, 60)" Text="One hour" />
+                    <GridButton Position="(3, 1)" OnClick="() => holdAway(ti, 240)" Text="Four hours" />
+                    <GridButton Position="(4, 1)" OnClick="() => holdAway(ti, 360)" Text="Six hours" />
 
                     <div style="grid-row: 6; grid-column: 1 / 2" class="text-muted">
                         (or until cancelled)
@@ -233,9 +242,9 @@
         await ti.Act(async () => await QuickActions.SetFanAsync(ti.ThermostatClient, true, TimeSpan.FromMinutes(minutes)));
     }
 
-    async Task holdSleep(ThermostatObject ti, int minutes)
+    async Task holdAway(ThermostatObject ti, int minutes)
     {
-        await ti.Act(async () => await QuickActions.SetRefAsync(ti.ThermostatClient, "sleep", TimeSpan.FromMinutes(minutes)));
+        await ti.Act(async () => await QuickActions.SetRefAsync(ti.ThermostatClient, "away", TimeSpan.FromMinutes(minutes)));
     }
 
     async Task holdRefTo(ThermostatObject ti, string refName, int hour)
