@@ -46,17 +46,26 @@
                     <GridButton Position="(3, 1)" OnClick="() => holdCool(ti, 60)" Text="Cool (-2 °F)" ClassName="cool" Disabled="!info.Cool" />
                     <GridButton Position="(4, 1)" OnClick="() => holdFan(ti, 60)" Text="Fan" Title="Keep air handler fan running" />
 
-                    <div style="grid-row: 6; grid-column: 1 / 2" class="text-muted">
+                    <div style="grid-row: 5; grid-column: 1 / 2" class="text-muted">
+                        (or until cancelled)
+                    </div>
+                </div>
+                <h5>Sleep</h5>
+                <div class="grid">
+                    <GridButton Position="(2, 1)" OnClick='() => holdRefTo(ti, "sleep", 0)' Text="until midnight" />
+                    <GridButton Position="(3, 1)" OnClick='() => holdRefTo(ti, "sleep", 15)' Text="until 3:00 PM" />
+
+                    <div style="grid-row: 4; grid-column: 1 / 2" class="text-muted">
                         (or until cancelled)
                     </div>
                 </div>
                 <h5>Away</h5>
                 <div class="grid">
-                    <GridButton Position="(2, 1)" OnClick="() => holdAway(ti, 60)" Text="One hour" />
-                    <GridButton Position="(3, 1)" OnClick="() => holdAway(ti, 240)" Text="Four hours" />
-                    <GridButton Position="(4, 1)" OnClick="() => holdAway(ti, 360)" Text="Six hours" />
+                    <GridButton Position="(2, 1)" OnClick="() => holdAway(ti, 60)" Text="1 hour" />
+                    <GridButton Position="(3, 1)" OnClick="() => holdAway(ti, 60 * 6)" Text="6 hours" />
+                    <GridButton Position="(4, 1)" OnClick="() => holdAway(ti, 60 * 24)" Text="24 hours" />
 
-                    <div style="grid-row: 6; grid-column: 1 / 2" class="text-muted">
+                    <div style="grid-row: 5; grid-column: 1 / 2" class="text-muted">
                         (or until cancelled)
                     </div>
                 </div>
