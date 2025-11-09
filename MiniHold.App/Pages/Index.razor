@@ -31,15 +31,15 @@
 
     <RefreshBox Thermostat="@ti" />
 
+    <hr />
+
     <div class="container-fluid indexPage">
         <div class="row">
-            <div class="col-md-12 col-lg-8">
-                <hr />
+            <div class="col-md-12 col-lg-4">
                 <h5>Current</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.Readings" />
             </div>
             <div class="col-md-12 col-lg-4">
-                <hr />
                 <h5>Hold (one hour)</h5>
                 <div class="grid">
                     <GridButton Position="(2, 1)" OnClick="() => holdHeat(ti, 60)" Text="Heat (+2 °F)" ClassName="heat" Disabled="!info.Heat" />
@@ -50,6 +50,8 @@
                         (or until cancelled)
                     </div>
                 </div>
+            </div>
+            <div class="col-md-12 col-lg-4">
                 <h5>Sleep</h5>
                 <div class="grid">
                     <GridButton Position="(2, 1)" OnClick='() => holdRefTo(ti, "sleep", 0)' Text="until midnight" />
@@ -70,7 +72,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-6">
                 <h4 class="visually-hidden">Outdoor Temperature</h4>
                 <hr />
                 <h5>Weather</h5>
@@ -83,7 +85,7 @@
                     <TemperatureDisplayBox UserInterfaceReading="@f" />
                 }
             </div>
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-6">
                 <h4 class="visually-hidden">Indoor Temperature</h4>
                 <hr />
                 <h5>Runtime</h5>
