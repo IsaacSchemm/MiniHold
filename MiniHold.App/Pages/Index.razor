@@ -330,17 +330,12 @@
     {
         await ti.Act(async () =>
         {
-            try {
-                await ti.ThermostatClient.CreateVacationAsync(
+            await ti.ThermostatClient.CreateVacationAsync(
                 $"Indf{indifferenceDate:yyyyMMdd}",
                 getIndifferenceRange(ti),
                 new[] { indifferenceDate.Date, DateTime.Now }.Max(),
                 indifferenceDate.Date.AddDays(1),
                 0);
-            } catch (Exception ex)
-            {
-                
-            }
         });
     }
 }
