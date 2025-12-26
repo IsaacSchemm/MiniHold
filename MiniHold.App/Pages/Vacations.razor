@@ -65,29 +65,37 @@
                     <form style="max-width: 400px">
                         <div class="row">
                             <div class="col-12">
-                                <label id="startDate" for="inputState" class="form-label">Start date</label>
+                                <label id="startDate" for="inputState" class="form-label">
+                                    <b>Start date</b>
+                                </label>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-sm-6 mb-3">
                                 <input type="date" class="form-control" aria-labelledby="startDate" @bind-value="startDate">
+                                <input class="form-control" readonly value="@startDate.ToString("ddd, MMM d")" />
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-sm-6 mb-3">
                                 <input type="time" class="form-control" aria-label="Start time" @bind-value="startTime">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <label id="endDate" for="inputState" class="form-label">End date</label>
+                                <label id="endDate" for="inputState" class="form-label">
+                                    <b>End date</b>
+                                </label>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <input type="date" class="form-control" aria-labelledby="startDate" @bind-value="endDate">
+                            <div class="col-sm-6 mb-3">
+                                <input type="date" class="form-control" aria-labelledby="endDate" @bind-value="endDate">
+                                <input class="form-control" readonly value="@endDate.ToString("ddd, MMM d")" />
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-sm-6 mb-3">
                                 <input type="time" class="form-control" aria-label="End time" @bind-value="endTime">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label id="heatLabel" for="inputState" class="form-label">Heat at (°F)</label>
+                                <label id="heatLabel" for="inputState" class="form-label">
+                                    <b>Heat at (°F)</b>
+                                </label>
                                 <input type="number"
                                        class="form-control"
                                        aria-labelledby="heatLabel"
@@ -97,7 +105,9 @@
                                        @bind-value="heatAt" />
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label id="coolLabel" for="inputState" class="form-label">Cool at (°F)</label>
+                                <label id="coolLabel" for="inputState" class="form-label">
+                                    <b>Cool at (°F)</b>
+                                </label>
                                 <input type="number"
                                        class="form-control"
                                        aria-labelledby="coolLabel"
@@ -132,7 +142,7 @@
 
     private DateTime startDate = DateTime.Today;
     private DateTime startTime = DateTime.Now.AddMinutes(15);
-    private DateTime endDate = DateTime.Today;
+    private DateTime endDate = DateTime.Today.AddDays(1);
     private DateTime endTime = new DateTime(2000, 1, 1, 12, 0, 0);
     private decimal heatAt = getTemplate().HeatTemp.Farenheit;
     private decimal coolAt = getTemplate().CoolTemp.Farenheit;
