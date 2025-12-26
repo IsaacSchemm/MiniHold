@@ -10,112 +10,113 @@
 {
     <RefreshBox Thermostat="@ti" />
 
-    foreach (var v in ti.Information.Events.Where(e => e.EventType == "vacation"))
-    {
-        <hr />
-
-        <h5>@v.Name</h5>
-
-        <p>
-            Start: <b>@v.StartDate?.ToString("dddd, MMMM d, yyyy")</b> (@v.StartDate?.ToString("h:mm tt"))
-            <br />
-            End: <b>@v.EndDate?.ToString("dddd, MMMM d, yyyy")</b> (@v.EndDate?.ToString("h:mm tt"))
-            <br />
-            @if (v.Running)
-            {
-                <div class="badge bg-primary">Running</div>
-            }
-            else
-            {
-                <div class="badge bg-secondary">Scheduled</div>
-            }
-        </p>
-        <p>
-            @foreach (var tr in v.AbsoluteTemperatureRanges)
-            {
-                <TemperatureDisplayBox UserInterfaceReading="@tr" />
-            }
-        </p>
-        <p>
-            @{
-                async Task del()
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col col-12 col-lg-6">
+                @foreach (var v in ti.Information.Events.Where(e => e.EventType == "vacation"))
                 {
-                    if (await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to remove the vacation \"{v.Name}\" from the thermostat \"{ti.ThermostatClient.Name}\"?"))
-                    {
-                        await ti.Act(async () => await ti.ThermostatClient.DeleteVacationAsync(v.Name));
-                    }
+                    <hr />
+
+                    <h5>@v.Name</h5>
+
+                    <p>
+                        Start: <b>@v.StartDate?.ToString("ddd, MMM d, yyyy")</b> (@v.StartDate?.ToString("h:mm tt"))
+                        <br />
+                        End: <b>@v.EndDate?.ToString("ddd, MMM d, yyyy")</b> (@v.EndDate?.ToString("h:mm tt"))
+                        <br />
+                        @if (v.Running)
+                        {
+                            <div class="badge bg-primary">Running</div>
+                        }
+                        else
+                        {
+                            <div class="badge bg-secondary">Scheduled</div>
+                        }
+                    </p>
+                    <p>
+                        @foreach (var tr in v.AbsoluteTemperatureRanges)
+                        {
+                            <TemperatureDisplayBox UserInterfaceReading="@tr" />
+                        }
+                    </p>
+                    <p>
+                        @{
+                            async Task del()
+                            {
+                                if (await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to remove the vacation \"{v.Name}\" from the thermostat \"{ti.ThermostatClient.Name}\"?"))
+                                {
+                                    await ti.Act(async () => await ti.ThermostatClient.DeleteVacationAsync(v.Name));
+                                }
+                            }
+                        }
+                        <button class="btn btn-danger" @onclick="del">Cancel</button>
+                    </p>
                 }
-            }
-            <button class="btn btn-danger" @onclick="del">Cancel</button>
-        </p>
-    }
+            </div>
+            <div class="col col-12 col-lg-6">
+                <hr />
 
-    <hr />
+                <p>
+                    Add new vacation:
+                </p>
 
-    <p>
-        Add new vacation:
-    </p>
-}
-
-@if (ClientStatic.ThermostatObjects.Any())
-{
-    <form style="max-width: 400px; margin: auto">
-        <div class="row">
-            <div class="col-md-12 mb-3">
-                <label id="nameLabel" for="inputState" class="form-label">Name</label>
-                <input type="text" class="form-control" aria-labelledby="nameLabel" @bind-value="name">
+                @if (ClientStatic.ThermostatObjects.Count() == 1)
+                {
+                    <form style="max-width: 400px">
+                        <div class="row">
+                            <div class="col-12">
+                                <label id="startDate" for="inputState" class="form-label">Start date</label>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="date" class="form-control" aria-labelledby="startDate" @bind-value="startDate">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="time" class="form-control" aria-label="Start time" @bind-value="startTime">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <label id="endDate" for="inputState" class="form-label">End date</label>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="date" class="form-control" aria-labelledby="startDate" @bind-value="endDate">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="time" class="form-control" aria-label="End time" @bind-value="endTime">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label id="heatLabel" for="inputState" class="form-label">Heat at (°F)</label>
+                                <input type="number"
+                                       class="form-control"
+                                       aria-labelledby="heatLabel"
+                                       min="@ClientStatic.ThermostatObjects.Select(x => x.Information.HeatRangeLow.Farenheit).Max()"
+                                       max="@ClientStatic.ThermostatObjects.Select(x => x.Information.HeatRangeHigh.Farenheit).Min()"
+                                       step="0.1"
+                                       @bind-value="heatAt" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label id="coolLabel" for="inputState" class="form-label">Cool at (°F)</label>
+                                <input type="number"
+                                       class="form-control"
+                                       aria-labelledby="coolLabel"
+                                       min="@ClientStatic.ThermostatObjects.Select(x => x.Information.CoolRangeLow.Farenheit).Max()"
+                                       max="@ClientStatic.ThermostatObjects.Select(x => x.Information.CoolRangeHigh.Farenheit).Min()"
+                                       step="0.1"
+                                       @bind-value="coolAt" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <button type="submit" class="btn btn-primary" @onclick="submit">Add new vacation</button>
+                            </div>
+                        </div>
+                    </form>
+                }
             </div>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <label id="startDate" for="inputState" class="form-label">Start date</label>
-            </div>
-            <div class="col-md-6 mb-3">
-                <input type="date" class="form-control" aria-labelledby="startDate" @bind-value="startDate">
-            </div>
-            <div class="col-md-6 mb-3">
-                <input type="time" class="form-control" aria-label="Start time" @bind-value="startTime">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <label id="endDate" for="inputState" class="form-label">End date</label>
-            </div>
-            <div class="col-md-6 mb-3">
-                <input type="date" class="form-control" aria-labelledby="startDate" @bind-value="endDate">
-            </div>
-            <div class="col-md-6 mb-3">
-                <input type="time" class="form-control" aria-label="End time" @bind-value="endTime">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label id="heatLabel" for="inputState" class="form-label">Heat at (°F)</label>
-                <input type="number"
-                       class="form-control"
-                       aria-labelledby="heatLabel"
-                       min="@ClientStatic.ThermostatObjects.Select(x => x.Information.HeatRangeLow.Farenheit).Max()"
-                       max="@ClientStatic.ThermostatObjects.Select(x => x.Information.HeatRangeHigh.Farenheit).Min()"
-                       step="0.1"
-                @bind-value="heatAt" />
-            </div>
-            <div class="col-md-4 mb-3">
-                <label id="coolLabel" for="inputState" class="form-label">Cool at (°F)</label>
-                <input type="number"
-                       class="form-control"
-                       aria-labelledby="coolLabel"
-                       min="@ClientStatic.ThermostatObjects.Select(x => x.Information.CoolRangeLow.Farenheit).Max()"
-                       max="@ClientStatic.ThermostatObjects.Select(x => x.Information.CoolRangeHigh.Farenheit).Min()"
-                       step="0.1"
-                @bind-value="coolAt" />
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 mb-3">
-                <button type="submit" class="btn btn-primary" @onclick="submit">Add new vacation</button>
-            </div>
-        </div>
-    </form>
+    </div>
 }
 
 @code {
@@ -124,14 +125,13 @@
         .Where(x => x.EventType == "template")
         .SelectMany(x => x.AbsoluteTemperatureRanges)
         .DefaultIfEmpty(new TempRange(
-            Temperature.FromFarenheit(58),
-            Temperature.FromFarenheit(82),
+            Temperature.FromFarenheit(60),
+            Temperature.FromFarenheit(80),
             "auto"))
         .First();
 
-    private string name = "Vacation";
     private DateTime startDate = DateTime.Today;
-    private DateTime startTime = new DateTime(2000, 1, 1, 12, 0, 0);
+    private DateTime startTime = DateTime.Now.AddMinutes(15);
     private DateTime endDate = DateTime.Today;
     private DateTime endTime = new DateTime(2000, 1, 1, 12, 0, 0);
     private decimal heatAt = getTemplate().HeatTemp.Farenheit;
@@ -144,7 +144,7 @@
             await t.Act(async () =>
             {
                 await t.ThermostatClient.CreateVacationAsync(
-                    name,
+                    "Vacation (MiniHold)",
                     new TempRange(
                         heatTemp: Temperature.FromFarenheit(heatAt),
                         coolTemp: Temperature.FromFarenheit(coolAt),
