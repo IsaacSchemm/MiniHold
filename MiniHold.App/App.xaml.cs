@@ -10,16 +10,14 @@
         public App()
         {
             InitializeComponent();
-
-            MainPage = new MainPage();
         }
 
         protected override Window CreateWindow(IActivationState activationState)
         {
-            var w = base.CreateWindow(activationState);
-            if (w != null)
-                w.Title = "MiniHold";
-            return w;
+            return new Window(new MainPage())
+            {
+                Title = "MiniHold"
+            };
         }
 
         public static async Task Act(Func<Task> func)
