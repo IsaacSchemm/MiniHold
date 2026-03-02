@@ -154,7 +154,7 @@
             await t.Act(async () =>
             {
                 await t.ThermostatClient.CreateVacationAsync(
-                    "Vacation (MiniHold)",
+                    $"{DateTime.UtcNow:yyMMddHHmmss}",
                     new TempRange(
                         heatTemp: Temperature.FromFarenheit(heatAt),
                         coolTemp: Temperature.FromFarenheit(coolAt),
