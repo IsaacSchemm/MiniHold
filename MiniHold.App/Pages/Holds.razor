@@ -1,0 +1,230 @@
+﻿@inherits MiniHoldPage
+@page "/holds"
+@inject IJSRuntime JsRuntime
+@using I8Beef.Ecobee;
+@using MiniHold.Abstractions;
+
+<LoadingSpinner Busy="@App.Busy" />
+
+@foreach (var ti in ClientStatic.ThermostatObjects)
+{
+	<RefreshBox Thermostat="@ti" />
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col col-12">
+				<hr />
+
+				<p align="center">
+					@{
+						Task heat() => ti.Act(() => ti.ThermostatClient.HoldAsync(
+							HoldType.NewTempRange(
+								new TempRange(
+									heatTemp: ti.Information.Runtime.TempRange.HeatTemp.Add(Temperature.FromFarenheit(2)),
+									coolTemp: ti.Information.Runtime.TempRange.CoolTemp.Add(Temperature.FromFarenheit(2)),
+									fan: ti.Information.Runtime.TempRange.Fan)),
+							HoldDuration.NextTransition));
+					}
+
+					<button class="btn btn-secondary heat" @onclick="heat">
+						Heat (+2 °F, until next transition)
+					</button>
+				</p>
+
+				<p align="center">
+					@{
+						Task cool() => ti.Act(() => QuickActions.SetHoldAsync(
+							ti.ThermostatClient,
+							new TempRange(
+								heatTemp: ti.Information.Runtime.TempRange.HeatTemp.Add(Temperature.FromFarenheit(-2)),
+								coolTemp: ti.Information.Runtime.TempRange.CoolTemp.Add(Temperature.FromFarenheit(-2)),
+								fan: ti.Information.Runtime.TempRange.Fan),
+							TimeSpan.FromHours(1)));
+					}
+
+					<button class="btn btn-secondary cool" @onclick="cool">
+						Cool (-2 °F, 1 hour)
+					</button>
+				</p>
+
+				<p align="center">
+					@{
+						Task fan() => ti.Act(() => QuickActions.SetFanAsync(
+							ti.ThermostatClient,
+							true,
+							TimeSpan.FromMinutes(30)));
+					}
+
+					<button class="btn btn-secondary" @onclick="fan">
+						Fan (30m)
+					</button>
+
+					&nbsp;
+
+					@{
+						Task backOff() => ti.Act(() => QuickActions.SetHoldAsync(
+							ti.ThermostatClient,
+							new TempRange(
+								heatTemp: ti.Information.Runtime.TempRange.HeatTemp.Add(Temperature.FromFarenheit(-2)),
+								coolTemp: ti.Information.Runtime.TempRange.CoolTemp.Add(Temperature.FromFarenheit(2)),
+								fan: ti.Information.Runtime.TempRange.Fan),
+							TimeSpan.FromMinutes(30)));
+					}
+
+					<button class="btn btn-secondary" @onclick="backOff">
+						Back off (30m)
+					</button>
+				</p>
+
+				<p align="center">
+					@{
+						Task cancel() =>
+							ti.Act(() => ti.ThermostatClient.CancelHoldAsync());
+					}
+
+					<button class="btn btn-danger" @onclick="cancel">
+						Cancel hold
+					</button>
+				</p>
+
+				<hr />
+			</div>
+			<div class="col col-12 col-md-6">
+				@foreach (var h in ti.Information.Events.Where(e => e.EventType == "hold"))
+				{
+					<h3>Current hold</h3>
+
+					<pre>@h.Name</pre>
+                    
+					<p>
+						@foreach (var tr in h.AbsoluteTemperatureRanges)
+						{
+							<TemperatureDisplayBox UserInterfaceReading="@tr" />
+						}
+					</p>
+					<p>
+						Start: <b>@h.StartDate?.ToString("ddd, MMM d, yyyy")</b> (@h.StartDate?.ToString("h:mm tt"))
+						<br />
+						End: <b>@h.EndDate?.ToString("ddd, MMM d, yyyy")</b> (@h.EndDate?.ToString("h:mm tt"))
+						<br />
+						@if (h.Running)
+						{
+							<div class="badge bg-primary">Running</div>
+						}
+						else
+						{
+							<div class="badge bg-secondary">Scheduled</div>
+						}
+					</p>
+
+					<hr />
+				}
+			</div>
+			<div class="col col-12 col-md-6">
+				<h3>
+					Set hold
+				</h3>
+
+				<form style="max-width: 400px">
+					<div class="row">
+						<div class="col-12">
+							<label id="startDate" for="inputState" class="form-label">
+								<b>Start date</b>
+							</label>
+						</div>
+						<div class="col-sm-6 mb-3">
+							<input type="date" class="form-control" aria-labelledby="startDate" @bind-value="startDate">
+							<input class="form-control" readonly value="@startDate.ToString("ddd, MMM d")" />
+						</div>
+						<div class="col-sm-6 mb-3">
+							<input type="time" class="form-control" aria-label="Start time" @bind-value="startTime">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<label id="endDate" for="inputState" class="form-label">
+								<b>End date</b>
+							</label>
+						</div>
+						<div class="col-sm-6 mb-3">
+							<input type="date" class="form-control" aria-labelledby="endDate" @bind-value="endDate">
+							<input class="form-control" readonly value="@endDate.ToString("ddd, MMM d")" />
+						</div>
+						<div class="col-sm-6 mb-3">
+							<input type="time" class="form-control" aria-label="End time" @bind-value="endTime">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-4 mb-3">
+							<label id="heatLabel" for="inputState" class="form-label">
+								<b>Heat at (°F)</b>
+							</label>
+							<input type="number"
+									class="form-control"
+									aria-labelledby="heatLabel"
+									min="@ti.Information.HeatRangeLow.Farenheit"
+									max="@ti.Information.HeatRangeHigh.Farenheit"
+									step="0.1"
+									@bind-value="heatAt" />
+						</div>
+						<div class="col-md-4 mb-3">
+							<label id="coolLabel" for="inputState" class="form-label">
+								<b>Cool at (°F)</b>
+							</label>
+							<input type="number"
+									class="form-control"
+									aria-labelledby="coolLabel"
+									min="@ti.Information.CoolRangeLow.Farenheit"
+									max="@ti.Information.CoolRangeHigh.Farenheit"
+									step="0.1"
+									@bind-value="coolAt" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12 mb-3">
+							@{
+								Task submit() =>
+									ti.Act(() => ti.ThermostatClient.HoldAsync(
+										HoldType.NewTempRange(
+											new TempRange(
+												heatTemp: Temperature.FromFarenheit(heatAt),
+												coolTemp: Temperature.FromFarenheit(coolAt),
+												fan: ti.Information.Runtime.TempRange.Fan)),
+										HoldDuration.NewRange(
+											ti.ThermostatClient.ToThermostatTime(startDate.Date + startTime.TimeOfDay),
+											ti.ThermostatClient.ToThermostatTime(endDate.Date + endTime.TimeOfDay))));
+							}
+							<button type="submit" class="btn btn-primary" @onclick="submit">Set hold</button>
+						</div>
+					</div>
+				</form>
+
+				<hr />
+			</div>
+		</div>
+	</div>
+}
+
+@code {
+	static TempRange getTemplate() => ClientStatic.ThermostatObjects
+		.SelectMany(x => x.Information.Events)
+		.SelectMany(x => x.AbsoluteTemperatureRanges)
+		.DefaultIfEmpty(new TempRange(
+			Temperature.FromFarenheit(60),
+			Temperature.FromFarenheit(80),
+			"auto"))
+		.First();
+
+	private DateTime startDate = DateTime.Today;
+	private DateTime startTime = DateTime.Now.AddMinutes(15);
+	private DateTime endDate = DateTime.Today.AddDays(1);
+	private DateTime endTime = new DateTime(2000, 1, 1, 12, 0, 0);
+	private decimal heatAt = getTemplate().HeatTemp.Farenheit;
+	private decimal coolAt = getTemplate().CoolTemp.Farenheit;
+
+	async Task act(Func<ThermostatObject, Task> f)
+	{
+		foreach (var t in ClientStatic.ThermostatObjects)
+			await t.Act(() => f(t));
+	}
+}

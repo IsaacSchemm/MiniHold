@@ -60,7 +60,7 @@ Enter this code in the My Apps > Add Application section of the customer portal,
     End Sub
 
     Private Async Sub AddRealThermostats()
-        Dim list = Await ThermostatEnumerator.FindAllAsync(EcobeeClient)
+        Dim list = Await ThermostatEnumerator.AsyncFind(EcobeeClient).ToListAsync()
         ThermostatDropDown.Items.Clear()
         For Each t In list
             ThermostatDropDown.Items.Add(t)

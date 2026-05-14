@@ -54,11 +54,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Update="Microsoft.AspNetCore.Components.WebView.Maui" Version="10.0.41" />
+      <PackageReference Update="Microsoft.AspNetCore.Components.WebView.Maui" Version="10.0.60" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Update="Microsoft.Maui.Controls" Version="10.0.41" />
+      <PackageReference Update="Microsoft.Maui.Controls" Version="10.0.60" />
     </ItemGroup>
 
 </Project>

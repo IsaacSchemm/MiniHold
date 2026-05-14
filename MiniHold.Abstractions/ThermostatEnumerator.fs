@@ -24,6 +24,3 @@ module ThermostatEnumerator =
             else
                 finished <- true
     }
-
-    let FindAsync(client) = AsyncFind(client) |> AsyncSeq.toAsyncEnum
-    let FindAllAsync(client) = AsyncFind(client) |> AsyncSeq.toListAsync |> Async.StartAsTask

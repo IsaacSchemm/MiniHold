@@ -38,59 +38,29 @@
             <div class="col-md-12 col-lg-4">
                 <h5>Current</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.Readings" />
-            </div>
-            <div class="col-md-12 col-lg-4">
-                <h5>Hold (one hour)</h5>
-                <div class="grid">
-                    <GridButton Position="(2, 1)" OnClick="() => holdHeat(ti, 60)" Text="Heat (+2 °F)" ClassName="heat" Disabled="!info.Heat" />
-                    <GridButton Position="(3, 1)" OnClick="() => holdCool(ti, 60)" Text="Cool (-2 °F)" ClassName="cool" Disabled="!info.Cool" />
-                    <GridButton Position="(4, 1)" OnClick="() => holdFan(ti, 60)" Text="Fan" Title="Keep air handler fan running" />
-
-                    <div style="grid-row: 5; grid-column: 1 / 2" class="text-muted">
-                        (or until cancelled)
+                @foreach (var s in ti.Information.Sensors)
+                {
+                    var avg = ti.Information.Readings.Temperature.SingleOrDefault();
+                    var specific = s.Readings.Temperature.SingleOrDefault();
+                    var offset = Temperature.FromFarenheit(specific.Farenheit - avg.Farenheit);
+                    <div>
+                        <strong>@s.NameWithOccupancyIndicator:</strong>
+                        @specific
+                        <span class="text-muted">
+                            @if (offset.Tenths > 0)
+                            {
+                                @:(+@offset)
+                            }
+                            @if (offset.Tenths < 0)
+                            {
+                                @:(@offset)
+                            }
+                        </span>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-12 col-lg-4 mb-3">
-                <h5>Away</h5>
-                <div class="grid">
-                    <GridButton Position="(2, 1)" OnClick="() => holdAway(ti, 60)" Text="1 hour" />
-                    <GridButton Position="(3, 1)" OnClick="() => holdAway(ti, 60 * 6)" Text="6 hours" />
-                    <GridButton Position="(4, 1)" OnClick="() => holdAway(ti, 60 * 24)" Text="24 hours" />
-
-                    <div style="grid-row: 5; grid-column: 1 / 2" class="text-muted">
-                        (or until cancelled)
-                    </div>
-                </div>
-            </div>
-            <hr />
-            <div class="col-md-12 col-lg-4">
-                <h5>Home</h5>
-                @{
-                    foreach (var level in ti.Information.ComfortLevels)
-                    {
-                        if (level.Name == "Home")
-                        {
-                            <div>@level.HeatTemp - @level.CoolTemp</div>
-                        }
-                    }
                 }
             </div>
-            <div class="col-md-12 col-lg-4">
-                <h5>Sleep</h5>
-                @{
-                    foreach (var level in ti.Information.ComfortLevels)
-                    {
-                        if (level.Name == "Sleep")
-                        {
-                            <div>@level.HeatTemp - @level.CoolTemp</div>
-                        }
-                    }
-                }
-            </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-lg-4">
                 <h4 class="visually-hidden">Outdoor Temperature</h4>
-                <hr />
                 <h5>Weather</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.Weather" />
                 @foreach (var f in info.DailyForecasts.Take(1))
@@ -101,9 +71,8 @@
                     <TemperatureDisplayBox UserInterfaceReading="@f" />
                 }
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-lg-4">
                 <h4 class="visually-hidden">Indoor Temperature</h4>
-                <hr />
                 <h5>Runtime</h5>
                 <TemperatureDisplayBox UserInterfaceReading="@info.RuntimeDisplay" />
                 @if (activeEvent != null)

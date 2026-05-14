@@ -12,13 +12,21 @@
 
     <div class="container-fluid">
         <div class="row">
-            <div class="col col-12 col-lg-6">
+            <div class="col col-12">
                 @foreach (var v in ti.Information.Events.Where(e => e.EventType == "vacation"))
                 {
                     <hr />
 
-                    <h5>@v.Name</h5>
+                    <h3>Scheduled vacation</h3>
 
+                    <pre>@v.Name</pre>
+
+                    <p>
+                        @foreach (var tr in v.AbsoluteTemperatureRanges)
+                        {
+                            <TemperatureDisplayBox UserInterfaceReading="@tr" />
+                        }
+                    </p>
                     <p>
                         Start: <b>@v.StartDate?.ToString("ddd, MMM d, yyyy")</b> (@v.StartDate?.ToString("h:mm tt"))
                         <br />
@@ -31,12 +39,6 @@
                         else
                         {
                             <div class="badge bg-secondary">Scheduled</div>
-                        }
-                    </p>
-                    <p>
-                        @foreach (var tr in v.AbsoluteTemperatureRanges)
-                        {
-                            <TemperatureDisplayBox UserInterfaceReading="@tr" />
                         }
                     </p>
                     <p>
@@ -53,16 +55,16 @@
                     </p>
                 }
             </div>
-            <div class="col col-12 col-lg-6">
+            <div class="col col-12">
                 <hr />
 
-                <p>
-                    Add new vacation:
-                </p>
+                <h3>
+                    Add new vacation
+                </h3>
 
                 @if (ClientStatic.ThermostatObjects.Count() == 1)
                 {
-                    <form style="max-width: 400px">
+                    <form style="max-width: 400px; margin: auto">
                         <div class="row">
                             <div class="col-12">
                                 <label id="startDate" for="inputState" class="form-label">
