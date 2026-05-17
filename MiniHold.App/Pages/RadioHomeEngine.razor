@@ -25,6 +25,11 @@
     <a class="btn btn-success" target="_blank" href="http://@IpAddress:9000/">Lyrion Music Server</a>
 </p>
 
+@if (Error != null)
+{
+    <pre>@Error</pre>
+}
+
 <div class="container">
     <div class="row">
         <div class="col-12 mb-4">
@@ -76,10 +81,10 @@
 
                         <h3 class="visually-hidden">Channel</h3>
 
-                        if (CurrentChannel.Image is SXMImage image)
+                        if (CurrentChannelImage is string url)
                         {
                             <p>
-                                <img src="@image.Url"
+                                <img src="@url"
                                      style="max-width: 16em; background-color: #444"
                                      alt="Channel logo" />
                             </p>
@@ -92,11 +97,11 @@
                     {
                         <h3 class="visually-hidden">Song</h3>
 
-                        if (CurrentSong.Album?.Image is SXMImage image)
+                        if (CurrentAlbumImage is string url)
                         {
                             <p>
-                                <img src="@image.Url"
-                                     style="max-width: 16em"
+                                <img src="@url"
+                                     style="max-width: 16em; background-color: #444"
                                      alt="Album art" />
                             </p>
                         }
@@ -106,7 +111,7 @@
                         <p>
                             @CurrentSong.Artist
                             <br />
-                            @CurrentSong.Album.Title
+                            @CurrentSong.Album?.Title
                         </p>
                     }
                 </div>
@@ -163,6 +168,8 @@
 
     private string IpAddress { get; set; } = "192.168.4.100";
 
+    private string Error { get; set; }
+
     private record Player(string Id, string Name);
 
     private readonly List<Player> players = new();
@@ -183,34 +190,40 @@
 
     private CD CurrentCD { get; set; }
 
-    private async Task ReloadPlayersFromServerAsync() => await App.Act(async () =>
+    private async Task ReloadFromServerAsync()
     {
-        using var cdDrivesResp = await _httpClient
-            .GetAsync($"http://{IpAddress}:5000/api/v1/cddrives");
+        if (string.IsNullOrEmpty(IpAddress))
+            return;
 
-        var cds = await cdDrivesResp.EnsureSuccessStatusCode()
-            .Content
-            .ReadFromJsonAsync<IEnumerable<CD>>();
+        try
+        {
+            using var cdDrivesResp = await _httpClient
+                .GetAsync($"http://{IpAddress}:5000/api/v1/cddrives");
 
-        CurrentCD = cds.FirstOrDefault();
-    });
+            var cds = await cdDrivesResp.EnsureSuccessStatusCode()
+                .Content
+                .ReadFromJsonAsync<IEnumerable<CD>>();
 
-    private async Task ReloadCDsFromServerAsync() => await App.Act(async () =>
-    {
-        using var playersResp = await _httpClient
-            .GetAsync($"http://{IpAddress}:5000/api/v1/players");
+            CurrentCD = cds.FirstOrDefault();
 
-        var newPlayers = await playersResp.EnsureSuccessStatusCode()
-            .Content
-            .ReadFromJsonAsync<IEnumerable<Player>>();
+            using var playersResp = await _httpClient
+                .GetAsync($"http://{IpAddress}:5000/api/v1/players");
 
-        players.Clear();
-        players.AddRange(newPlayers);
-    });
+            var newPlayers = await playersResp.EnsureSuccessStatusCode()
+                .Content
+                .ReadFromJsonAsync<IEnumerable<Player>>();
 
-    private Task ReloadFromServerAsync() => Task.WhenAll(
-        ReloadPlayersFromServerAsync(),
-        ReloadCDsFromServerAsync());
+            players.Clear();
+            players.AddRange(newPlayers);
+
+            Error = null;
+        }
+        catch (Exception ex)
+        {
+            IpAddress = null;
+            Error = ex.ToString();
+        }
+    }
 
     private async Task PlayCDAsync() => await App.Act(async () =>
     {
@@ -261,6 +274,9 @@
 
     private async Task PlaySXMAsync() => await App.Act(async () =>
     {
+        if (ChannelNumber == 0)
+            return;
+
         using var resp = await _httpClient.PostAsync(
             $"http://{IpAddress}:5000/api/v1/players/{Uri.EscapeDataString(CurrentPlayerId)}/play/sxm/{ChannelNumber}",
             content: null);
@@ -272,6 +288,9 @@
 
     private async Task AppendSXMAsync() => await App.Act(async () =>
     {
+        if (ChannelNumber == 0)
+            return;
+
         using var resp = await _httpClient.PostAsync(
             $"http://{IpAddress}:5000/api/v1/players/{Uri.EscapeDataString(CurrentPlayerId)}/append/sxm/{ChannelNumber}",
             content: null);
@@ -287,10 +306,15 @@
     private record SXMSong(string Title, string Artist, SXMAlbum Album, DateTimeOffset StartTime);
 
     private SXMChannel CurrentChannel { get; set; }
+    private string CurrentChannelImage { get; set; }
     private SXMSong CurrentSong { get; set; }
+    private string CurrentAlbumImage { get; set; }
 
     private async Task GetSXMInformationAsync() => await App.Act(async () =>
     {
+        if (ChannelNumber == 0)
+            return;
+
         using var channelResp = await _httpClient.GetAsync(
             $"http://{IpAddress}:5000/api/v1/sxm/{ChannelNumber}");
 
@@ -299,6 +323,8 @@
             .ReadFromJsonAsync<SXMChannel>();
 
         CurrentChannel = channel;
+
+        CurrentChannelImage = null;
 
         if (CurrentChannel.Image != null)
         {
@@ -311,10 +337,7 @@
 
                 if (imageResp.Content.Headers.ContentType?.MediaType is string mediaType)
                 {
-                    CurrentChannel = CurrentChannel with
-                    {
-                        Image = new($"data:{mediaType};base64,{Convert.ToBase64String(image)}")
-                    };
+                    CurrentChannelImage = new($"data:{mediaType};base64,{Convert.ToBase64String(image)}");
                 }
             }
         }
@@ -329,6 +352,24 @@
         CurrentSong = history
             .OrderByDescending(s => s.StartTime)
             .Last();
+
+        CurrentAlbumImage = null;
+
+        if (CurrentSong?.Album?.Image != null)
+        {
+            using var imageResp = await _httpClient.GetAsync(
+                CurrentSong.Album.Image.Url);
+
+            if (imageResp.IsSuccessStatusCode)
+            {
+                var image = await imageResp.Content.ReadAsByteArrayAsync();
+
+                if (imageResp.Content.Headers.ContentType?.MediaType is string mediaType)
+                {
+                    CurrentAlbumImage = new($"data:{mediaType};base64,{Convert.ToBase64String(image)}");
+                }
+            }
+        }
 
         ChannelNumber = 0;
     });
