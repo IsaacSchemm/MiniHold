@@ -1,0 +1,359 @@
+﻿@inherits MiniHoldPage
+@page "/radiohomeengine"
+@inject IJSRuntime JsRuntime
+@using System.Net.Http.Json;
+
+<LoadingSpinner Busy="@App.Busy" />
+
+<h1>Audio</h1>
+
+<label id="ipAddress" class="form-label">
+    <b>IP address</b>
+</label>
+<div class="input-group mb-3">
+    <input type="text" class="form-control" aria-labelledby="ipAddress" @bind-value="IpAddress">
+    <button class="btn btn-primary" type="button" @onclick="() => ReloadFromServerAsync()">Connect</button>
+</div>
+
+<p>
+    <b>RadioHomeEngine:</b> <code>@IpAddress:5000</code>
+    <br />
+    <b>Lyrion Music Server:</b> <code>@IpAddress:9000</code>
+</p>
+
+<p align="center">
+    <a class="btn btn-success" target="_blank" href="http://@IpAddress:9000/">Lyrion Music Server</a>
+</p>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h2>Player</h2>
+
+            <InputRadioGroup @bind-Value="SelectedPlayerId">
+                @foreach (var player in players)
+                {
+                    <label class="col-12 col-md-6 col-lg-4 col-xl-3" style="line-height: 200%">
+                        <InputRadio Value="@player.Id" /> @player.Name
+                    </label>
+                }
+            </InputRadioGroup>
+        </div>
+
+        @if (SelectedPlayerId != null)
+        {
+            <div class="col-lg-6">
+                <h2>SiriusXM</h2>
+
+                <div id="channelNumberEntryTable" class="mb-2">
+                    @for (var i = 1; i <= 9; i++)
+                    {
+                        var n = i;
+                        <button class="btn btn-primary" @onclick="() => InputChannelNumber(n)">@n</button>
+                    }
+
+                    <button class="btn btn-primary" @onclick="() => ChannelNumberBackspace()">⌫</button>
+                    <button class="btn btn-primary" @onclick="() => InputChannelNumber(0)">0</button>
+                    <div></div>
+
+                    <input type="text"
+                    class="form-control text-center"
+                    style="grid-column: 1 / 4"
+                    readonly
+                    value="@(ChannelNumber == 0 ? "" : ChannelNumber)" />
+                </div>
+
+                <p align="center">
+                    <button class="btn btn-primary" @onclick="() => PlaySXMAsync()">Play now</button>
+                    <button class="btn btn-secondary" @onclick="() => AppendSXMAsync()">Play last</button>
+                    <button class="btn btn-outline-secondary" @onclick="() => GetSXMInformationAsync()">Information</button>
+                </p>
+
+                <div class="text-center">
+                    @if (CurrentChannel != null)
+                    {
+                        <hr />
+
+                        <h3 class="visually-hidden">Channel</h3>
+
+                        if (CurrentChannel.Image is SXMImage image)
+                        {
+                            <p>
+                                <img src="@image.Url"
+                                     style="max-width: 16em; background-color: #444"
+                                     alt="Channel logo" />
+                            </p>
+                        }
+
+                        <h4>@CurrentChannel.Name</h4>
+                    }
+
+                    @if (CurrentSong != null)
+                    {
+                        <h3 class="visually-hidden">Song</h3>
+
+                        if (CurrentSong.Album?.Image is SXMImage image)
+                        {
+                            <p>
+                                <img src="@image.Url"
+                                     style="max-width: 16em"
+                                     alt="Album art" />
+                            </p>
+                        }
+
+                        <h4>@CurrentSong.Title</h4>
+
+                        <p>
+                            @CurrentSong.Artist
+                            <br />
+                            @CurrentSong.Album.Title
+                        </p>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <h2>CD</h2>
+
+                @if (CurrentCD?.AudioCD is AudioCD audioCD)
+                {
+                    <p>
+                        <strong>@audioCD.AlbumName</strong>
+                        <br />
+                        <span>@audioCD.Artist</span>
+                    </p>
+                }
+
+                <p align="center">
+                    <button class="btn btn-primary" @onclick="() => PlayCDAsync()">Play</button>
+                    <button class="btn btn-warning" @onclick="() => RipCDAsync()">Rip</button>
+                    <button class="btn btn-outline-secondary" @onclick="() => EjectCDAsync()">Eject</button>
+                </p>
+
+                <h2>Playlist</h2>
+
+                <p align="center">
+                    <button class="btn btn-secondary" @onclick="() => PlayForecastAsync()">Forecast</button>
+                </p>
+
+                <p align="center">
+                    <button class="btn btn-secondary" @onclick="() => ClearPlaylistAsync()">Clear</button>
+                </p>
+            </div>
+        }
+    </div>
+</div>
+
+<style type="text/css">
+    #channelNumberEntryTable {
+        display: grid;
+        grid: auto-flow / 64px 64px 64px;
+        margin: auto;
+        width: 192px;
+    }
+
+        #channelNumberEntryTable > * {
+            font-size: 32px;
+            height: 64px;
+        }
+</style>
+
+@code {
+    private readonly HttpClient _httpClient = new HttpClient();
+
+    private string IpAddress { get; set; } = "192.168.4.100";
+
+    private record Player(string Id, string Name);
+
+    private readonly List<Player> players = new();
+
+    private string SelectedPlayerId { get; set; }
+
+    private string CurrentPlayerId => SelectedPlayerId;
+
+    private record Track(
+        string Number,
+        string Title);
+
+    private record AudioCD(
+        string AlbumName,
+        string Artist);
+
+    private record CD(string Id, AudioCD AudioCD, bool Ripping);
+
+    private CD CurrentCD { get; set; }
+
+    private async Task ReloadPlayersFromServerAsync() => await App.Act(async () =>
+    {
+        using var cdDrivesResp = await _httpClient
+            .GetAsync($"http://{IpAddress}:5000/api/v1/cddrives");
+
+        var cds = await cdDrivesResp.EnsureSuccessStatusCode()
+            .Content
+            .ReadFromJsonAsync<IEnumerable<CD>>();
+
+        CurrentCD = cds.FirstOrDefault();
+    });
+
+    private async Task ReloadCDsFromServerAsync() => await App.Act(async () =>
+    {
+        using var playersResp = await _httpClient
+            .GetAsync($"http://{IpAddress}:5000/api/v1/players");
+
+        var newPlayers = await playersResp.EnsureSuccessStatusCode()
+            .Content
+            .ReadFromJsonAsync<IEnumerable<Player>>();
+
+        players.Clear();
+        players.AddRange(newPlayers);
+    });
+
+    private Task ReloadFromServerAsync() => Task.WhenAll(
+        ReloadPlayersFromServerAsync(),
+        ReloadCDsFromServerAsync());
+
+    private async Task PlayCDAsync() => await App.Act(async () =>
+    {
+        using var resp = await _httpClient.PostAsync(
+            $"http://{IpAddress}:5000/api/v1/players/{Uri.EscapeDataString(CurrentPlayerId)}/play/cddrives/{Uri.EscapeDataString(CurrentCD.Id)}",
+            content: null);
+
+        resp.EnsureSuccessStatusCode();
+    });
+
+    private async Task RipCDAsync() => await App.Act(async () =>
+    {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to rip this CD to the Lyrion music library using RadioHomeEngine?"))
+            return;
+
+        using var resp = await _httpClient.PostAsync(
+            $"http://{IpAddress}:5000/api/v1/cddrives/{Uri.EscapeDataString(CurrentCD.Id)}/rip",
+            content: null);
+
+        resp.EnsureSuccessStatusCode();
+    });
+
+    private async Task EjectCDAsync() => await App.Act(async () =>
+    {
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to eject this CD?"))
+            return;
+
+        using var resp = await _httpClient.PostAsync(
+            $"http://{IpAddress}:5000/api/v1/cddrives/{Uri.EscapeDataString(CurrentCD.Id)}/eject",
+            content: null);
+
+        resp.EnsureSuccessStatusCode();
+    });
+
+    private int ChannelNumber { get; set; }
+
+    private void InputChannelNumber(int n)
+    {
+        ChannelNumber *= 10;
+        ChannelNumber += n;
+    }
+
+    private void ChannelNumberBackspace() =>
+        ChannelNumber /= 10;
+
+    private void ChannelNumberEnter() =>
+        ChannelNumber = 0;
+
+    private async Task PlaySXMAsync() => await App.Act(async () =>
+    {
+        using var resp = await _httpClient.PostAsync(
+            $"http://{IpAddress}:5000/api/v1/players/{Uri.EscapeDataString(CurrentPlayerId)}/play/sxm/{ChannelNumber}",
+            content: null);
+
+        resp.EnsureSuccessStatusCode();
+
+        ChannelNumber = 0;
+    });
+
+    private async Task AppendSXMAsync() => await App.Act(async () =>
+    {
+        using var resp = await _httpClient.PostAsync(
+            $"http://{IpAddress}:5000/api/v1/players/{Uri.EscapeDataString(CurrentPlayerId)}/append/sxm/{ChannelNumber}",
+            content: null);
+
+        resp.EnsureSuccessStatusCode();
+
+        ChannelNumber = 0;
+    });
+
+    private record SXMImage(string Url);
+    private record SXMChannel(string Name, SXMImage Image);
+    private record SXMAlbum(string Title, SXMImage Image);
+    private record SXMSong(string Title, string Artist, SXMAlbum Album, DateTimeOffset StartTime);
+
+    private SXMChannel CurrentChannel { get; set; }
+    private SXMSong CurrentSong { get; set; }
+
+    private async Task GetSXMInformationAsync() => await App.Act(async () =>
+    {
+        using var channelResp = await _httpClient.GetAsync(
+            $"http://{IpAddress}:5000/api/v1/sxm/{ChannelNumber}");
+
+        var channel = await channelResp.EnsureSuccessStatusCode()
+            .Content
+            .ReadFromJsonAsync<SXMChannel>();
+
+        CurrentChannel = channel;
+
+        if (CurrentChannel.Image != null)
+        {
+            using var imageResp = await _httpClient.GetAsync(
+                CurrentChannel.Image.Url);
+
+            if (imageResp.IsSuccessStatusCode)
+            {
+                var image = await imageResp.Content.ReadAsByteArrayAsync();
+
+                if (imageResp.Content.Headers.ContentType?.MediaType is string mediaType)
+                {
+                    CurrentChannel = CurrentChannel with
+                    {
+                        Image = new($"data:{mediaType};base64,{Convert.ToBase64String(image)}")
+                    };
+                }
+            }
+        }
+
+        using var historyResp = await _httpClient.GetAsync(
+            $"http://{IpAddress}:5000/api/v1/sxm/{ChannelNumber}/now-playing/history");
+
+        var history = await historyResp.EnsureSuccessStatusCode()
+            .Content
+            .ReadFromJsonAsync<List<SXMSong>>();
+
+        CurrentSong = history
+            .OrderByDescending(s => s.StartTime)
+            .Last();
+
+        ChannelNumber = 0;
+    });
+
+    private async Task PlayForecastAsync() => await App.Act(async () =>
+    {
+        using var resp = await _httpClient.PostAsync(
+            $"http://{IpAddress}:5000/api/v1/players/{Uri.EscapeDataString(CurrentPlayerId)}/play/forecast",
+            content: null);
+
+        resp.EnsureSuccessStatusCode();
+    });
+
+    private async Task ClearPlaylistAsync() => await App.Act(async () =>
+    {
+        using var resp = await _httpClient.PostAsync(
+            $"http://{IpAddress}:5000/api/v1/players/{Uri.EscapeDataString(CurrentPlayerId)}/clear",
+            content: null);
+
+        resp.EnsureSuccessStatusCode();
+    });
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadFromServerAsync();
+        await base.OnInitializedAsync();
+    }
+}
