@@ -120,20 +120,23 @@
             <div class="col-lg-6">
                 <h2>CD</h2>
 
-                @if (CurrentCD?.AudioCD is AudioCD audioCD)
+                @foreach (var cd in CurrentCDs)
                 {
-                    <p>
-                        <strong>@audioCD.AlbumName</strong>
-                        <br />
-                        <span>@audioCD.Artist</span>
+                    if (cd?.AudioCD is AudioCD audioCD)
+                    {
+                        <p>
+                            <strong>@audioCD.AlbumName</strong>
+                            <br />
+                            <span>@audioCD.Artist</span>
+                        </p>
+                    }
+
+                    <p align="center">
+                        <button class="btn btn-primary" @onclick="() => PlayCDAsync(cd.Id)">Play</button>
+                        <button class="btn btn-warning" @onclick="() => RipCDAsync(cd.Id)">Rip</button>
+                        <button class="btn btn-outline-secondary" @onclick="() => EjectCDAsync(cd.Id)">Eject</button>
                     </p>
                 }
-
-                <p align="center">
-                    <button class="btn btn-primary" @onclick="() => PlayCDAsync()">Play</button>
-                    <button class="btn btn-warning" @onclick="() => RipCDAsync()">Rip</button>
-                    <button class="btn btn-outline-secondary" @onclick="() => EjectCDAsync()">Eject</button>
-                </p>
 
                 <h2>Playlist</h2>
 
@@ -188,7 +191,7 @@
 
     private record CD(string Id, AudioCD AudioCD, bool Ripping);
 
-    private CD CurrentCD { get; set; }
+    private List<CD> CurrentCDs { get; set; }
 
     private async Task ReloadFromServerAsync()
     {
@@ -202,9 +205,9 @@
 
             var cds = await cdDrivesResp.EnsureSuccessStatusCode()
                 .Content
-                .ReadFromJsonAsync<IEnumerable<CD>>();
+                .ReadFromJsonAsync<List<CD>>();
 
-            CurrentCD = cds.FirstOrDefault();
+            CurrentCDs = cds;
 
             using var playersResp = await _httpClient
                 .GetAsync($"http://{IpAddress}:5000/api/v1/players");
@@ -225,34 +228,34 @@
         }
     }
 
-    private async Task PlayCDAsync() => await App.Act(async () =>
+    private async Task PlayCDAsync(string id) => await App.Act(async () =>
     {
         using var resp = await _httpClient.PostAsync(
-            $"http://{IpAddress}:5000/api/v1/players/{Uri.EscapeDataString(CurrentPlayerId)}/play/cddrives/{Uri.EscapeDataString(CurrentCD.Id)}",
+            $"http://{IpAddress}:5000/api/v1/players/{Uri.EscapeDataString(CurrentPlayerId)}/play/cddrives/{Uri.EscapeDataString(id)}",
             content: null);
 
         resp.EnsureSuccessStatusCode();
     });
 
-    private async Task RipCDAsync() => await App.Act(async () =>
+    private async Task RipCDAsync(string id) => await App.Act(async () =>
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to rip this CD to the Lyrion music library using RadioHomeEngine?"))
             return;
 
         using var resp = await _httpClient.PostAsync(
-            $"http://{IpAddress}:5000/api/v1/cddrives/{Uri.EscapeDataString(CurrentCD.Id)}/rip",
+            $"http://{IpAddress}:5000/api/v1/cddrives/{Uri.EscapeDataString(id)}/rip",
             content: null);
 
         resp.EnsureSuccessStatusCode();
     });
 
-    private async Task EjectCDAsync() => await App.Act(async () =>
+    private async Task EjectCDAsync(string id) => await App.Act(async () =>
     {
         if (!await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to eject this CD?"))
             return;
 
         using var resp = await _httpClient.PostAsync(
-            $"http://{IpAddress}:5000/api/v1/cddrives/{Uri.EscapeDataString(CurrentCD.Id)}/eject",
+            $"http://{IpAddress}:5000/api/v1/cddrives/{Uri.EscapeDataString(id)}/eject",
             content: null);
 
         resp.EnsureSuccessStatusCode();
@@ -350,7 +353,7 @@
             .ReadFromJsonAsync<List<SXMSong>>();
 
         CurrentSong = history
-            .OrderByDescending(s => s.StartTime)
+            .OrderBy(s => s.StartTime)
             .Last();
 
         CurrentAlbumImage = null;
