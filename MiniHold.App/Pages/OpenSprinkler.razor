@@ -1,0 +1,178 @@
+﻿@inherits MiniHoldPage
+@page "/opensprinkler"
+@inject IJSRuntime JsRuntime
+@using System.Net.Http.Json;
+@using Microsoft.FSharp.Collections;
+
+<LoadingSpinner Busy="@App.Busy" />
+
+<h1>OpenSprinkler</h1>
+
+<label id="ipAddress" class="form-label">
+    <b>IP address</b>
+</label>
+<div class="input-group mb-3">
+    <input type="text" class="form-control" aria-labelledby="ipAddress" @bind-value="IpAddress">
+    <button class="btn btn-primary" type="button" @onclick="() => ReloadFromServerAsync()">Connect</button>
+</div>
+
+<p align="center">
+    <a class="btn btn-success" target="_blank" href="http://@IpAddress/">OpenSprinkler</a>
+</p>
+
+@if (Error != null)
+{
+    <pre>@Error</pre>
+}
+
+<hr />
+
+<div class="container">
+    <div class="row">
+        @foreach (var station in CurrentStations)
+        {
+            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                <h2>@station.Name</h2>
+
+                <p>
+                    @if (station.Running)
+                    {
+                        <strong>Running</strong>
+                    }
+                    else
+                    {
+                        @:Stopped
+                    }
+                </p>
+
+                <p>
+                    <button class="btn btn-primary" @onclick="() => OpenZoneAsync(station.Index, TimeSpan.FromSeconds(30))">
+                        Run 30s
+                    </button>
+
+                    &nbsp;
+
+                    <button class="btn btn-danger" @onclick="() => CloseZoneAsync(station.Index)">
+                        Stop
+                    </button>
+                </p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private readonly HttpClient _httpClient = new HttpClient();
+
+    private string IpAddress { get; set; } = "192.168.4.101";
+
+    private string Error { get; set; }
+
+    private record Station(
+        int Index,
+        string Name,
+        bool Running);
+
+    private List<Station> CurrentStations { get; set; } = [];
+
+    private record APIStationNamesAndAttributes(
+        FSharpList<string> snames,
+        FSharpList<byte> stn_dis);
+
+    private record APIStationStatus(
+        FSharpList<byte> sn);
+
+    private async Task ReloadFromServerAsync() => await App.Act(async () =>
+    {
+        if (string.IsNullOrEmpty(IpAddress))
+            return;
+
+        try
+        {
+            CurrentStations.Clear();
+
+            using var stationNamesAndAttributesResp = await _httpClient
+                .GetAsync($"http://{IpAddress}/jn");
+
+            var stationNamesAndAttributes = await stationNamesAndAttributesResp
+                .EnsureSuccessStatusCode()
+                .Content
+                .ReadFromJsonAsync<APIStationNamesAndAttributes>();
+
+            using var stationStatusResp = await _httpClient
+                .GetAsync($"http://{IpAddress}/js");
+
+            var stationStatus = await stationStatusResp
+                .EnsureSuccessStatusCode()
+                .Content
+                .ReadFromJsonAsync<APIStationStatus>();
+
+            for (var i = 0; i < 8; i++)
+            {
+                var dis = stationNamesAndAttributes.stn_dis[i / 8];
+
+                if ((dis & 1 << i) != 0)
+                    continue;
+
+                CurrentStations.Add(
+                    new(
+                        i,
+                        stationNamesAndAttributes.snames[i],
+                        stationStatus.sn[i] != 0));
+            }
+
+            Error = null;
+        }
+        catch (Exception ex)
+        {
+            Error = ex.ToString();
+        }
+    });
+
+    private record ReturnValue(
+        int result);
+
+    private async Task OpenZoneAsync(int index, TimeSpan timeSpan) => await App.Act(async () =>
+    {
+        using var resp = await _httpClient.GetAsync(
+            $"http://{IpAddress}/cm?sid={index}&en=1&t={(int)timeSpan.TotalSeconds}&qo=1");
+
+        var returnValue = await resp
+            .EnsureSuccessStatusCode()
+            .Content
+            .ReadFromJsonAsync<ReturnValue>();
+
+        if (returnValue.result != 1)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", $"Failed with code: {returnValue.result} - see OpenSprinker API Reference");
+            return;
+        }
+
+        await ReloadFromServerAsync();
+    });
+
+    private async Task CloseZoneAsync(int index) => await App.Act(async () =>
+    {
+        using var resp = await _httpClient.GetAsync(
+            $"http://{IpAddress}/cm?sid={index}&en=0");
+
+        var returnValue = await resp
+            .EnsureSuccessStatusCode()
+            .Content
+            .ReadFromJsonAsync<ReturnValue>();
+
+        if (returnValue.result != 1)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", $"Failed with code: {returnValue.result} - see OpenSprinker API Reference");
+            return;
+        }
+
+        await ReloadFromServerAsync();
+    });
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await ReloadFromServerAsync();
+    }
+}
