@@ -10,7 +10,11 @@
     foreach (var a in Thermostat.Information.Alerts)
     {
         <div class="alert alert-danger" role="alert">
-            @a.Text (@a.DateTime)
+            @a.Text
+            <div class="small">
+                @a.DateTime.ToLongDateString()
+                @a.DateTime.ToShortTimeString()
+            </div>
         </div>
     }
 
