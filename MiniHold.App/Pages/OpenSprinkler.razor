@@ -46,6 +46,14 @@
                 </p>
 
                 <p>
+                    <button class="btn btn-primary" @onclick="() => OpenZoneAsync(station.Index, TimeSpan.FromMinutes(20))">
+                        Run 20m
+                    </button>
+
+                    <button class="btn btn-primary" @onclick="() => OpenZoneAsync(station.Index, TimeSpan.FromMinutes(5))">
+                        Run 5m
+                    </button>
+
                     <button class="btn btn-primary" @onclick="() => OpenZoneAsync(station.Index, TimeSpan.FromSeconds(30))">
                         Run 30s
                     </button>
